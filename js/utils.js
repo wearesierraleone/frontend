@@ -15,7 +15,7 @@ function baseUrl() {
         return 'http://localhost:8080';
     } else if (isGitHubPages) {
         // When on GitHub Pages, always point to the data in the main backend repository
-        return 'https://raw.githubusercontent.com/ernestkamara/wearesalone/main';
+        return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/main';
     } else {
         // For other static deployments, use relative paths
         return '';

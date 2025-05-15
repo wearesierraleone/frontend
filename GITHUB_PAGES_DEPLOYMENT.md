@@ -4,7 +4,7 @@ This document provides step-by-step instructions for deploying the We Are Sierra
 
 ## Prerequisites
 
-1. GitHub account with access to the repository: https://github.com/ernestsaidukamara/wearesalone.git
+1. GitHub account with access to the repository: https://github.com/wearesierraleone/frontend.git
 2. Git installed on your local machine or GitHub Desktop
 3. Authentication set up for GitHub (HTTPS or SSH)
 
@@ -46,8 +46,7 @@ git push -u origin gh-pages
 ### 3. Configure GitHub Pages in Repository Settings
 
 1. Go to the repository on GitHub:
-   * If using the organization: https://github.com/wearesierraleone/wearesalone
-   * If using your personal account: https://github.com/YOUR_USERNAME/wearesalone
+   * https://github.com/wearesierraleone/frontend
 2. Click on "Settings" in the top navigation bar
 3. In the left sidebar, scroll down and click on "Pages" 
 4. Under "Source", select the branch you just pushed (`gh-pages` or `gh-pages-clean`)
@@ -58,10 +57,9 @@ GitHub will now build and deploy your site. This typically takes a few minutes. 
 
 ### 4. Access Your Deployed Site
 
-Once GitHub Pages has finished building your site, it will be available at one of these URLs (depending on where you published):
+Once GitHub Pages has finished building your site, it will be available at:
 
-* If using the organization: `https://wearesierraleone.github.io/wearesalone/`
-* If using your personal account: `https://YOUR_USERNAME.github.io/wearesalone/`
+* `https://wearesierraleone.github.io/frontend/`
 
 You can find the exact URL in the repository's "Settings > Pages" section after deployment.
 
