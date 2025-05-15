@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title id="pageTitle">Post Details | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View details, vote, and comment on this civic issue in Sierra Leone">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:title" content="We Are Sierra Leone - Civic Platform">
+  <meta property="og:description" content="View details, vote, and comment on this civic issue in Sierra Leone">
+  <meta property="og:type" content="website">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/utils.js" defer></script>
+  <script src="js/modal.js" defer></script>
+  <script src="js/local_storage_sync.js" defer></script>
+  <script src="js/vote.js" defer></script>
+  <script src="js/comment.js" defer></script>
+  <script src="js/sync_status.js" defer></script>
+  <script src="js/footer.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c5c5c5;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg px-4 py-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
+      <div class="flex items-center mb-4 sm:mb-0">
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">We Are Sierra Leone</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home
+        </a>
+        <a href="submit.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Submit
+        </a>
+        <a href="petitions.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Petitions
+        </a>
+        <a href="faq.html" class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          FAQ
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 max-w-3xl mx-auto">
+    <div id="postContent">
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+        <div id="imageWrap" class="w-full"></div>
+
+        <div class="p-6">
+          <div id="meta" class="flex flex-wrap gap-2 mb-3"></div>
+          <h1 id="title" class="text-3xl font-bold text-gray-800 mb-4"></h1>
+          <p id="body" class="text-gray-700 text-lg leading-relaxed mb-6"></p>
+
+          <div class="border-t border-b py-4 mb-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <button id="upvoteBtn"
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-green-600">
+                  <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                  </svg>
+                  Upvote
+                </button>
+                <button id="downvoteBtn"
+                  class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors disabled:opacity-50 disabled:hover:bg-red-600">
+                  <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                  Downvote
+                </button>
+              </div>
+              <div id="voteStats" class="text-gray-600 font-medium"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="convertPetitionWrap" class="my-6 hidden">
+        <button id="convertToPetition"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg flex items-center transition-colors shadow-md">
+          <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Convert to Petition
+        </button>
+        <p class="text-sm text-gray-500 mt-2">This post has enough votes to become a petition. Converting means people can
+          sign it to show support.</p>
+      </div>
+
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+              <svg class="w-6 h-6 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+              </svg>
+              Comments <span class="text-gray-500 font-normal">(<span id="commentCount">0</span>)</span>
+            </h2>
+          </div>
+
+          <ul id="commentList" class="space-y-4 mb-6"></ul>
+
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h3 class="text-lg font-medium text-gray-700 mb-3">Add your comment</h3>
+            <form id="commentForm" class="space-y-4">
+              <div class="relative">
+                <textarea name="comment" placeholder="What are your thoughts on this issue?" required
+                  class="w-full border border-gray-300 p-4 rounded-lg h-28 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors">
+                  <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  Post Comment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-100 rounded-lg p-6 mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex items-center space-x-2">
+            <a href="index.html"
+              class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center shadow-sm">
+              <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Home
+            </a>
+            <a href="#" id="reportLink"
+              class="text-red-600 hover:text-red-700 font-medium transition-colors flex items-center">
+              <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Report Post
+            </a>
+          </div>
+
+          <div class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm">
+            <div class="flex items-center">
+              <span class="font-medium text-gray-700 mr-3">Share:</span>
+              <div class="flex space-x-3">
+                <a id="twitterShare" target="_blank" class="text-blue-500 hover:text-blue-600 transition-colors p-1"
+                  title="Share on Twitter">
+                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                  </svg>
+                </a>
+                <a id="whatsappShare" target="_blank" class="text-green-500 hover:text-green-600 transition-colors p-1"
+                  title="Share on WhatsApp">
+                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                </a>
+                <button id="copyLink" class="text-blue-500 hover:text-blue-600 transition-colors p-1" title="Copy link">
+                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <button id="copyLink" class="text-blue-500 hover:text-blue-600 transition-colors p-1" title="Copy link">
+                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 404 error display when post not found -->
+    <div id="notFoundError" class="hidden">
+      <div class="bg-white shadow-lg rounded-lg overflow-hidden p-8 text-center">
+        <div class="flex flex-col items-center">
+          <div class="bg-red-100 p-4 rounded-full mb-4">
+            <svg class="w-16 h-16 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 class="text-3xl font-bold text-red-600 mb-2">Post Not Found</h2>
+          <p class="text-gray-600 text-lg mb-6">The post you're looking for doesn't exist or has been removed.</p>
+          <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.body.appendChild(createFooter());
+  </script>
+
+  <script>
+    async function updateVoteStats(postId) {
+      try {
+        // Try to fetch server stats first
+        const fetchStats = async () => {
+          try {
+            const response = await fetch('/data/vote_stats.json');
+            if (!response.ok) throw new Error('Stats fetch failed');
+            return await response.json();
+          } catch (e) {
+            console.log('Could not load vote stats, using localStorage fallback');
+            return null;
+          }
+        };
+        
+        // Get stats from server 
+        let stats = await fetchStats();
+        let serverUpvotes = 0;
+        let serverDownvotes = 0;
+        
+        if (stats && stats[postId]) {
+          // We have stats from the server
+          serverUpvotes = stats[postId].upvotes || 0;
+          serverDownvotes = stats[postId].downvotes || 0;
+        }
+        
+        // Get local votes from localStorage
+        let localVotes;
+        if (typeof getLocalVotes === 'function') {
+          // Use the function from local_storage_sync.js if available
+          localVotes = getLocalVotes(postId);
+        } else {
+          // Fallback to counting votes directly
+          localVotes = { upvotes: 0, downvotes: 0 };
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith(`upvote-${postId}`)) {
+              localVotes.upvotes++;
+            } else if (key.startsWith(`downvote-${postId}`)) {
+              localVotes.downvotes++;
+            }
+          }
+        }
+        
+        // If server data is available, use it as a base and add any local votes not yet synced
+        // In a real app, you would need to track which votes have already been synced
+        // For simplicity, we'll just take the maximum of server and local counts
+        const upvotes = Math.max(serverUpvotes, localVotes.upvotes);
+        const downvotes = Math.max(serverDownvotes, localVotes.downvotes);
+        
+        // If user already voted (from localStorage), ensure vote is counted
+        if (localStorage.getItem(`voted-${postId}`) === 'true' && upvotes + downvotes === 0) {
+          upvotes = 1; // Default to assuming it was an upvote
+        }
+        
+        console.log(`Combined vote stats for ${postId}: ${upvotes} up, ${downvotes} down (server: ${serverUpvotes}/${serverDownvotes}, local: ${localVotes.upvotes}/${localVotes.downvotes})`);
+        
+        
+        document.getElementById('voteStats').innerHTML = `
+    <div class="flex items-center space-x-3">
+      <span class="flex items-center">
+        <svg class="w-4 h-4 text-green-600 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+        </svg>
+        <span>${upvotes}</span>
+      </span>
+      <span class="flex items-center">
+        <svg class="w-4 h-4 text-red-600 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+        <span>${downvotes}</span>
+      </span>
+    </div>`;
+      } catch (error) {
+        console.error('Error updating vote stats:', error);
+        document.getElementById('voteStats').innerHTML = `
+    <div class="flex items-center space-x-3">
+      <span class="text-gray-500">Vote stats unavailable</span>
+    </div>`;
+      }
+    }
+    
+    async function loadPost() {
+      const postId = new URLSearchParams(window.location.search).get('id');
+      const voteKey = `voted-${postId}`;
+      if (localStorage.getItem(voteKey)) {
+        document.getElementById('upvoteBtn').disabled = true;
+        document.getElementById('downvoteBtn').disabled = true;
+      }
+
+      // Use our robust data loading function with default values
+      const posts = await loadData('data/approved.json', []);
+      const votes = await loadData('data/votes.json', {});
+      const allComments = await loadData('data/comments.json', {});
+
+      // Cache successful responses for offline use
+      localStorage.setItem('cache_data_approved.json', JSON.stringify(posts));
+      localStorage.setItem('cache_data_votes.json', JSON.stringify(votes));
+      localStorage.setItem('cache_data_comments.json', JSON.stringify(allComments));
+
+      const post = posts.find(p => p.id === postId);
+      if (!post) {
+        document.getElementById('postContent').classList.add('hidden');
+        document.getElementById('notFoundError').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('title').innerText = post.title;
+      document.getElementById('body').innerText = post.body;
+
+      // Update the page title with the post title
+      document.getElementById('pageTitle').innerText = `${post.title} | We Are Sierra Leone`;
+
+      // Update Open Graph meta tags
+      document.querySelector('meta[property="og:title"]').setAttribute('content', post.title);
+      document.querySelector('meta[property="og:description"]').setAttribute('content', post.body.substring(0, 150) + '...');
+
+      const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`;
+      const whatsappURL = `https://wa.me/?text=${encodeURIComponent(post.title + ' ' + window.location.href)}`;
+      document.getElementById('twitterShare').href = twitterURL;
+      document.getElementById('whatsappShare').href = whatsappURL;
+
+      if (post.imageUrl) {
+        const img = document.createElement('img');
+        img.src = post.imageUrl;
+        img.alt = "Post image";
+        img.className = "rounded w-full max-h-96 object-cover mb-4";
+        document.getElementById('imageWrap').appendChild(img);
+      }
+
+      const dateObj = new Date(post.timestamp);
+      const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+      const formattedDate = dateObj.toLocaleString('en-GB', options).replace(',', '');
+      const category = post.category ? `<span class="bg-gray-200 px-2 py-1 rounded text-xs text-gray-700">${post.category}</span>` : '';
+      document.getElementById('meta').innerHTML = `${category} <span class="ml-2">${formattedDate}</span>`;
+
+      // Display vote statistics
+      updateVoteStats(postId);
+
+      // Check if we should show the petition conversion option
+      const voteStats = await fetch('/data/vote_stats.json').then(res => res.json()).catch(() => ({}));
+      const upvotes = voteStats[postId]?.upvotes || 0;
+
+      if (upvotes >= 10 && !post.isPetition) {
+        document.getElementById('convertPetitionWrap').classList.remove('hidden');
+      }
+
+      const postComments = allComments[postId] || [];
+      document.getElementById('commentCount').innerText = postComments.length;
+      const commentList = document.getElementById('commentList');
+
+      if (postComments.length === 0) {
+        commentList.innerHTML = `
+          <li class="bg-gray-50 p-6 rounded-lg text-center">
+            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <p class="text-gray-500 font-medium">No comments yet.</p>
+            <p class="text-gray-400 text-sm mt-1">Be the first to share your thoughts!</p>
+          </li>`;
+      } else {
+        postComments.forEach(c => {
+          const li = document.createElement('li');
+          li.className = "bg-white border border-gray-100 p-4 rounded-lg shadow-sm";
+          const date = new Date(c.timestamp);
+          const dateStr = date.toLocaleString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: false
+          }).replace(',', '');
+          li.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center">
+                <div class="bg-blue-100 text-blue-700 rounded-full p-2 mr-3">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <strong class="font-medium text-gray-800">${c.anonId}</strong>
+              </div>
+              <span class="text-gray-500 text-sm">${dateStr}</span>
+            </div>
+            <div class="pl-10 text-gray-700 leading-relaxed">${c.text}</div>`;
+          commentList.appendChild(li);
+        });
+      }
+    }
+
+    window.onload = () => {
+      loadPost();
+
+      document.getElementById('upvoteBtn').addEventListener('click', function () {
+        // Disable both buttons and add loading state to clicked button
+        const upvoteBtn = document.getElementById('upvoteBtn');
+        const downvoteBtn = document.getElementById('downvoteBtn');
+        const originalText = this.innerHTML;
+
+        upvoteBtn.disabled = true;
+        downvoteBtn.disabled = true;
+        this.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span>Voting...</span>
+  `;
+
+        const postId = new URLSearchParams(window.location.search).get('id');
+        
+        // Create vote object to store
+        const voteObj = {
+          postId,
+          type: 'upvote',
+          timestamp: new Date().toISOString()
+        };
+        
+        // Get API URL from utils.js baseUrl() function or fall back to static mode
+        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
+        const isStaticMode = apiUrl === '/api';
+        
+        // Always store vote locally first for immediate feedback regardless of API mode
+        const voteKey = `upvote-${postId}-${Date.now()}`;
+        localStorage.setItem(voteKey, JSON.stringify(voteObj));
+        localStorage.setItem(`voted-${postId}`, 'true');
+        
+        // Update UI immediately to show the vote
+        setTimeout(() => {
+          // Update UI with local vote
+          this.innerHTML = `
+            <svg class="w-5 h-5 mr-1 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+            <span>Voted</span>
+          `;
+          this.classList.add('bg-green-700');
+          this.classList.remove('bg-green-600', 'hover:bg-green-700');
+          
+          // Update stats immediately with local votes
+          updateVoteStats(postId);
+        }, 300);
+        
+        if (isStaticMode) {
+          // Handle static mode (no backend server)
+          console.log('Static mode: simulating upvote');
+          showSuccessModal('Vote saved locally and will be submitted when connected.', null, 2000, 'success');
+          return;
+        }
+        
+        // Regular API mode
+        fetch(`${apiUrl}/upvote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(voteObj)
+        })
+        .then(res => {
+          if (res.ok) {
+            showSuccessModal('Upvote recorded.', null, 2000, 'success');
+            document.getElementById('upvoteBtn').disabled = true;
+            document.getElementById('downvoteBtn').disabled = true;
+            updateVoteStats(postId);
+          } else {
+            // Don't reset button state since we already counted the vote locally
+            showSuccessModal('Vote saved locally. Will be synchronized later.', null, 2000, 'info');
+          }
+        })
+        .catch(err => {
+          console.error('Vote error:', err);
+          showSuccessModal('Vote saved locally. Will try to sync later.', null, 2000, 'info');
+          // Don't reset UI - we still have the local vote
+        });
+      });
+
+      document.getElementById('downvoteBtn').addEventListener('click', function () {
+        // Disable both buttons and add loading state to clicked button
+        const upvoteBtn = document.getElementById('upvoteBtn');
+        const downvoteBtn = document.getElementById('downvoteBtn');
+        const originalText = this.innerHTML;
+
+        upvoteBtn.disabled = true;
+        downvoteBtn.disabled = true;
+        this.innerHTML = `
+    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span>Voting...</span>
+  `;
+
+        const postId = new URLSearchParams(window.location.search).get('id');
+        
+        // Create vote object to store
+        const voteObj = {
+          postId,
+          type: 'downvote',
+          timestamp: new Date().toISOString()
+        };
+        
+        // Get API URL from utils.js baseUrl() function or fall back to static mode
+        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
+        const isStaticMode = apiUrl === '/api';
+        
+        // Always store vote locally first for immediate feedback regardless of API mode
+        const voteKey = `downvote-${postId}-${Date.now()}`;
+        localStorage.setItem(voteKey, JSON.stringify(voteObj));
+        localStorage.setItem(`voted-${postId}`, 'true');
+        
+        // Update UI immediately to show the vote
+        setTimeout(() => {
+          // Update UI with local vote
+          this.innerHTML = `
+            <svg class="w-5 h-5 mr-1 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            <span>Voted</span>
+          `;
+          this.classList.add('bg-red-700');
+          this.classList.remove('bg-red-600', 'hover:bg-red-700');
+          
+          // Update stats immediately with local votes
+          updateVoteStats(postId);
+        }, 300);
+        
+        if (isStaticMode) {
+          // Handle static mode (no backend server)
+          console.log('Static mode: simulating downvote');
+          showSuccessModal('Vote saved locally and will be submitted when connected.', null, 2000, 'success');
+          return;
+        }
+        
+        // Regular API mode
+        fetch(`${apiUrl}/downvote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(voteObj)
+        })
+        .then(res => {
+          if (res.ok) {
+            showSuccessModal('Your vote has been recorded.', null, 2000, 'success');
+            document.getElementById('upvoteBtn').disabled = true;
+            document.getElementById('downvoteBtn').disabled = true;
+            updateVoteStats(postId);
+          } else {
+            // Don't reset button state since we already counted the vote locally
+            showSuccessModal('Vote saved locally. Will be synchronized later.', null, 2000, 'info');
+          }
+        })
+        .catch(err => {
+          console.error('Vote error:', err);
+          showSuccessModal('Vote saved locally. Will try to sync later.', null, 2000, 'info');
+          
+          // Don't reset UI - we still have the local vote
+        });
+      });
+
+      document.getElementById('convertToPetition').addEventListener('click', function () {
+        const convertBtn = document.getElementById('convertToPetition');
+        const originalText = convertBtn.innerHTML;
+        convertBtn.disabled = true;
+        convertBtn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Converting...</span>
+        `;
+
+        const postId = new URLSearchParams(window.location.search).get('id');
+        
+        // Get API URL from utils.js baseUrl() function or fall back to static mode
+        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
+        const isStaticMode = apiUrl === '/api';
+        
+        if (isStaticMode) {
+          // Handle static mode (no backend server)
+          console.log('Static mode: simulating petition conversion');
+          
+          // Store conversion in localStorage
+          const conversionKey = `petition-${postId}-${Date.now()}`;
+          localStorage.setItem(conversionKey, JSON.stringify({
+            postId,
+            action: 'petition',
+            timestamp: new Date().toISOString()
+          }));
+          
+          // Simulate successful response
+          setTimeout(() => {
+            showSuccessModal('Post successfully converted to petition! (Static Mode)', window.location.href);
+          }, 800);
+          return;
+        }
+        
+        // Regular API mode
+        fetch(`${apiUrl}/convert`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, action: 'petition', timestamp: new Date().toISOString() })
+        })
+        .then(res => {
+          if (res.ok) {
+            showSuccessModal('Post successfully converted to petition! People can now sign it to show support.', window.location.href);
+          } else {
+            showSuccessModal('Failed to convert post to petition. Please try again later.', null, 0, 'error');
+            // Reset button state
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = originalText;
+          }
+        })
+        .catch(err => {
+          console.error('Petition conversion error:', err);
+          showSuccessModal('Network error while converting to petition. Please try again later.', null, 0, 'error');
+          // Reset button state
+          convertBtn.disabled = false;
+          convertBtn.innerHTML = originalText;
+        });
+      });
+
+      document.getElementById('reportLink').addEventListener('click', e => {
+        e.preventDefault();
+
+        // Create and show a modal dialog for reporting
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full m-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-gray-800">Report this post</h3>
+              <button id="closeReportModal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-gray-600 mb-4">Please select a reason for reporting this post:</p>
+            <form id="reportForm" class="space-y-4">
+              <div class="space-y-2">
+                <label class="flex items-center">
+                  <input type="radio" name="reportReason" value="misinformation" class="mr-2">
+                  <span>Misinformation</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="reportReason" value="hate_speech" class="mr-2">
+                  <span>Hate speech or harassment</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="reportReason" value="violence" class="mr-2">
+                  <span>Violence or dangerous content</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="reportReason" value="spam" class="mr-2">
+                  <span>Spam or misleading</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="reportReason" value="other" class="mr-2">
+                  <span>Other</span>
+                </label>
+              </div>
+              <div id="otherReasonContainer" class="hidden">
+                <textarea 
+                  id="otherReason" 
+                  placeholder="Please describe the issue..." 
+                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                ></textarea>
+              </div>
+              <div class="flex justify-end gap-3">
+                <button type="button" id="cancelReport" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+                <button type="submit" id="submitReport" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Report Post</button>
+              </div>
+            </form>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Handle the close/cancel buttons
+        const closeModal = () => document.body.removeChild(modal);
+        document.getElementById('closeReportModal').addEventListener('click', closeModal);
+        document.getElementById('cancelReport').addEventListener('click', closeModal);
+
+        // Show/hide the "other" text field when the "other" option is selected
+        const radioButtons = document.querySelectorAll('input[name="reportReason"]');
+        radioButtons.forEach(radio => {
+          radio.addEventListener('change', () => {
+            const otherContainer = document.getElementById('otherReasonContainer');
+            otherContainer.classList.toggle('hidden', radio.value !== 'other');
+          });
+        });
+
+        // Handle form submission
+        document.getElementById('reportForm').addEventListener('submit', event => {
+          event.preventDefault();
+
+          const selectedReason = document.querySelector('input[name="reportReason"]:checked');
+          if (!selectedReason) {
+            alert('Please select a reason for reporting.');
+            return;
+          }
+
+          let reason = selectedReason.value;
+          if (reason === 'other') {
+            const otherText = document.getElementById('otherReason').value.trim();
+            if (!otherText) {
+              alert('Please provide details for your report.');
+              return;
+            }
+            reason += ': ' + otherText;
+          }
+
+          const postId = new URLSearchParams(window.location.search).get('id');
+          const anonId = localStorage.getItem('anonId') || 'anon-' + Math.floor(Math.random() * 99999);
+          localStorage.setItem('anonId', anonId);
+
+          const report = {
+            postId,
+            reporter: anonId,
+            timestamp: new Date().toISOString(),
+            reason: reason
+          };
+
+          // Submit the report to the server API
+          fetch('/report', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(report)
+          })
+          .then(response => {
+            if (response.ok) {
+              showSuccessModal('Report submitted successfully', 'Thank you for helping keep our community safe. A moderator will review this report.', undefined, 'success');
+            } else {
+              throw new Error('Network response was not ok');
+            }
+          })
+          .catch(error => {
+            console.error('Error submitting report:', error);
+            showSuccessModal('Error submitting report', 'Please try again later or contact support if the problem persists.', undefined, 'error');
+          });
+        });
+
+        document.getElementById('copyLink').addEventListener('click', () => {
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            // Create a temporary toast notification instead of using alert
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300';
+            toast.innerText = 'Link copied to clipboard';
+            document.body.appendChild(toast);
+
+            // Remove the toast after 2 seconds
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              setTimeout(() => {
+                document.body.removeChild(toast);
+              }, 300);
+            }, 2000);
+          });
+        });
+      });          
+  </script>
+</body>
+
+</html>

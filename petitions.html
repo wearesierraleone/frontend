@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Active Petitions | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse and sign active petitions for civic issues in Sierra Leone">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:title" content="Petitions | We Are Sierra Leone">
+  <meta property="og:description" content="Browse and sign active petitions addressing civic issues in Sierra Leone">
+  <meta property="og:type" content="website">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/footer.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c5c5c5;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
+    }
+    
+    /* Status filter pills */
+    .status-pill {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background-color: #f3f4f6;
+      color: #4b5563;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    
+    .status-pill:hover {
+      background-color: #e5e7eb;
+    }
+    
+    .status-pill.active {
+      background-color: #1e40af;
+      color: white;
+    }
+    
+    /* Petition card hover effect */
+    .petition-card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .petition-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg px-4 py-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
+      <div class="flex items-center mb-4 sm:mb-0">
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">We Are Sierra Leone</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home
+        </a>
+        <a href="submit.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Submit
+        </a>
+        <a href="petitions.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center border-b-2 border-white pb-1">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Petitions
+        </a>
+        <a href="faq.html" class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          FAQ
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 max-w-6xl mx-auto">
+    <div class="bg-blue-50 bg-opacity-80 rounded-xl p-6 md:p-10 shadow-md mb-10">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-blue-800 mb-4">Petitions</h2>
+        <p class="text-gray-700 max-w-2xl mx-auto">Support important civic initiatives by signing petitions that matter
+          to Sierra Leone. Each signature helps drive positive change in our community.</p>
+      </div>
+    </div>
+
+    <div id="petitionsContainer" class="bg-white rounded-lg shadow-lg p-6 mb-10">
+      
+      <!-- Search and Filter Section -->
+      <div class="mb-6">
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <!-- Search Box -->
+          <div class="flex-grow">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input type="text" id="searchInput" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" placeholder="Search petitions...">
+            </div>
+          </div>
+          
+          <!-- Filter Dropdown -->
+          <div class="w-full md:w-48">
+            <select id="stateFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+              <option value="all" selected>All States</option>
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+              <option value="Draft">Draft</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Awaiting government">Awaiting Government</option>
+              <option value="Government responses">Has Response</option>
+              <option value="Awaiting a debate">Awaiting Debate</option>
+              <option value="Debated in Parliament">Debated</option>
+              <option value="Not debated">Not Debated</option>
+            </select>
+          </div>
+          
+          <!-- Sort Dropdown -->
+          <div class="w-full md:w-48">
+            <select id="sortOption" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+              <option value="latest">Latest First</option>
+              <option value="signatures">Most Signatures</option>
+              <option value="deadline">Deadline Approaching</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Status Filter Pills -->
+        <div class="flex flex-wrap gap-2" id="statusFilterPills">
+          <button class="status-pill active" data-status="all">All</button>
+          <button class="status-pill" data-status="Open">Open</button>
+          <button class="status-pill" data-status="Closed">Closed</button>
+          <button class="status-pill" data-status="Awaiting government">Awaiting Gov't</button>
+          <button class="status-pill" data-status="Government responses">Has Response</button>
+        </div>
+      </div>
+      
+      <div id="petitionCount" class="text-sm text-gray-500 mb-4"></div>
+      <ul id="petitionList" class="space-y-4"></ul>
+      
+      <!-- No Results Message -->
+      <div id="noResults" class="hidden bg-gray-50 p-6 rounded-lg text-center">
+        <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-gray-600 font-medium mb-2">No petitions match your search</p>
+        <p class="text-gray-500">Try adjusting your filters or search terms</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.body.appendChild(createFooter());
+  </script>
+
+  <script>
+    // Global variables to store data
+    let allPosts = [];
+    let allPetitions = {};
+    let allVotes = {};
+    let currentFilter = 'all';
+    let currentSort = 'latest';
+    let searchTerm = '';
+    
+    async function fetchData() {
+      try {
+        // Use our robust data loading function with default values
+        allPosts = await loadData('data/approved.json', []);
+        allPetitions = await loadData('data/petitions.json', {});
+        allVotes = await loadData('data/votes.json', {});
+        
+        // Cache successful responses for offline use
+        localStorage.setItem('cache_data_approved.json', JSON.stringify(allPosts));
+        localStorage.setItem('cache_data_petitions.json', JSON.stringify(allPetitions));
+        localStorage.setItem('cache_data_votes.json', JSON.stringify(allVotes));
+        
+        // Check for expired petitions and mark them as closed
+        const now = new Date();
+        Object.keys(allPetitions).forEach(postId => {
+          const petition = allPetitions[postId];
+          if (petition.state === 'Open' && petition.deadline) {
+            const deadlineDate = new Date(petition.deadline);
+            if (now > deadlineDate) {
+              petition.state = 'Closed';
+              petition.closedReason = 'Expired';
+            }
+          }
+        });
+        
+        renderPetitions();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('petitionList').innerHTML = `
+          <li class="bg-red-50 p-6 rounded-lg">
+            <div class="flex flex-col sm:flex-row items-center">
+              <div class="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4">
+                <svg class="h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-red-700 font-medium mb-2">Error loading petitions. Please try again later.</p>
+                <p class="text-sm text-gray-600 mb-4">This could be due to network connectivity issues or because you're viewing the site offline.</p>
+                <button onclick="fetchData()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+                  Retry
+                </button>
+              </div>
+            </div>
+          </li>`;
+        
+        // Try to load from cache if available
+        const cachedPosts = localStorage.getItem('cache_data_approved.json');
+        const cachedPetitions = localStorage.getItem('cache_data_petitions.json');
+        const cachedVotes = localStorage.getItem('cache_data_votes.json');
+        
+        if (cachedPosts && cachedPetitions && cachedVotes) {
+          allPosts = JSON.parse(cachedPosts);
+          allPetitions = JSON.parse(cachedPetitions);
+          allVotes = JSON.parse(cachedVotes);
+          renderPetitions();
+          
+          // Show offline notification
+          const notification = document.createElement('div');
+          notification.className = 'fixed bottom-4 left-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow-lg';
+          notification.innerHTML = `
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  Using cached data. Some information may be outdated.
+                </p>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(notification);
+          setTimeout(() => notification.remove(), 5000);
+        }
+      }
+    }
+    
+    function renderPetitions() {
+      const list = document.getElementById('petitionList');
+      const noResults = document.getElementById('noResults');
+      list.innerHTML = '';
+      
+      // Filter active petitions
+      let activePetitions = allPosts.filter(post => allPetitions[post.id]);
+      
+      // Apply search filter
+      if (searchTerm) {
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        activePetitions = activePetitions.filter(post => 
+          post.title.toLowerCase().includes(lowerSearchTerm) || 
+          post.body.toLowerCase().includes(lowerSearchTerm) ||
+          (post.category && post.category.toLowerCase().includes(lowerSearchTerm))
+        );
+      }
+      
+      // Apply state filter
+      if (currentFilter !== 'all') {
+        activePetitions = activePetitions.filter(post => {
+          const petitionData = allPetitions[post.id];
+          return petitionData && petitionData.state === currentFilter;
+        });
+      }
+      
+      // Apply sorting
+      activePetitions = sortPetitions(activePetitions);
+      
+      // Update petition count
+      document.getElementById('petitionCount').textContent = `Found ${activePetitions.length} petition${activePetitions.length === 1 ? '' : 's'}`;
+      
+      // Show no results message if needed
+      if (activePetitions.length === 0) {
+        list.innerHTML = '';
+        noResults.classList.remove('hidden');
+        return;
+      } else {
+        noResults.classList.add('hidden');
+      }
+      
+      // Render the petitions
+      activePetitions.forEach(post => renderPetitionCard(post, list));
+    }
+    
+    function renderPetitionCard(post, list) {
+      const voteCount = allVotes[post.id] || 0;
+      const petitionData = allPetitions[post.id] || {};
+      const signatureCount = petitionData.signatures?.length || 0;
+      let petitionState = petitionData.state || 'Open';
+      const targetSignatures = petitionData.targetSignatures || 100;
+      const deadlineDate = petitionData.deadline ? new Date(petitionData.deadline) : null;
+      const now = new Date();
+      
+      // Check if petition has expired but still marked as open
+      if (deadlineDate && now > deadlineDate && petitionState === 'Open') {
+        petitionState = 'Closed (Expired)';
+      }
+      
+      // Calculate days remaining if deadline exists
+      let daysRemaining = null;
+      let deadlineStatus = '';
+      if (deadlineDate) {
+        if (now > deadlineDate) {
+          deadlineStatus = 'expired';
+        } else {
+          const diffTime = deadlineDate - now;
+          daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (daysRemaining <= 7) {
+            deadlineStatus = 'urgent';
+          } else if (daysRemaining <= 30) {
+            deadlineStatus = 'approaching';
+          }
+        }
+      }
+      
+      // Format creation date
+      const date = new Date(post.timestamp).toLocaleString('en-GB', {
+        day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: false
+      }).replace(',', '');
+      
+      // Format deadline date if available
+      let deadlineFormatted = 'No deadline';
+      let deadlineHtml = '';
+      if (deadlineDate) {
+        deadlineFormatted = deadlineDate.toLocaleDateString('en-GB', { 
+          day: 'numeric', month: 'long', year: 'numeric' 
+        });
+        
+        if (deadlineStatus === 'expired') {
+          deadlineHtml = `<span class="text-red-600 font-medium">Deadline: ${deadlineFormatted} (Expired)</span>`;
+        } else if (deadlineStatus === 'urgent') {
+          deadlineHtml = `
+            <span class="text-red-600 font-medium">Deadline: ${deadlineFormatted}</span>
+            <span class="inline-flex items-center ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} left
+            </span>`;
+        } else if (deadlineStatus === 'approaching') {
+          deadlineHtml = `
+            <span class="text-orange-600 font-medium">Deadline: ${deadlineFormatted}</span>
+            <span class="text-xs text-gray-600 ml-2">(${daysRemaining} days left)</span>`;
+        } else {
+          deadlineHtml = `<span class="font-medium">Deadline: ${deadlineFormatted}</span>`;
+        }
+      } else {
+        deadlineHtml = `<span class="font-medium">Deadline: Not set</span>`;
+      }
+
+      // Determine progress percentage
+      const progressPercent = Math.min(Math.round((signatureCount / targetSignatures) * 100), 100);
+      
+      // Determine state class based on petition state
+      let stateClass = 'bg-green-100 text-green-800'; // Default for Open
+      let displayState = petitionState;
+      
+      switch(petitionState) {
+        case 'Closed':
+          stateClass = 'bg-red-100 text-red-800';
+          break;
+        case 'Closed (Expired)':
+          stateClass = 'bg-red-100 text-red-800';
+          break;
+        case 'Draft':
+          stateClass = 'bg-gray-100 text-gray-800';
+          break;
+        case 'Rejected':
+          stateClass = 'bg-red-100 text-red-800';
+          break;
+        case 'Awaiting government':
+          stateClass = 'bg-yellow-100 text-yellow-800';
+          break;
+        case 'Government responses':
+          stateClass = 'bg-blue-100 text-blue-800';
+          break;
+        case 'Awaiting a debate':
+          stateClass = 'bg-purple-100 text-purple-800';
+          break;
+        case 'Debated in Parliament':
+          stateClass = 'bg-indigo-100 text-indigo-800';
+          break;
+        case 'Not debated':
+          stateClass = 'bg-gray-100 text-gray-800';
+          break;
+      }
+      
+      // Progress bar color based on percentage
+      let progressBarClass = 'bg-blue-600';
+      if (progressPercent >= 100) {
+        progressBarClass = 'bg-green-600';
+      } else if (progressPercent >= 75) {
+        progressBarClass = 'bg-green-500';
+      } else if (progressPercent >= 50) {
+        progressBarClass = 'bg-yellow-500';
+      } else if (progressPercent >= 25) {
+        progressBarClass = 'bg-orange-500';
+      } else {
+        progressBarClass = 'bg-red-500';
+      }
+      
+      const li = document.createElement('li');
+      li.className = 'bg-white border border-gray-200 rounded-lg shadow-sm p-5 petition-card';
+      li.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+          <div class="flex-1">
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Petition</span>
+              <span class="${stateClass} text-xs font-medium px-2.5 py-0.5 rounded-full">${displayState}</span>
+              ${post.category ? `<span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${post.category}</span>` : ''}
+            </div>
+            <a href="petition.html?id=${post.id}" class="text-xl font-bold text-blue-800 hover:text-blue-600 transition-colors">${post.title}</a>
+            <p class="text-gray-700 mt-2 mb-3 line-clamp-2">${post.body}</p>
+            
+            <div class="mb-3">
+              <div class="flex justify-between text-xs text-gray-600 mb-1">
+                <span>${signatureCount} of ${targetSignatures} signatures</span>
+                <span>${progressPercent}% complete</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="${progressBarClass} h-2.5 rounded-full" style="width: ${progressPercent}%"></div>
+              </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
+              <div class="flex flex-col text-sm space-y-1">
+                <span class="text-gray-600"><span class="font-medium">Created:</span> ${date}</span>
+                <span class="text-gray-600">${deadlineHtml}</span>
+              </div>
+              <div class="flex items-center gap-4 text-sm mt-2 sm:mt-0">
+                <span class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                  </svg>
+                  ${voteCount} votes
+                </span>
+                <span class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  ${signatureCount} signatures
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      list.appendChild(li);
+    }
+    
+    function sortPetitions(petitions) {
+      switch(currentSort) {
+        case 'latest':
+          return petitions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        case 'signatures':
+          return petitions.sort((a, b) => {
+            const sigA = allPetitions[a.id]?.signatures?.length || 0;
+            const sigB = allPetitions[b.id]?.signatures?.length || 0;
+            return sigB - sigA;
+          });
+        
+        case 'deadline':
+          const now = new Date();
+          return petitions.sort((a, b) => {
+            const deadlineA = allPetitions[a.id]?.deadline ? new Date(allPetitions[a.id].deadline) : null;
+            const deadlineB = allPetitions[b.id]?.deadline ? new Date(allPetitions[b.id].deadline) : null;
+            
+            // Petitions without deadline go at the end
+            if (!deadlineA && !deadlineB) return 0;
+            if (!deadlineA) return 1;
+            if (!deadlineB) return -1;
+            
+            // Expired deadlines go at the end
+            const aExpired = now > deadlineA;
+            const bExpired = now > deadlineB;
+            if (aExpired && !bExpired) return 1;
+            if (!aExpired && bExpired) return -1;
+            if (aExpired && bExpired) return 0;
+            
+            // Sort by closest deadline first
+            return deadlineA - deadlineB;
+          });
+          
+        default:
+          return petitions;
+      }
+    }
+    
+    function setupEventListeners() {
+      // Search input listener
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', debounce(function() {
+        searchTerm = this.value.trim();
+        renderPetitions();
+      }, 300));
+      
+      // State filter dropdown
+      const stateFilter = document.getElementById('stateFilter');
+      stateFilter.addEventListener('change', function() {
+        currentFilter = this.value;
+        updateStatusPills(currentFilter);
+        renderPetitions();
+      });
+      
+      // Sort options dropdown
+      const sortOption = document.getElementById('sortOption');
+      sortOption.addEventListener('change', function() {
+        currentSort = this.value;
+        renderPetitions();
+      });
+      
+      // Status filter pills
+      const statusPills = document.querySelectorAll('.status-pill');
+      statusPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+          currentFilter = this.dataset.status;
+          updateStatusPills(currentFilter);
+          // Update the dropdown to match
+          document.getElementById('stateFilter').value = currentFilter;
+          renderPetitions();
+        });
+      });
+    }
+    
+    function updateStatusPills(selectedStatus) {
+      const pills = document.querySelectorAll('.status-pill');
+      pills.forEach(pill => {
+        if (pill.dataset.status === selectedStatus) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+    
+    // Debounce function to limit how often a function is called
+    function debounce(func, wait) {
+      let timeout;
+      return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          func.apply(context, args);
+        }, wait);
+      };
+    }
+    
+    // Initialize
+    window.onload = function() {
+      fetchData();
+      setupEventListeners();
+    };
+  </script>
+</body>
+
+</html>
