@@ -1,28 +1,263 @@
 /**
  * Local Storage and Synchronization Utilities
- * Handles storing and syncing user interactions (votes, comments) while offline
+ * Handles storing and syncing user interactions (posts, votes, comments) in GitHub Pages
  */
+
+/**
+ * Saves data to a localStorage collection
+ * @param {string} collectionName - The name of the collection (posts, votes, etc.)
+ * @param {object} item - The item to save
+ * @returns {string} The ID of the saved item
+ */
+function saveToCollection(collectionName, item) {
+  try {
+    // Ensure the item has an ID
+    if (!item.id) {
+      item.id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Ensure timestamp exists
+    if (!item._timestamp) {
+      item._timestamp = new Date().toISOString();
+    }
+    
+    // Get the existing collection or create a new one
+    const existingData = localStorage.getItem(`collection_${collectionName}`) || '[]';
+    const collection = JSON.parse(existingData);
+    
+    // Add the new item
+    collection.push(item);
+    
+    // Save back to localStorage
+    localStorage.setItem(`collection_${collectionName}`, JSON.stringify(collection));
+    
+    console.log(`Item saved to ${collectionName} collection:`, item);
+    return item.id;
+  } catch (e) {
+    console.error(`Error saving to ${collectionName} collection:`, e);
+    return null;
+  }
+}
+
+/**
+ * Save a post to localStorage
+ * @param {object} post - The post object to save
+ * @returns {string|null} The ID of the saved post or null on error
+ */
+function savePostLocally(post) {
+  // Add some additional metadata needed for posts
+  post.status = post.status || 'pending';
+  post.votes = post.votes || { up: 0, down: 0 };
+  post.comments = post.comments || [];
+  
+  return saveToCollection('posts', post);
+}
 
 /**
  * Save a vote to localStorage for the current post
  * @param {object} vote - The vote object to save
+ * @returns {string|null} The ID of the saved vote or null on error
  */
 function saveVoteLocally(vote) {
   try {
-    // Create a unique key for this vote
-    const voteKey = `${vote.type}-${vote.postId}-${Date.now()}`;
-    
-    // Store the vote with its timestamp
-    localStorage.setItem(voteKey, JSON.stringify(vote));
+    // Save to votes collection
+    const voteId = saveToCollection('votes', vote);
     
     // Mark that the user has voted on this post
     localStorage.setItem(`voted-${vote.postId}`, 'true');
     
-    console.log('Vote saved locally:', vote);
-    return voteKey;
+    // Update the post's vote count if possible
+    try {
+      updatePostVoteCount(vote.postId, vote.type);
+    } catch (countError) {
+      console.warn('Could not update post vote count:', countError);
+    }
+    
+    return voteId;
   } catch (e) {
     console.error('Error saving vote locally:', e);
     return null;
+  }
+}
+
+/**
+ * Update the vote count for a post in the local collection
+ * @param {string} postId - The ID of the post to update
+ * @param {string} voteType - "up" for upvote, "down" for downvote
+ */
+function updatePostVoteCount(postId, voteType) {
+  // Get posts collection
+  const postsData = localStorage.getItem('collection_posts') || '[]';
+  const posts = JSON.parse(postsData);
+  
+  // Find the post
+  const postIndex = posts.findIndex(p => p.id === postId);
+  if (postIndex === -1) return;
+  
+  // Update vote count
+  if (!posts[postIndex].votes) {
+    posts[postIndex].votes = { up: 0, down: 0 };
+  }
+  
+  posts[postIndex].votes[voteType]++;
+  
+  // Save back to localStorage
+  localStorage.setItem('collection_posts', JSON.stringify(posts));
+}
+
+/**
+ * Save a comment to localStorage for a post
+ * @param {object} comment - The comment object
+ * @returns {string|null} The ID of the saved comment or null on error
+ */
+function saveCommentLocally(comment) {
+  try {
+    // Save to comments collection
+    const commentId = saveToCollection('comments', comment);
+    
+    // Update the post's comments if possible
+    try {
+      const postsData = localStorage.getItem('collection_posts') || '[]';
+      const posts = JSON.parse(postsData);
+      
+      // Find the post
+      const postIndex = posts.findIndex(p => p.id === comment.postId);
+      if (postIndex !== -1) {
+        // Add comment reference to the post
+        if (!posts[postIndex].comments) {
+          posts[postIndex].comments = [];
+        }
+        posts[postIndex].comments.push(commentId);
+        
+        // Save back to localStorage
+        localStorage.setItem('collection_posts', JSON.stringify(posts));
+      }
+    } catch (postError) {
+      console.warn('Could not update post with comment:', postError);
+    }
+    
+    return commentId;
+  } catch (e) {
+    console.error('Error saving comment locally:', e);
+    return null;
+  }
+}
+
+/**
+ * Get all posts from local storage
+ * @returns {Array} Array of posts
+ */
+function getLocalPosts() {
+  try {
+    const postsData = localStorage.getItem('collection_posts') || '[]';
+    return JSON.parse(postsData).sort((a, b) => {
+      return new Date(b._timestamp) - new Date(a._timestamp);
+    });
+  } catch (e) {
+    console.error('Error retrieving local posts:', e);
+    return [];
+  }
+}
+
+/**
+ * Get a single post by ID
+ * @param {string} postId - The ID of the post to get
+ * @returns {object|null} The post object or null if not found
+ */
+function getLocalPost(postId) {
+  try {
+    const posts = getLocalPosts();
+    return posts.find(post => post.id === postId) || null;
+  } catch (e) {
+    console.error('Error retrieving local post:', e);
+    return null;
+  }
+}
+
+/**
+ * Get comments for a post from local storage
+ * @param {string} postId - The ID of the post
+ * @returns {Array} Array of comments
+ */
+function getLocalComments(postId) {
+  try {
+    const commentsData = localStorage.getItem('collection_comments') || '[]';
+    return JSON.parse(commentsData)
+      .filter(comment => comment.postId === postId)
+      .sort((a, b) => new Date(b._timestamp) - new Date(a._timestamp));
+  } catch (e) {
+    console.error('Error retrieving local comments:', e);
+    return [];
+  }
+}
+
+/**
+ * Get vote statistics for a post
+ * @param {string} postId - The ID of the post
+ * @returns {object} Vote statistics with up and down counts
+ */
+function getLocalVoteStats(postId) {
+  try {
+    const votesData = localStorage.getItem('collection_votes') || '[]';
+    const votes = JSON.parse(votesData).filter(vote => vote.postId === postId);
+    
+    // Count votes
+    const stats = { up: 0, down: 0 };
+    votes.forEach(vote => {
+      if (vote.type === 'up' || vote.type === 'upvote') stats.up++;
+      if (vote.type === 'down' || vote.type === 'downvote') stats.down++;
+    });
+    
+    return stats;
+  } catch (e) {
+    console.error('Error calculating local vote stats:', e);
+    return { up: 0, down: 0 };
+  }
+}
+
+/**
+ * Check if the current user has voted on a post
+ * @param {string} postId - The ID of the post
+ * @returns {boolean} True if the user has voted, false otherwise
+ */
+function hasUserVotedLocally(postId) {
+  return localStorage.getItem(`voted-${postId}`) === 'true';
+}
+
+/**
+ * Combines local posts with fetched posts
+ * @param {Array} fetchedPosts - Posts fetched from the API
+ * @returns {Array} Combined list of posts with duplicates removed
+ */
+function combineWithLocalPosts(fetchedPosts) {
+  try {
+    const localPosts = getLocalPosts();
+    
+    // Skip if we have no local posts
+    if (localPosts.length === 0) return fetchedPosts;
+    
+    // Create a merged array with no duplicates
+    const mergedPosts = [...fetchedPosts];
+    
+    // Add local posts that aren't in the fetched posts
+    localPosts.forEach(localPost => {
+      const isDuplicate = fetchedPosts.some(post => 
+        post.id === localPost.id || 
+        (post.title === localPost.title && post.body === localPost.body)
+      );
+      
+      if (!isDuplicate) {
+        mergedPosts.push(localPost);
+      }
+    });
+    
+    // Sort by timestamp, newest first
+    return mergedPosts.sort((a, b) => 
+      new Date(b._timestamp || b.timestamp) - new Date(a._timestamp || a.timestamp)
+    );
+  } catch (e) {
+    console.error('Error combining posts:', e);
+    return fetchedPosts;
   }
 }
 

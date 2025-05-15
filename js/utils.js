@@ -1,8 +1,9 @@
 /**
  * Returns the base URL for API requests
- * @returns {string} The base URL for API requests
+ * @param {boolean} forDataOnly - If true, returns the URL for data files only, not API endpoints
+ * @returns {string} The base URL for API requests or data files
  */
-function baseUrl() {
+function baseUrl(forDataOnly = false) {
     // Check if we're running locally or in production
     const isLocal = window.location.hostname === 'localhost' || 
                     window.location.hostname === '127.0.0.1';
@@ -14,8 +15,14 @@ function baseUrl() {
     if (isLocal) {
         return 'http://localhost:8080';
     } else if (isGitHubPages) {
-        // When on GitHub Pages, always point to the data in the main backend repository
-        return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/main';
+        // Use different URLs for data files vs API endpoints
+        if (forDataOnly) {
+            // When loading data (JSON files), use the raw GitHub content
+            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/main';
+        } else {
+            // For API submissions, use the Flask submission bot
+            return 'https://flask-submission-bot.onrender.com';
+        }
     } else {
         // For other static deployments, use relative paths
         return '';
@@ -38,20 +45,43 @@ function postContent(
     redirectTo = null,
     errorMsg = 'Operation failed. Please try again.') {
     
+    // Use baseUrl() without parameters to get the API URL (not the data URL)
     const url = baseUrl() + path;
     const apiUrl = baseUrl();
+    
+    console.log(`Posting to API URL: ${url} (Base API URL: ${apiUrl})`);
     
     // Add timestamp to data for better tracking
     data._timestamp = new Date().toISOString();
     
-    // Check if we're in offline/static mode (no backend)
-    if (apiUrl === '/api') {
-        console.log('Running in static mode - saving to localStorage', data);
+    // Check if we're in offline/static mode or on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const hasSubmissionAPI = apiUrl.includes('onrender.com') || apiUrl.includes('localhost');
+    
+    // Use localStorage fallback only if we don't have a submission API
+    if (apiUrl === '/api' || (isGitHubPages && !hasSubmissionAPI)) {
+        console.log('Running in static/GitHub Pages mode - saving to localStorage', data);
         // Store in localStorage for demo purposes
         try {
             // Create a unique ID for this submission
             const submissionId = 'submission_' + Date.now();
             localStorage.setItem(submissionId, JSON.stringify(data));
+            
+            // Also add to the specific collection in localStorage if path indicates a collection
+            const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+            if (collectionPath) {
+                // Try to get existing collection data
+                const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                try {
+                    const collection = JSON.parse(existingData);
+                    // Add new item with generated ID
+                    const newItem = { ...data, id: `local_${Date.now()}` };
+                    collection.push(newItem);
+                    localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                } catch (e) {
+                    console.error('Error updating collection:', e);
+                }
+            }
             
             // Show success and redirect after a delay to simulate server response
             setTimeout(() => {
@@ -73,10 +103,13 @@ function postContent(
     return fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         },
         body: JSON.stringify(data),
-        signal: controller.signal
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'same-origin'
     })
     .then(res => {
         clearTimeout(timeoutId);
@@ -117,20 +150,43 @@ function postContentWithCallback(
     callback,
     errorMsg = 'Failed to submit data. Please try again.'
 ) {
+    // Use baseUrl() without parameters to get the API URL (not the data URL)
     const url = baseUrl() + path;
     const apiUrl = baseUrl();
+    
+    console.log(`Posting to API URL with callback: ${url} (Base API URL: ${apiUrl})`);
     
     // Add timestamp to data
     data._timestamp = new Date().toISOString();
     
-    // Check if we're in offline/static mode (no backend)
-    if (apiUrl === '/api') {
-        console.log('Running in static mode - saving to localStorage', data);
+    // Check if we're in offline/static mode or on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const hasSubmissionAPI = apiUrl.includes('onrender.com') || apiUrl.includes('localhost');
+    
+    // Use localStorage fallback only if we don't have a submission API
+    if (apiUrl === '/api' || (isGitHubPages && !hasSubmissionAPI)) {
+        console.log('Running in static/GitHub Pages mode - saving to localStorage', data);
         // Store in localStorage for demo purposes
         try {
             // Create a unique ID for this submission
             const submissionId = 'callback_submission_' + Date.now();
             localStorage.setItem(submissionId, JSON.stringify(data));
+            
+            // Also add to the specific collection in localStorage if path indicates a collection
+            const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+            if (collectionPath) {
+                // Try to get existing collection data
+                const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                try {
+                    const collection = JSON.parse(existingData);
+                    // Add new item with generated ID
+                    const newItem = { ...data, id: `local_${Date.now()}` };
+                    collection.push(newItem);
+                    localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                } catch (e) {
+                    console.error('Error updating collection:', e);
+                }
+            }
             
             // Execute callback after a delay to simulate server response
             setTimeout(() => {
@@ -153,10 +209,13 @@ function postContentWithCallback(
     return fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         },
         body: JSON.stringify(data),
-        signal: controller.signal
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'same-origin'
     })
     .then(res => {
         clearTimeout(timeoutId);
@@ -198,12 +257,32 @@ function postContentWithCallback(
  * @returns {Promise<object>} - The data from the API or default value
  */
 async function loadData(path, defaultValue = {}) {
+    // Check if we're on GitHub Pages - if so, first check for local collections
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+    
+    // First, check if we have a local collection for this path (created via POST)
+    if (isGitHubPages) {
+        try {
+            const localCollection = localStorage.getItem(`collection_${collectionPath}`);
+            if (localCollection) {
+                console.log(`Loading local collection data for ${path}`);
+                const localData = JSON.parse(localCollection);
+                if (localData && localData.length > 0) {
+                    return localData;
+                }
+            }
+        } catch (localError) {
+            console.warn(`Error reading local collection for ${path}:`, localError);
+        }
+    }
+    
     try {
-        // Construct the URL using baseUrl() to handle different environments
-        const url = `${baseUrl()}/${path}`;
+        // Construct the URL using baseUrl() with forDataOnly=true to get the data URL
+        const url = `${baseUrl(true)}/${path}`;
         console.log(`Loading data from: ${url}`);
         
-        // First try loading from the API or direct file path
+        // Try loading from the data URL or direct file path
         const response = await fetch(url);
         
         // Check if the response is ok
@@ -211,8 +290,17 @@ async function loadData(path, defaultValue = {}) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Parse and return the JSON data
-        return await response.json();
+        // Parse the JSON data
+        const data = await response.json();
+        
+        // Cache the data in localStorage
+        try {
+            localStorage.setItem(`cache_${path.replace(/\//g, '_')}`, JSON.stringify(data));
+        } catch (cacheError) {
+            console.warn('Could not cache data:', cacheError);
+        }
+        
+        return data;
     } catch (error) {
         console.warn(`Error loading data from ${path}:`, error);
         

@@ -23,6 +23,7 @@
   <script src="js/comment.js" defer></script>
   <script src="js/sync_status.js" defer></script>
   <script src="js/footer.js"></script>
+  <script src="js/diagnostics.js"></script>
 
   <style>
     /* Custom scrollbar */
@@ -828,7 +829,13 @@
             }, 2000);
           });
         });
-      });          
+      });
+      
+      document.getElementById('commentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleCommentSubmission();
+      });  
+    }
   </script>
 </body>
 

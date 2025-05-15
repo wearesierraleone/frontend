@@ -21,6 +21,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="js/utils.js"></script>
   <script src="js/footer.js"></script>
+  <script src="js/local_storage_sync.js"></script>
+  <script src="js/diagnostics.js"></script>
   <script>
     tailwind.config = {
       plugins: [tailwind.plugin(({ addUtilities }) => {
@@ -189,10 +191,15 @@
     async function loadPosts() {
       try {
         // Use our robust data loading function with default values
-        const posts = await loadData('data/approved.json', []);
+        const fetchedPosts = await loadData('data/approved.json', []);
         const votes = await loadData('data/votes.json', {});
         const comments = await loadData('data/comments.json', {});
         const petitions = await loadData('data/petitions.json', {});
+        
+        // Combine with any locally created posts (created when on GitHub Pages)
+        const posts = typeof combineWithLocalPosts === 'function' 
+          ? combineWithLocalPosts(fetchedPosts)
+          : fetchedPosts;
         
         // Cache successful responses in localStorage for offline use
         localStorage.setItem('cache_data_approved.json', JSON.stringify(posts));

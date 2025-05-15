@@ -14,7 +14,8 @@ This document provides step-by-step instructions for deploying the We Are Sierra
 
 We've already prepared the repository with the necessary changes:
 
-- Updated the `baseUrl()` function in `public/js/utils.js` to work with GitHub Pages
+- Updated the `baseUrl()` function in `js/utils.js` to work with GitHub Pages
+- Set up integration with the Flask API at https://flask-submission-bot.onrender.com
 - Created a `.nojekyll` file to prevent Jekyll processing
 - Removed unnecessary files from the public directory
 

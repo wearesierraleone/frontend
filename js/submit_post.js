@@ -65,9 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
       status: 'pending'
     };
     
-    // Submit post
+    // Check if we're on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    console.log('Submitting post:', post, 'Is GitHub Pages:', isGitHubPages);
+    
+    // Submit post using the appropriate endpoint for our Flask API
     postContent(
-      '/submit', 
+      '/submit', // Use '/submit' for the Flask API endpoint
       post, 
       'Post submitted successfully.', 
       'index.html',
