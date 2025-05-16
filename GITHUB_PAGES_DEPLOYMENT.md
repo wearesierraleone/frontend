@@ -161,7 +161,7 @@ For a more streamlined deployment process that automatically handles private rep
    - Go to your repository Settings
    - Navigate to "Secrets and variables" → "Actions"
    - Click "New repository secret"
-   - Name: `GITHUB_DATA_TOKEN`
+   - Name: `DATA_TOKEN`
    - Value: [Your GitHub Personal Access Token with 'repo' scope]
    - Click "Add secret"
 

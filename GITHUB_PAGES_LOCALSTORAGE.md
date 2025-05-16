@@ -57,7 +57,7 @@ There are two ways the platform handles GitHub authentication for private reposi
 
 For official deployments using GitHub Actions:
 
-1. A GitHub token is stored as a repository secret called `GITHUB_DATA_TOKEN`
+1. A GitHub token is stored as a repository secret called `DATA_TOKEN`
 2. The GitHub Actions workflow automatically injects this token during deployment
 3. Users can access the site without needing to provide their own token
 4. This is the recommended approach for production deployments
@@ -65,7 +65,7 @@ For official deployments using GitHub Actions:
 To set up automated authentication:
 
 1. Go to your repository's Settings > Secrets and variables > Actions
-2. Add a new repository secret named `GITHUB_DATA_TOKEN`
+2. Add a new repository secret named `DATA_TOKEN`
 3. Set its value to a GitHub Personal Access Token with `repo` scope
 4. Deploy using the GitHub Actions workflow in `.github/workflows/deploy-github-pages.yml`
 

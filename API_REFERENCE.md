@@ -29,7 +29,7 @@ To access data from a private GitHub repository, a Personal Access Token is requ
 
 ```javascript
 // Example URL with token
-https://raw.githubusercontent.com/wearesierraleone/wearesalone/main/data/approved.json?token=YOUR_TOKEN_HERE
+https://raw.githubusercontent.com/wearesierraleone/wearesalone/main/data/approved.json?token=YOUR_TOKEN_HERE 
 ```
 
 ### Flask API Authentication

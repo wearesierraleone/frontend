@@ -38,7 +38,7 @@ If the backend repository is private, the application supports two methods of Gi
 
 Using GitHub Actions and repository secrets:
 
-1. Store a GitHub Personal Access Token as a repository secret named `GITHUB_DATA_TOKEN`
+1. Store a GitHub Personal Access Token as a repository secret named `DATA_TOKEN`
 2. The GitHub Actions workflow automatically injects this token during deployment
 3. Users can access the site without needing to provide their own tokens
 4. Use `setup_github_secret.sh` script or GitHub web interface to set up the secret

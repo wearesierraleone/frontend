@@ -28,7 +28,7 @@ jobs:
           
       - name: Inject GitHub Token
         env:
-          GITHUB_DATA_TOKEN: ${{ secrets.GITHUB_DATA_TOKEN }}
+          DATA_TOKEN: ${{ secrets.DATA_TOKEN }}
         run: |
           # Replace token placeholder in utils.js
           replace-in-file --configFile=replace-config.js
@@ -39,7 +39,7 @@ jobs:
           module.exports = {
             files: ['js/utils.js'],
             from: /const token = sessionStorage.getItem\('github_access_token'\);/g,
-            to: `const token = "${{ secrets.GITHUB_DATA_TOKEN }}"; // Injected during build`,
+            to: `const token = "${{ secrets.DATA_TOKEN }}"; // Injected during build`,
           };
           EOF
 

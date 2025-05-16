@@ -66,11 +66,11 @@ if [ -z "$GITHUB_TOKEN" ]; then
 fi
 
 # Set the repository secret
-echo -e "${YELLOW}Setting up the GITHUB_DATA_TOKEN secret...${NC}"
-echo "$GITHUB_TOKEN" | gh secret set GITHUB_DATA_TOKEN --repo "$REPO_PATH"
+echo -e "${YELLOW}Setting up the DATA_TOKEN secret...${NC}"
+echo "$GITHUB_TOKEN" | gh secret set DATA_TOKEN --repo "$REPO_PATH"
 
 if [ $? -eq 0 ]; then
-    echo -e "${GREEN}Success! GITHUB_DATA_TOKEN has been set up for $REPO_PATH${NC}"
+    echo -e "${GREEN}Success! DATA_TOKEN has been set up for $REPO_PATH${NC}"
     echo
     echo -e "You can now deploy using GitHub Actions:"
     echo "1. Push to the main or gh-pages-clean branch"
@@ -80,7 +80,7 @@ else
     echo "Please try again or set it manually through the GitHub web interface:"
     echo "1. Go to https://github.com/$REPO_PATH/settings/secrets/actions"
     echo "2. Click 'New repository secret'"
-    echo "3. Name: GITHUB_DATA_TOKEN"
+    echo "3. Name: DATA_TOKEN"
     echo "4. Value: [Your GitHub Personal Access Token]"
     exit 1
 fi
