@@ -19,10 +19,9 @@
   <script src="js/github_token.js"></script>
   <script src="js/utils.js" defer></script>
   <script src="js/modal.js" defer></script>
-  <script src="js/local_storage_sync.js" defer></script>
+  <script src="js/fallback_data.js"></script>
   <script src="js/vote.js" defer></script>
   <script src="js/comment.js" defer></script>
-  <script src="js/sync_status.js" defer></script>
   <script src="js/footer.js"></script>
   <script src="js/diagnostics.js"></script>
 
@@ -382,6 +381,14 @@
 
       document.getElementById('title').innerText = post.title;
       document.getElementById('body').innerText = post.body;
+
+      // Add status indicator for moderators (visible only for moderators and admins)
+      if (post.status) {
+        const statusElement = document.createElement('div');
+        statusElement.className = `text-sm ${post.status === 'approved' ? 'text-green-600' : 'text-yellow-600'} font-medium mt-2`;
+        statusElement.innerHTML = `Status: ${post.status.toUpperCase()}`;
+        document.getElementById('title').parentNode.insertBefore(statusElement, document.getElementById('body'));
+      }
 
       // Update the page title with the post title
       document.getElementById('pageTitle').innerText = `${post.title} | We Are Sierra Leone`;

@@ -70,18 +70,91 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Submitting post:', post, 'Is GitHub Pages:', isGitHubPages);
     
-    // Submit post using the appropriate endpoint for our Flask API
-    postContent(
-      '/submit', // Use '/submit' for the Flask API endpoint
-      post, 
-      'Post submitted successfully.', 
-      'index.html',
-      'Failed to submit post, please try again.'
-    )
-    .catch(error => {
-      console.error('Post submission error:', error);
-      // Error is already handled in postContent, just logging here
-    })
+    // Simple direct post approach
+    // First load existing posts
+    fetch('data/approved.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to load posts: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(existingPosts => {
+        // Add a unique ID to the post
+        post.id = `post${Date.now()}`;
+        
+        // Add the post to the existing posts array
+        const updatedPosts = [...existingPosts, post];
+        
+        // In a real application, this would make an API call to save the post
+        // For local development, we need to save through another mechanism
+        console.log('New post created:', post);
+        
+        // Check if we're in development and using our enhanced server
+        // This ensures we only try to use the API when the correct server is running
+        // We now check for multiple possible ports that our dynamic port selection might use
+        const commonDevPorts = ['5500', '5501', '5502', '5503', '8080', '8081', '3000', '3001'];
+        const currentPort = window.location.port;
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isEnhancedServer = isLocalhost && commonDevPorts.includes(currentPort);
+        
+        if (isEnhancedServer) {
+          // We're running on our enhanced API server
+          console.log('Using enhanced server with API support');
+          // Send the updated posts array to our local server endpoint
+          fetch('/save-post', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              post: post,
+              allPosts: updatedPosts
+            })
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Success:', data);
+            showSuccessModal('Post submitted successfully and is pending approval.', 'index.html', 2000, 'success');
+          })
+          .catch(saveError => {
+            console.error('Error saving post:', saveError);
+            showSuccessModal(
+              `Unable to save the post. Server connection error.\nMake sure you started the enhanced server with:\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`, 
+              null, 
+              0, 
+              'error'
+            );
+          });
+        } else if (isGitHubPages) {
+          // We're on GitHub Pages
+          console.log('Running on GitHub Pages - demo mode');
+          showSuccessModal(
+            'Demo mode: Post would be saved with pending status. In this environment, posts cannot be saved to the server.', 
+            'index.html', 
+            3000, 
+            'info'
+          );
+        } else {
+          // We're on another development server without API support
+          console.log('Not using enhanced server. Port: ' + window.location.port);
+          showSuccessModal(
+            `Demo mode: Post would be saved with pending status. To actually save posts, run one of the API servers:\n\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`, 
+            'index.html', 
+            4000, 
+            'info'
+          );
+        }
+      })
+      .catch(error => {
+        console.error('Error processing post:', error);
+        showSuccessModal('Failed to submit post, please try again.', null, 0, 'error');
+      })
     .finally(() => {
       // Re-enable submit button regardless of outcome after a short delay
       setTimeout(() => {

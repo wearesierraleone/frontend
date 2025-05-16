@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin dashboard for moderators">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/github_token.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/fallback_data.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c5c5c5;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg px-4 py-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
+      <div class="flex items-center mb-4 sm:mb-0">
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">We Are Sierra Leone | Admin</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Back to Site
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 max-w-5xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h1 class="text-2xl font-bold mb-2">Admin Dashboard</h1>
+      <p class="text-gray-600 mb-4">Manage posts and moderate content</p>
+      
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="relative w-full sm:w-1/2">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input type="text" id="searchInput" placeholder="Search posts..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <select id="statusFilter"
+            class="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+            <option value="all">All Statuses</option>
+            <option value="pending" selected>Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-800">Post Management</h2>
+      <span id="postCount"
+        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Loading...</span>
+    </div>
+
+    <div id="postList" class="space-y-5">
+      <!-- Posts will be displayed here -->
+    </div>
+  </main>
+
+  <script>
+    document.body.appendChild(createFooter());
+
+    async function loadPosts() {
+      try {
+        // Status message to indicate loading
+        const postListContainer = document.getElementById('postList');
+        postListContainer.innerHTML = '<div class="text-center p-4"><div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div><p class="mt-2 text-gray-600">Loading posts...</p></div>';
+        
+        // Load posts directly with fetch
+        const postsResponse = await fetch('data/approved.json');
+        if (!postsResponse.ok) {
+          throw new Error(`Failed to load posts: ${postsResponse.status}`);
+        }
+        const posts = await postsResponse.json();
+        
+        postListContainer.innerHTML = '';
+
+        // Filter based on selected status
+        const statusFilter = document.getElementById('statusFilter').value;
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        
+        let filteredPosts = posts;
+        
+        if (statusFilter !== 'all') {
+          filteredPosts = filteredPosts.filter(post => post.status === statusFilter);
+        }
+        
+        if (searchQuery) {
+          filteredPosts = filteredPosts.filter(post => 
+            post.title.toLowerCase().includes(searchQuery) || 
+            post.body.toLowerCase().includes(searchQuery)
+          );
+        }
+
+        // Update post count
+        document.getElementById('postCount').innerText = `${filteredPosts.length} Posts`;
+
+        if (filteredPosts.length === 0) {
+          postListContainer.innerHTML = `
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-gray-600 mb-4">No posts found matching your criteria</p>
+            </div>`;
+          return;
+        }
+
+        // Sort by timestamp, newest first
+        filteredPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        // Display each post
+        filteredPosts.forEach(post => {
+          const postElement = document.createElement('div');
+          postElement.className = 'bg-white rounded-lg shadow-md overflow-hidden';
+          
+          // Set border color based on status
+          if (post.status === 'pending') {
+            postElement.classList.add('border-l-4', 'border-yellow-500');
+          } else if (post.status === 'approved') {
+            postElement.classList.add('border-l-4', 'border-green-500');
+          } else if (post.status === 'rejected') {
+            postElement.classList.add('border-l-4', 'border-red-500');
+          }
+
+          const dateObj = new Date(post.timestamp);
+          const formattedDate = dateObj.toLocaleString('en-GB', { 
+            day: 'numeric', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: false 
+          }).replace(',', '');
+
+          postElement.innerHTML = `
+            <div class="p-5">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <div class="flex flex-wrap gap-2 mb-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${post.category || 'Uncategorized'}</span>
+                    <span class="${post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : post.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} text-xs font-medium px-2.5 py-0.5 rounded-full">${post.status}</span>
+                  </div>
+                  <a href='post.html?id=${post.id}' class='text-xl font-bold text-blue-800 hover:underline block mb-2'>${post.title}</a>
+                  <p class="text-gray-700 line-clamp-2 mb-3">${post.body}</p>
+                </div>
+                ${post.imageUrl ? `
+                  <div class="ml-4 flex-shrink-0">
+                    <img src="${post.imageUrl}" alt="Post thumbnail" class="h-20 w-20 object-cover rounded">
+                  </div>
+                ` : ''}
+              </div>
+              <div class="flex items-center justify-between mt-4">
+                <div class="text-sm text-gray-500">${formattedDate}</div>
+                <div class="space-x-2">
+                  ${post.status === 'pending' ? `
+                    <button data-id="${post.id}" data-action="approve" class="approve-btn bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded">
+                      Approve
+                    </button>
+                    <button data-id="${post.id}" data-action="reject" class="reject-btn bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded">
+                      Reject
+                    </button>
+                  ` : post.status === 'approved' ? `
+                    <button data-id="${post.id}" data-action="unapprove" class="unapprove-btn bg-yellow-600 hover:bg-yellow-700 text-white text-sm px-3 py-1 rounded">
+                      Unpublish
+                    </button>
+                  ` : `
+                    <button data-id="${post.id}" data-action="approve" class="approve-btn bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded">
+                      Approve
+                    </button>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+          
+          postListContainer.appendChild(postElement);
+        });
+
+        // Add event listeners to approval buttons
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+          btn.addEventListener('click', () => updatePostStatus(btn.dataset.id, 'approved'));
+        });
+
+        document.querySelectorAll('.reject-btn').forEach(btn => {
+          btn.addEventListener('click', () => updatePostStatus(btn.dataset.id, 'rejected'));
+        });
+
+        document.querySelectorAll('.unapprove-btn').forEach(btn => {
+          btn.addEventListener('click', () => updatePostStatus(btn.dataset.id, 'pending'));
+        });
+      } catch (error) {
+        console.error("Error loading posts:", error);
+        
+        // Try once more directly
+        try {
+          // Direct retry after short delay
+          setTimeout(async () => {
+            try {
+              console.log("Retrying post load...");
+              const retryResponse = await fetch('data/approved.json');
+              if (!retryResponse.ok) throw new Error(`HTTP error: ${retryResponse.status}`);
+              
+              const posts = await retryResponse.json();
+              if (posts && Array.isArray(posts)) {
+                // Retry successful, reload posts
+                console.log("Retry successful, reloading posts");
+                loadPosts();
+                return;
+              }
+            } catch (retryError) {
+              console.error("Retry failed:", retryError);
+              // Show final error
+              document.getElementById('postList').innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-red-700 mb-1">
+                        Error loading posts. Please try again.
+                      </p>
+                      <p class="text-xs text-gray-600 mb-2">
+                        This could be due to network connectivity issues or server problems.
+                      </p>
+                      <button onclick="loadPosts()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>`;
+              document.getElementById('postCount').innerText = '0 Posts';
+            }
+          }, 1000);
+        } catch (finalError) {
+          console.error("Final error handling failed:", finalError);
+          document.getElementById('postCount').innerText = '0 Posts';
+        }
+      }
+    }
+
+    async function updatePostStatus(postId, newStatus) {
+      try {
+        // Show processing indicator
+        showSuccessModal(`Processing ${newStatus} request...`, null, 0, 'info', true);
+        
+        // Load all posts
+        const postsResponse = await fetch('data/approved.json');
+        if (!postsResponse.ok) {
+          throw new Error(`Failed to load posts: ${postsResponse.status}`);
+        }
+        const posts = await postsResponse.json();
+        
+        // Find the post with the given ID
+        const postIndex = posts.findIndex(post => post.id === postId);
+        
+        if (postIndex === -1) {
+          // Remove any existing modals first
+          const existingModals = document.querySelectorAll('.js-modal');
+          existingModals.forEach(modal => document.body.removeChild(modal));
+          
+          showSuccessModal('Post not found.', null, 0, 'error');
+          return;
+        }
+        
+        // Update the post's status
+        posts[postIndex].status = newStatus;
+        
+        // Save the updated posts array
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // For local development, use our save API endpoint
+          try {
+            const saveResponse = await fetch('/save-post', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                post: posts[postIndex],
+                allPosts: posts
+              })
+            });
+            
+            if (!saveResponse.ok) {
+              throw new Error('Save API failed');
+            }
+            
+            const saveResult = await saveResponse.json();
+            console.log('Save result:', saveResult);
+          } catch (saveError) {
+            console.error('Error saving status change:', saveError);
+            
+            // Remove any existing modals first
+            const existingModals = document.querySelectorAll('.js-modal');
+            existingModals.forEach(modal => document.body.removeChild(modal));
+            
+            // Then show the error modal
+            showSuccessModal(
+              'Unable to save status change. Make sure you are running the enhanced local server: ./scripts/start_local_server_with_api.sh', 
+              null, 
+              0, 
+              'error'
+            );
+            return;
+          }
+        } else {
+          // In production, this would make an API call to update the post
+          console.log(`Post ${postId} status updated to ${newStatus}`);
+        }
+        
+        // Determine the display message based on the new status
+        let statusMessage;
+        switch (newStatus) {
+          case 'approved':
+            statusMessage = 'Post approved and now visible on the public site';
+            break;
+          case 'rejected':
+            statusMessage = 'Post rejected';
+            break;
+          case 'pending':
+            statusMessage = 'Post unpublished (moved to pending)';
+            break;
+          default:
+            statusMessage = `Post status changed to ${newStatus}`;
+        }
+        
+        // Show success message
+        showSuccessModal(statusMessage, null, 1500, 'success');
+        
+        // Reload the posts list after a short delay
+        setTimeout(loadPosts, 1500);
+      } catch (error) {
+        console.error('Error updating post status:', error);
+        
+        // Remove any existing modals first
+        const existingModals = document.querySelectorAll('.js-modal');
+        existingModals.forEach(modal => document.body.removeChild(modal));
+        
+        // Show detailed error message
+        showSuccessModal(`Error updating post status: ${error.message}. Please try again.`, null, 0, 'error');
+      }
+    }
+
+    window.onload = () => {
+      loadPosts();
+      
+      // Add event listeners
+      document.getElementById('searchInput').addEventListener('input', loadPosts);
+      document.getElementById('statusFilter').addEventListener('change', loadPosts);
+    };
+  </script>
+</body>
+
+</html>

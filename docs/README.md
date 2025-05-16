@@ -88,5 +88,15 @@ To work on the frontend locally:
 
 1. Clone this repository
 2. Make your changes to the HTML, CSS, or JavaScript files
-3. Test locally by opening the HTML files in a browser
-4. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`
+3. Start a local development server (see below)
+4. Test locally using the server URL
+5. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`
+
+### Local Development Servers
+
+This project supports multiple local development server options with dynamic port selection to avoid conflicts. See `LOCAL_DEVELOPMENT.md` for detailed instructions on:
+
+- Basic static file server
+- Enhanced API server with post submission support
+- VS Code Live Server compatible options
+- Troubleshooting connection issues

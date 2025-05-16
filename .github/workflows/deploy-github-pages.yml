@@ -1,3 +1,13 @@
+# GitHub Pages Deployment Workflow
+# 
+# This workflow deploys the frontend to GitHub Pages and performs validation checks.
+# 
+# Note: This project uses dynamic port selection for local development servers
+# (start_local_server_with_api.sh and start_vscode_server_with_api.sh),
+# but GitHub Pages deployment is completely static and doesn't use these servers.
+# The diagnostic tools like server_port_checker.html are included in the deployment
+# to help users debug connection issues when accessing the deployed site.
+
 name: Deploy to GitHub Pages
 
 on:
@@ -40,7 +50,31 @@ jobs:
               cp -v ../data/*.json ./data/
             fi
           fi
+          
+      - name: Verify Diagnostic Tools
+        run: |
+          echo "Checking for diagnostic tools:"
+          # Check for our diagnostic port checker tool
+          if [ ! -f "./diagnostics/server_port_checker.html" ] || [ ! -f "./js/diagnostics/server_port_checker.js" ]; then
+            echo "WARNING: Server port checker diagnostic tool is missing!"
+          else
+            echo "✅ Server port checker found"
+          fi
+          
+          # Ensure the diagnostics directory exists
+          mkdir -p ./diagnostics
+          mkdir -p ./js/diagnostics
 
+      - name: Validate files for deployment
+        run: |
+          echo "Checking for hardcoded port references in critical files..."
+          # Check for hardcoded port references in critical files that might cause issues in production
+          if grep -r --include="*.js" --include="*.html" "localhost:5500" --exclude-dir=node_modules . | grep -v "dynamically"; then
+            echo "WARNING: Found hardcoded localhost:5500 references that might need to be made dynamic"
+          else
+            echo "✅ No problematic hardcoded port references found"
+          fi
+          
       - name: Create .nojekyll file
         run: touch .nojekyll
 

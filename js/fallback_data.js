@@ -1,6 +1,11 @@
-[
+/**
+ * Fallback data for when JSON files can't be loaded
+ * This provides a minimal set of data to ensure the site works even if loading fails
+ */
+
+const FALLBACK_POSTS = [
   {
-    "id": "post1",
+    "id": "fallback1",
     "title": "Improving School Infrastructure in Freetown",
     "body": "Many schools in Freetown need urgent repairs and upgrades. Children are studying in classrooms with leaking roofs during the rainy season. We need a coordinated effort to improve educational infrastructure.",
     "category": "education",
@@ -8,38 +13,47 @@
     "status": "approved"
   },
   {
-    "id": "post2",
+    "id": "fallback2",
     "title": "Healthcare Access in Rural Communities",
     "body": "Access to healthcare remains a serious challenge in rural Sierra Leone. Some villages require residents to travel more than 20km to reach the nearest clinic. Mobile healthcare units could help address this gap.",
     "category": "health",
-    "imageUrl": "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhbHRoY2FyZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
     "timestamp": "2025-05-08T14:15:00Z",
     "status": "approved"
   },
   {
-    "id": "post3",
+    "id": "fallback3",
     "title": "Youth Unemployment Solutions",
     "body": "Youth unemployment remains one of our biggest challenges. We need vocational training centers in every district that focus on practical skills that match market demands.",
     "category": "youth",
     "timestamp": "2025-05-06T11:20:00Z",
     "status": "approved"
-  },
-  {
-    "title": "Hellow",
-    "body": "http://localhost:5501/http://localhost:5501/http://localhost:5501/",
-    "category": "health",
-    "imageUrl": "",
-    "timestamp": "2025-05-16T19:19:33.741Z",
-    "status": "rejected",
-    "id": "post1747423173747"
-  },
-  {
-    "title": "http://localhost:5501/",
-    "body": "http://localhost:5501/http://localhost:5501/",
-    "category": "technology",
-    "imageUrl": "https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/370c/live/d15c0910-30e1-11f0-8519-3b5a01ebe413.jpg.webp",
-    "timestamp": "2025-05-16T19:20:06.182Z",
-    "status": "pending",
-    "id": "post1747423206191"
   }
-]
+];
+
+/**
+ * Get fallback posts data
+ * @returns {Array} Fallback posts array
+ */
+function getFallbackPosts() {
+  return FALLBACK_POSTS;
+}
+
+/**
+ * Load fallback data when needed 
+ * @param {string} dataType - The type of data to load ('posts', 'votes', 'comments', 'petitions')
+ * @returns {any} - The appropriate fallback data
+ */
+function getFallbackData(dataType) {
+  switch(dataType) {
+    case 'posts':
+      return FALLBACK_POSTS;
+    case 'votes':
+      return {};
+    case 'comments':
+      return {};
+    case 'petitions':
+      return {};
+    default:
+      return null;
+  }
+}

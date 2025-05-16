@@ -47,6 +47,7 @@ function createFooter() {
       
       <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-center items-center">
         <p class="text-gray-400">&copy; ${currentYear} We Are Sierra Leone. All rights reserved.</p>
+        <a href="admin.html" class="text-xs text-gray-500 hover:text-gray-400 ml-2 mt-2 md:mt-0">Moderator Access</a>
       </div>
     </div>
     `;

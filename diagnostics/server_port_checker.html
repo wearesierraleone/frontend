@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Server Port Checker</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .panel {
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .results {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .available {
+      color: green;
+    }
+    .unavailable {
+      color: #999;
+    }
+    .current {
+      background-color: #fffde7;
+      font-weight: bold;
+    }
+    .button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .instructions {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-left: 4px solid #4CAF50;
+      margin: 20px 0;
+    }
+    .error {
+      background-color: #ffebee;
+      padding: 15px;
+      border-left: 4px solid #f44336;
+      margin: 20px 0;
+    }
+    code {
+      font-family: monospace;
+      background-color: #f1f1f1;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API Server Port Checker</h1>
+    
+    <div class="panel">
+      <p>This tool checks for API servers running on common development ports.</p>
+      <p>Current page URL: <span id="currentUrl"></span></p>
+      <button id="checkPorts" class="button">Check API Servers</button>
+    </div>
+    
+    <div class="results" id="results">
+      <p>Click the button above to scan for API servers...</p>
+    </div>
+    
+    <div class="instructions" id="instructions" style="display:none">
+      <h3>Instructions</h3>
+      <p>To start an API server that can process post submissions:</p>
+      <code>./scripts/start_local_server_with_api.sh</code>
+      <p>Or, for VS Code Live Server compatibility:</p>
+      <code>./scripts/start_vscode_server_with_api.sh</code>
+      <p>After starting the server, reload this page using the URL displayed in the terminal.</p>
+    </div>
+  </div>
+  
+  <script src="../js/diagnostics/server_port_checker.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show current URL
+      document.getElementById('currentUrl').textContent = window.location.href;
+      
+      // Add event listener for check button
+      document.getElementById('checkPorts').addEventListener('click', async function() {
+        const resultsElement = document.getElementById('results');
+        resultsElement.innerHTML = '<p>Scanning for API servers on common ports...</p>';
+        
+        // Check API servers
+        const results = await checkApiServerPorts();
+        
+        // Format results
+        let html = '<h2>Port Scan Results</h2>';
+        html += '<table>';
+        html += '<tr><th>Port</th><th>Status</th><th>URL</th></tr>';
+        
+        // Get the current port
+        const currentPort = window.location.port;
+        
+        // Sort ports numerically
+        const portNumbers = Object.keys(results.checkedPorts).map(Number).sort((a, b) => a - b);
+        
+        for (const port of portNumbers) {
+          const info = results.checkedPorts[port];
+          const rowClass = port.toString() === currentPort ? 'current' : '';
+          const statusClass = info.available ? 'available' : 'unavailable';
+          const statusText = info.available ? '✅ Available' : '❌ Not available';
+          
+          html += `<tr class="${rowClass}">`;
+          html += `<td>${port}</td>`;
+          html += `<td class="${statusClass}">${statusText}</td>`;
+          html += `<td><a href="${info.url}" target="_blank">${info.url}</a></td>`;
+          html += '</tr>';
+        }
+        
+        html += '</table>';
+        
+        // Add summary and recommendations
+        if (results.availablePorts.length > 0) {
+          if (results.availablePorts.includes(currentPort)) {
+            html += '<div class="instructions">';
+            html += '<p>✅ You are currently connected to a working API server on port ' + currentPort + '.</p>';
+            html += '<p>You should be able to submit posts and have them saved to the server.</p>';
+            html += '</div>';
+          } else {
+            html += '<div class="error">';
+            html += '<p>⚠️ An API server was found, but you are not connected to it.</p>';
+            html += '<p>You are currently on port ' + currentPort + ', but API servers were found on: ' + results.availablePorts.join(', ') + '</p>';
+            html += '<p>Consider switching to one of the available API server ports.</p>';
+            html += '</div>';
+            document.getElementById('instructions').style.display = 'block';
+          }
+        } else {
+          html += '<div class="error">';
+          html += '<p>❌ No API servers were found running on common ports.</p>';
+          html += '<p>You need to start an API server to enable post submission functionality.</p>';
+          html += '</div>';
+          document.getElementById('instructions').style.display = 'block';
+        }
+        
+        resultsElement.innerHTML = html;
+      });
+    });
+  </script>
+</body>
+</html>
