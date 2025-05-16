@@ -40,11 +40,9 @@ function baseUrl(forDataOnly = false) {
     } else if (isGitHubPages) {
         // Use different URLs for data files vs API endpoints
         if (forDataOnly) {
-            // When loading data (JSON files), use the raw GitHub content
-            // For private repositories, we need to include the token for authentication
-            // Note: This token is temporary and will expire - a better solution would be
-            // to host the data files on a public CDN or use the Flask API to serve them
-            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/refs/heads/main';
+            // Use local data files in the frontend repository itself
+            // This eliminates the need for cross-repository authentication
+            return '';
         } else {
             // For API submissions, use the Flask submission bot
             return 'https://flask-submission-bot.onrender.com';
@@ -309,21 +307,8 @@ async function loadData(path, defaultValue = {}) {
     
     try {
         // Construct the URL using baseUrl() with forDataOnly=true to get the data URL
+        // With our new approach, this will be a local path within the repository
         let url = `${baseUrl(true)}/${path}`;
-        
-        // Check if we're using GitHub raw content and need to append token for private repo access
-        const isGitHubRaw = url.includes('raw.githubusercontent.com') || url.includes('refs/heads/main');
-        if (isGitHubRaw && !url.includes('?token=')) {
-            // First check for build-time injected token (from GitHub Actions)
-            // Then fall back to session storage token (from manual entry)
-            const token = "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"; // Injected during build
-            
-            // If we have a token, append it to the URL
-            if (token && token !== "null" && token !== "undefined") {
-                url += `?token=${token}`;
-                console.log('Using token from session storage');
-            }
-        }
         
         // Use enhanced logging
         logApiRequest(url, 'GET');

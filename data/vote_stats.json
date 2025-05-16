@@ -1,0 +1,14 @@
+{
+  "post1": {
+    "upvotes": 15,
+    "downvotes": 2
+  },
+  "post2": {
+    "upvotes": 8,
+    "downvotes": 3
+  },
+  "post3": {
+    "upvotes": 24,
+    "downvotes": 4
+  }
+}

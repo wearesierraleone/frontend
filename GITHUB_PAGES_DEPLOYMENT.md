@@ -116,36 +116,34 @@ If you encounter issues with your deployed site:
 ### Making a Public Repository Private:
 Note that with a free GitHub account, GitHub Pages works only with public repositories. Making your repository private will disable GitHub Pages unless you have GitHub Pro, Team, or Enterprise.
 
-## Accessing Data from Private Repositories
+## Data File Management
 
-If your data is stored in a private GitHub repository, the frontend needs authentication to access it. Our system supports this through GitHub personal access tokens:
+The platform now uses a simplified architecture with data files stored directly in the frontend repository:
 
-### Setting Up GitHub Token Authentication
+### Data File Structure
 
-1. **Create a Token**:
-   - Go to [GitHub Settings > Developer Settings > Personal access tokens](https://github.com/settings/tokens)
-   - Click "Generate new token"
-   - Give it a descriptive name (e.g., "We Are Sierra Leone Data Access")
-   - Select the "repo" scope (needed to access private repository content)
-   - Click "Generate token"
-   - **IMPORTANT**: Copy the token immediately - GitHub only shows it once!
+1. **Organization**:
+   - All data files are stored in the `/data` directory 
+   - Main data files include:
+     - `approved.json`: Approved posts/stories
+     - `petitions.json`: Active petitions
+     - `comments.json`: User comments
+     - `votes.json`: User votes
+     - `vote_stats.json`: Aggregated vote statistics
 
-2. **Enter the Token in the Frontend**:
-   - When accessing the site, you'll receive a prompt for your GitHub token if data cannot be retrieved
-   - Enter your token in the dialog box
-   - The token will be stored in your browser's session storage and will be cleared when you close the browser tab
+2. **Updating Data Files**:
+   - Data files can be edited directly in the repository
+   - After pushing changes, GitHub Actions automatically deploys the updated site
+   - No authentication is required to access these files in the deployed site
 
-3. **Managing Tokens**:
-   - Visit the diagnostics page at `diagnostics.html` to manage your token
-   - You can test API connections to verify your token is working
-   - Token authentication is only needed for data access, not for submitting content
+### Advantages of This Approach
 
-### Security Considerations
+- **Simplicity**: No need for complex token-based authentication
+- **Performance**: Faster data loading with no authentication overhead
+- **Reliability**: No dependency on external private repositories 
+- **Maintainability**: Easier for contributors to update and maintain
 
-- Tokens should be treated as passwords - do not share them
-- The token is stored only in your browser's session storage, not in cookies or local storage
-- For better security, create tokens with an expiration date
-- If a token is compromised, revoke it immediately in your GitHub settings
+For more detailed information on the data architecture, see the [DATA_ARCHITECTURE.md](DATA_ARCHITECTURE.md) file.
 
 ### Automated Deployment with GitHub Actions
 
