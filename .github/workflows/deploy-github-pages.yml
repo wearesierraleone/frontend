@@ -17,31 +17,44 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          
-      - name: Install Dependencies
+      - name: Debug File Structure
         run: |
-          npm install -g replace-in-file
+          echo "Current directory: $(pwd)"
+          find . -type f -name "utils.js" | grep -v "node_modules"
+          
+      - name: Display utils.js Content
+        run: |
+          echo "First 10 lines of utils.js:"
+          head -n 10 ./js/utils.js
+          echo "Lines containing 'token':"
+          grep -n "token" ./js/utils.js || echo "No lines with 'token' found"
           
       - name: Inject GitHub Token
         env:
           DATA_TOKEN: ${{ secrets.DATA_TOKEN }}
         run: |
-          # Replace token placeholder in utils.js
-          replace-in-file --configFile=replace-config.js
-
-      - name: Create Replace Config
-        run: |
-          cat > replace-config.js << 'EOF'
-          module.exports = {
-            files: ['js/utils.js'],
-            from: /const token = sessionStorage.getItem\('github_access_token'\);/g,
-            to: `const token = "${{ secrets.DATA_TOKEN }}"; // Injected during build`,
-          };
-          EOF
+          # Find the line containing github_access_token
+          echo "Looking for the token line..."
+          TOKEN_LINE=$(grep -n "github_access_token" ./js/utils.js | head -n 1)
+          echo "Found token line: $TOKEN_LINE"
+          
+          if [ -n "$TOKEN_LINE" ]; then
+            # Extract line number
+            LINE_NUM=$(echo "$TOKEN_LINE" | cut -d':' -f1)
+            echo "Line number: $LINE_NUM"
+            
+            # Create a backup of the file
+            cp ./js/utils.js ./js/utils.js.bak
+            
+            # Insert the token at that line
+            TOKEN_REPLACEMENT="            const token = \"$DATA_TOKEN\"; // Injected during build"
+            sed -i "${LINE_NUM}s/.*/$TOKEN_REPLACEMENT/" ./js/utils.js
+            
+            echo "Replacement completed. Verifying new line:"
+            sed -n "${LINE_NUM}p" ./js/utils.js
+          else
+            echo "Token line not found. Continuing without replacement."
+          fi
 
       - name: Create .nojekyll file
         run: touch .nojekyll
