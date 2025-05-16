@@ -95,3 +95,55 @@ function showSuccessModal(message = 'Your action was successful.', redirectTo = 
     }
   };
 }
+
+/**
+ * Display a general purpose modal with custom content
+ * 
+ * @param {string} content - The HTML content to display in the modal
+ * @param {Function} callback - Optional function to call after the modal is displayed
+ */
+function showModal(content, callback = null) {
+  // Remove any existing modals
+  const existingModals = document.querySelectorAll('.js-modal');
+  existingModals.forEach(modal => document.body.removeChild(modal));
+  
+  // Create modal container
+  const modalContainer = document.createElement('div');
+  modalContainer.id = 'modal';
+  modalContainer.className = 'js-modal fixed inset-0 flex items-center justify-center z-50';
+  
+  // Create backdrop
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fixed inset-0 bg-black bg-opacity-50';
+  backdrop.onclick = () => document.body.removeChild(modalContainer);
+  
+  // Create modal content
+  const modalContent = document.createElement('div');
+  modalContent.className = 'bg-white rounded-lg shadow-xl w-full max-w-md mx-4 z-10 overflow-hidden';
+  modalContent.innerHTML = content;
+  
+  // Add close button if not present in content
+  if (!content.includes('close-modal-btn')) {
+    const closeButton = document.createElement('button');
+    closeButton.id = 'close-modal-btn';
+    closeButton.className = 'absolute top-2 right-2 text-gray-500 hover:text-gray-800';
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = () => document.body.removeChild(modalContainer);
+    modalContent.appendChild(closeButton);
+  }
+  
+  // Assemble modal
+  modalContainer.appendChild(backdrop);
+  modalContainer.appendChild(modalContent);
+  
+  // Add to document
+  document.body.appendChild(modalContainer);
+  
+  // Execute callback if provided
+  if (callback && typeof callback === 'function') {
+    callback();
+  }
+  
+  // Return the modal container
+  return modalContainer;
+}

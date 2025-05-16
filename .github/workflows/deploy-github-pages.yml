@@ -1,0 +1,54 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - gh-pages-clean # development branch for GitHub Pages
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          
+      - name: Install Dependencies
+        run: |
+          npm install -g replace-in-file
+          
+      - name: Inject GitHub Token
+        env:
+          GITHUB_DATA_TOKEN: ${{ secrets.GITHUB_DATA_TOKEN }}
+        run: |
+          # Replace token placeholder in utils.js
+          replace-in-file --configFile=replace-config.js
+
+      - name: Create Replace Config
+        run: |
+          cat > replace-config.js << 'EOF'
+          module.exports = {
+            files: ['js/utils.js'],
+            from: /const token = sessionStorage.getItem\('github_access_token'\);/g,
+            to: `const token = "${{ secrets.GITHUB_DATA_TOKEN }}"; // Injected during build`,
+          };
+          EOF
+
+      - name: Create .nojekyll file
+        run: touch .nojekyll
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to
+          folder: . # The folder the action should deploy
+          clean: true # Automatically remove deleted files from the deploy branch

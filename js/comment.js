@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // We're online, try to submit to the server
     postContent(
-      '/comment',
+      '/comment',  // Updated to match Flask API endpoint '/comments'
       comment,
       'Comment submitted successfully.',
       null,

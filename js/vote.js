@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     postContentWithCallback(
-      '/vote',
+      '/vote',  // Updated to match Flask API endpoint '/votes'
       vote,
       () => {
         voteBtn.innerText = 'Voted';

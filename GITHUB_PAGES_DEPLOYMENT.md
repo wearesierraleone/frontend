@@ -115,3 +115,69 @@ If you encounter issues with your deployed site:
 
 ### Making a Public Repository Private:
 Note that with a free GitHub account, GitHub Pages works only with public repositories. Making your repository private will disable GitHub Pages unless you have GitHub Pro, Team, or Enterprise.
+
+## Accessing Data from Private Repositories
+
+If your data is stored in a private GitHub repository, the frontend needs authentication to access it. Our system supports this through GitHub personal access tokens:
+
+### Setting Up GitHub Token Authentication
+
+1. **Create a Token**:
+   - Go to [GitHub Settings > Developer Settings > Personal access tokens](https://github.com/settings/tokens)
+   - Click "Generate new token"
+   - Give it a descriptive name (e.g., "We Are Sierra Leone Data Access")
+   - Select the "repo" scope (needed to access private repository content)
+   - Click "Generate token"
+   - **IMPORTANT**: Copy the token immediately - GitHub only shows it once!
+
+2. **Enter the Token in the Frontend**:
+   - When accessing the site, you'll receive a prompt for your GitHub token if data cannot be retrieved
+   - Enter your token in the dialog box
+   - The token will be stored in your browser's session storage and will be cleared when you close the browser tab
+
+3. **Managing Tokens**:
+   - Visit the diagnostics page at `diagnostics.html` to manage your token
+   - You can test API connections to verify your token is working
+   - Token authentication is only needed for data access, not for submitting content
+
+### Security Considerations
+
+- Tokens should be treated as passwords - do not share them
+- The token is stored only in your browser's session storage, not in cookies or local storage
+- For better security, create tokens with an expiration date
+- If a token is compromised, revoke it immediately in your GitHub settings
+
+### Automated Deployment with GitHub Actions
+
+For a more streamlined deployment process that automatically handles private repository authentication, you can use GitHub Actions:
+
+#### Setting Up GitHub Actions Deployment
+
+1. Create the GitHub Actions workflow file:
+   - Create a directory: `.github/workflows/`
+   - Add the file `deploy-github-pages.yml` (already included in the repository)
+
+2. Add a Repository Secret for Private Data Access:
+   - Go to your repository Settings
+   - Navigate to "Secrets and variables" → "Actions"
+   - Click "New repository secret"
+   - Name: `GITHUB_DATA_TOKEN`
+   - Value: [Your GitHub Personal Access Token with 'repo' scope]
+   - Click "Add secret"
+
+3. Trigger the Workflow:
+   - Push changes to the `main` or `gh-pages-clean` branch
+   - OR manually trigger the workflow from the "Actions" tab in your repository
+   
+4. Monitor Deployment:
+   - Go to the "Actions" tab in your repository
+   - Click on the running workflow to see its progress
+   - Once completed, your site will be available at your GitHub Pages URL
+
+#### Benefits of GitHub Actions Deployment
+
+- Automatically injects the GitHub token during build time
+- Users don't need to provide their own token
+- Consistent deployment process
+- Can be triggered manually or automatically on push
+- Handles all necessary build steps in one process

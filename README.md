@@ -28,6 +28,38 @@ The application uses the following approach for data management:
 2. Falls back to local storage cache if the fetch fails
 3. Uses default values as a last resort
 
+## Authentication
+
+### Private Repository Access
+
+If the backend repository is private, the application supports two methods of GitHub token authentication:
+
+#### 1. Automated (Recommended)
+
+Using GitHub Actions and repository secrets:
+
+1. Store a GitHub Personal Access Token as a repository secret named `GITHUB_DATA_TOKEN`
+2. The GitHub Actions workflow automatically injects this token during deployment
+3. Users can access the site without needing to provide their own tokens
+4. Use `setup_github_secret.sh` script or GitHub web interface to set up the secret
+
+#### 2. Manual
+
+Using session storage for development or testing:
+
+1. Users will be prompted to enter a GitHub token when needed
+2. Tokens are stored in session storage (cleared when browser tab is closed)
+3. The diagnostics page (`diagnostics.html`) provides tools for managing tokens
+
+See `GITHUB_PAGES_LOCALSTORAGE.md` for more details on both authentication methods.
+
+### API Submission
+
+Form submissions are sent to the Flask Submission Bot API:
+- API endpoint: https://flask-submission-bot.onrender.com
+- Supported endpoints: `/submit`, `/comments`, `/votes`
+- See `API_REFERENCE.md` for detailed API documentation
+
 ## Development
 
 To work on the frontend locally:

@@ -1,4 +1,27 @@
 /**
+ * Enhanced diagnostic logging for API requests
+ * @param {string} url - The URL being called
+ * @param {string} method - The HTTP method being used
+ * @param {object} data - The data being sent (for POST requests)
+ */
+function logApiRequest(url, method, data = null) {
+    console.group(`API Request: ${method} ${url}`);
+    console.log(`🌐 URL: ${url}`);
+    console.log(`📝 Method: ${method}`);
+    if (data) {
+        const truncatedData = JSON.stringify(data).length > 200 
+            ? JSON.stringify(data).substring(0, 200) + '...'
+            : JSON.stringify(data);
+        console.log(`📦 Request Body: ${truncatedData}`);
+    }
+    console.log(`⏱️ Time: ${new Date().toISOString()}`);
+    console.log(`🌍 Host: ${window.location.hostname}`);
+    console.log(`🔄 Environment: ${window.location.hostname.includes('github.io') ? 'GitHub Pages' : 
+                            (window.location.hostname === 'localhost' ? 'Local Development' : 'Other')}`)
+    console.groupEnd();
+}
+
+/**
  * Returns the base URL for API requests
  * @param {boolean} forDataOnly - If true, returns the URL for data files only, not API endpoints
  * @returns {string} The base URL for API requests or data files
@@ -18,7 +41,10 @@ function baseUrl(forDataOnly = false) {
         // Use different URLs for data files vs API endpoints
         if (forDataOnly) {
             // When loading data (JSON files), use the raw GitHub content
-            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/main';
+            // For private repositories, we need to include the token for authentication
+            // Note: This token is temporary and will expire - a better solution would be
+            // to host the data files on a public CDN or use the Flask API to serve them
+            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/refs/heads/main';
         } else {
             // For API submissions, use the Flask submission bot
             return 'https://flask-submission-bot.onrender.com';
@@ -49,17 +75,19 @@ function postContent(
     const url = baseUrl() + path;
     const apiUrl = baseUrl();
     
-    console.log(`Posting to API URL: ${url} (Base API URL: ${apiUrl})`);
+    // Use enhanced logging
+    logApiRequest(url, 'POST', data);
     
     // Add timestamp to data for better tracking
     data._timestamp = new Date().toISOString();
     
     // Check if we're in offline/static mode or on GitHub Pages
     const isGitHubPages = window.location.hostname.includes('github.io');
-    const hasSubmissionAPI = apiUrl.includes('onrender.com') || apiUrl.includes('localhost');
+    // If we're on GitHub Pages, we should be using the Flask API
+    const hasSubmissionAPI = apiUrl.includes('flask-submission-bot.onrender.com') || apiUrl.includes('localhost');
     
     // Use localStorage fallback only if we don't have a submission API
-    if (apiUrl === '/api' || (isGitHubPages && !hasSubmissionAPI)) {
+    if (apiUrl === '' || apiUrl === '/api') {
         console.log('Running in static/GitHub Pages mode - saving to localStorage', data);
         // Store in localStorage for demo purposes
         try {
@@ -154,17 +182,19 @@ function postContentWithCallback(
     const url = baseUrl() + path;
     const apiUrl = baseUrl();
     
-    console.log(`Posting to API URL with callback: ${url} (Base API URL: ${apiUrl})`);
+    // Use enhanced logging
+    logApiRequest(url, 'POST', data);
     
     // Add timestamp to data
     data._timestamp = new Date().toISOString();
     
-    // Check if we're in offline/static mode or on GitHub Pages
+    // Check if we're in offline/static mode 
     const isGitHubPages = window.location.hostname.includes('github.io');
-    const hasSubmissionAPI = apiUrl.includes('onrender.com') || apiUrl.includes('localhost');
+    // If we're on GitHub Pages, we should be using the Flask API
+    const hasSubmissionAPI = apiUrl.includes('flask-submission-bot.onrender.com') || apiUrl.includes('localhost');
     
     // Use localStorage fallback only if we don't have a submission API
-    if (apiUrl === '/api' || (isGitHubPages && !hasSubmissionAPI)) {
+    if (apiUrl === '' || apiUrl === '/api') {
         console.log('Running in static/GitHub Pages mode - saving to localStorage', data);
         // Store in localStorage for demo purposes
         try {
@@ -279,14 +309,42 @@ async function loadData(path, defaultValue = {}) {
     
     try {
         // Construct the URL using baseUrl() with forDataOnly=true to get the data URL
-        const url = `${baseUrl(true)}/${path}`;
-        console.log(`Loading data from: ${url}`);
+        let url = `${baseUrl(true)}/${path}`;
+        
+        // Check if we're using GitHub raw content and need to append token for private repo access
+        const isGitHubRaw = url.includes('raw.githubusercontent.com') || url.includes('refs/heads/main');
+        if (isGitHubRaw && !url.includes('?token=')) {
+            // First check for build-time injected token (from GitHub Actions)
+            // Then fall back to session storage token (from manual entry)
+            const token = sessionStorage.getItem('github_access_token');
+            
+            // If we have a token, append it to the URL
+            if (token && token !== "null" && token !== "undefined") {
+                url += `?token=${token}`;
+                console.log('Using token from session storage');
+            }
+        }
+        
+        // Use enhanced logging
+        logApiRequest(url, 'GET');
         
         // Try loading from the data URL or direct file path
         const response = await fetch(url);
         
         // Check if the response is ok
         if (!response.ok) {
+            // If we get a 401 (Unauthorized) or 403 (Forbidden) from GitHub, we need a token
+            if ((response.status === 401 || response.status === 403) && 
+                (url.includes('githubusercontent.com') || url.includes('github'))) {
+                
+                // Mark that we need GitHub authentication
+                localStorage.setItem('github_auth_required', 'true');
+                
+                // If we have the promptForGitHubToken function available, call it
+                if (typeof promptForGitHubToken === 'function') {
+                    promptForGitHubToken();
+                }
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
