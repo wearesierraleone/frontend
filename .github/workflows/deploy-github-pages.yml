@@ -47,8 +47,8 @@ jobs:
             cp ./js/utils.js ./js/utils.js.bak
             
             # Insert the token at that line
-            TOKEN_REPLACEMENT="            const token = \"$DATA_TOKEN\"; // Injected during build"
-            sed -i "${LINE_NUM}s/.*/$TOKEN_REPLACEMENT/" ./js/utils.js
+            # Use different delimiters for sed to avoid escaping issues
+            sed -i "${LINE_NUM}c\\            const token = \"$DATA_TOKEN\"; // Injected during build" ./js/utils.js
             
             echo "Replacement completed. Verifying new line:"
             sed -n "${LINE_NUM}p" ./js/utils.js
