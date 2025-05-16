@@ -124,7 +124,7 @@ function postContent(
     
     // Set timeout for fetch to prevent infinite waiting
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
     
     return fetch(url, {
         method: 'POST',
@@ -151,6 +151,37 @@ function postContent(
     .catch(err => {
         clearTimeout(timeoutId);
         console.error('Request failed:', err);
+        
+        // If we're on GitHub Pages and get an abort error (timeout), use localStorage as fallback
+        if (isGitHubPages && err.name === 'AbortError') {
+            console.log('API request timed out, falling back to localStorage storage');
+            try {
+                // Create a unique ID for this submission
+                const submissionId = 'submission_' + Date.now();
+                localStorage.setItem(submissionId, JSON.stringify(data));
+                
+                // Also add to the specific collection
+                const collectionPath = path.replace(/^\/+|\/+$/g, '');
+                if (collectionPath) {
+                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                    try {
+                        const collection = JSON.parse(existingData);
+                        const newItem = { ...data, id: `local_${Date.now()}` };
+                        collection.push(newItem);
+                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                    } catch (e) {
+                        console.error('Error updating collection:', e);
+                    }
+                }
+                
+                showSuccessModal(successMsg + ' (Saved locally)', redirectTo, 2000, 'success');
+                return Promise.resolve({});
+            } catch (e) {
+                console.error('localStorage fallback error:', e);
+                showSuccessModal('Server unavailable and local storage failed. Please try again later.', null, 0, 'error');
+                return Promise.reject(e);
+            }
+        }
         
         let errorMessage = 'Network error. Please try again later.';
         if (err.name === 'AbortError') {
@@ -232,7 +263,7 @@ function postContentWithCallback(
     
     // Set timeout for fetch to prevent infinite waiting
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
     
     return fetch(url, {
         method: 'POST',
@@ -267,6 +298,39 @@ function postContentWithCallback(
     .catch(err => {
         clearTimeout(timeoutId);
         console.error('Request failed:', err);
+        
+        // If we're on GitHub Pages and get an abort error (timeout), use localStorage as fallback
+        if (isGitHubPages && err.name === 'AbortError') {
+            console.log('API request timed out, falling back to localStorage storage');
+            try {
+                // Create a unique ID for this submission
+                const submissionId = 'callback_submission_' + Date.now();
+                localStorage.setItem(submissionId, JSON.stringify(data));
+                
+                // Also add to the specific collection
+                const collectionPath = path.replace(/^\/+|\/+$/g, '');
+                if (collectionPath) {
+                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                    try {
+                        const collection = JSON.parse(existingData);
+                        const newItem = { ...data, id: `local_${Date.now()}` };
+                        collection.push(newItem);
+                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                    } catch (e) {
+                        console.error('Error updating collection:', e);
+                    }
+                }
+                
+                // Execute callback with the local data
+                callback(data);
+                showSuccessModal('Operation successful (Saved locally)', null, 0, 'success');
+                return Promise.resolve(data);
+            } catch (e) {
+                console.error('localStorage fallback error:', e);
+                showSuccessModal('Server unavailable and local storage failed. Please try again later.', null, 0, 'error');
+                return Promise.reject(e);
+            }
+        }
         
         let errorMessage = 'Network error. Please try again later.';
         if (err.name === 'AbortError') {
