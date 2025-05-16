@@ -347,8 +347,8 @@
   <script>
     async function loadPetition() {
       const postId = new URLSearchParams(window.location.search).get('id');
-      const resPost = await fetch('../data/approved.json');
-      const posts = await resPost.json();
+      // Use loadData helper function instead of direct fetch
+      const posts = await loadData('data/approved.json', []);
       const post = posts.find(p => p.id === postId);
       if (!post) {
         document.body.innerHTML = `
@@ -424,8 +424,8 @@
         document.getElementById('imageWrap').appendChild(img);
       }
 
-      const resPetitions = await fetch('../data/petitions.json');
-      const petitions = await resPetitions.json();
+      // Get petition data using loadData helper
+      const petitions = await loadData('data/petitions.json', {});
       const petitionData = petitions[postId];
       
       if (!petitionData) {
@@ -650,8 +650,7 @@
       };
 
       // First, check if the petition is still open
-      fetch('../data/petitions.json')
-        .then(res => res.json())
+      loadData('data/petitions.json', {})
         .then(petitions => {
           const petitionData = petitions[postId];
           
@@ -670,14 +669,10 @@
           }
           
           // If checks pass, submit signature
-          return fetch('http://localhost:8080/sign', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
+          return postContent('/sign', data, 'Your signature has been added.');
         })
         .then(res => {
-          if (res.ok) {
+          if (res.ok || res === true) {
             closeSigningModal();
             showSuccessModal('Thank you! Your signature has been successfully added to this petition.');
             window.location.reload();

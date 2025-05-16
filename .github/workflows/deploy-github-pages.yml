@@ -30,6 +30,15 @@ jobs:
           # Make sure we have the required data files
           if [ ! -f "./data/approved.json" ] || [ ! -f "./data/petitions.json" ]; then
             echo "WARNING: Some required data files are missing!"
+            
+            # Create data directory if needed
+            mkdir -p ./data
+            
+            # Copy data files from parent directory if available
+            if [ -d "../data" ]; then
+              echo "Copying data files from parent directory..."
+              cp -v ../data/*.json ./data/
+            fi
           fi
 
       - name: Create .nojekyll file

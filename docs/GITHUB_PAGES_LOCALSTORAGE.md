@@ -95,7 +95,7 @@ For development or situations where GitHub Actions can't be used:
    - Create tokens with expiration dates for better security
 
 3. **Managing Your Token**:
-   - Visit the `diagnostics.html` page to manage your token and test connections
+   - Visit the `diagnostics/diagnostics.html` page to manage your token and test connections
    - You can set or clear your token manually
    - The token is only needed for data access, not for submitting content
 
@@ -104,7 +104,7 @@ For development or situations where GitHub Actions can't be used:
 If you encounter data loading issues:
 
 1. Check if you're accessing a private repository (ask the administrator)
-2. Visit `diagnostics.html` to run API connection tests
+2. Visit `diagnostics/diagnostics.html` to run API connection tests
 3. Verify your token has the correct permissions (needs "repo" scope)
 4. Try generating a new token if the current one has expired
 

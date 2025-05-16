@@ -281,9 +281,7 @@
         // Try to fetch server stats first
         const fetchStats = async () => {
           try {
-            const response = await fetch('/data/vote_stats.json');
-            if (!response.ok) throw new Error('Stats fetch failed');
-            return await response.json();
+            return await loadData('data/vote_stats.json', {});
           } catch (e) {
             console.log('Could not load vote stats, using localStorage fallback');
             return null;
@@ -415,7 +413,7 @@
       updateVoteStats(postId);
 
       // Check if we should show the petition conversion option
-      const voteStats = await fetch('/data/vote_stats.json').then(res => res.json()).catch(() => ({}));
+      const voteStats = await loadData('data/vote_stats.json', {});
       const upvotes = voteStats[postId]?.upvotes || 0;
 
       if (upvotes >= 10 && !post.isPetition) {
@@ -523,13 +521,9 @@
         }
         
         // Regular API mode
-        fetch(`${apiUrl}/upvote`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(voteObj)
-        })
+        postContent('/upvote', voteObj, 'Upvote recorded.', null, 'Vote submission failed')
         .then(res => {
-          if (res.ok) {
+          if (res.ok || res === true) {
             showSuccessModal('Upvote recorded.', null, 2000, 'success');
             document.getElementById('upvoteBtn').disabled = true;
             document.getElementById('downvoteBtn').disabled = true;
@@ -604,13 +598,9 @@
         }
         
         // Regular API mode
-        fetch(`${apiUrl}/downvote`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(voteObj)
-        })
+        postContent('/downvote', voteObj, 'Vote recorded', null, 'Vote submission failed')
         .then(res => {
-          if (res.ok) {
+          if (res.ok || res === true) {
             showSuccessModal('Your vote has been recorded.', null, 2000, 'success');
             document.getElementById('upvoteBtn').disabled = true;
             document.getElementById('downvoteBtn').disabled = true;
@@ -666,13 +656,10 @@
         }
         
         // Regular API mode
-        fetch(`${apiUrl}/convert`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId, action: 'petition', timestamp: new Date().toISOString() })
-        })
+        postContent('/convert', { postId, action: 'petition', timestamp: new Date().toISOString() }, 
+                   'Post converted to petition', null, 'Conversion failed')
         .then(res => {
-          if (res.ok) {
+          if (res.ok || res === true) {
             showSuccessModal('Post successfully converted to petition! People can now sign it to show support.', window.location.href);
           } else {
             showSuccessModal('Failed to convert post to petition. Please try again later.', null, 0, 'error');
@@ -793,15 +780,9 @@
           };
 
           // Submit the report to the server API
-          fetch('/report', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(report)
-          })
+          postContent('/report', report, 'Report submitted', null, 'Failed to submit report')
           .then(response => {
-            if (response.ok) {
+            if (response.ok || response === true) {
               showSuccessModal('Report submitted successfully', 'Thank you for helping keep our community safe. A moderator will review this report.', undefined, 'success');
             } else {
               throw new Error('Network response was not ok');
