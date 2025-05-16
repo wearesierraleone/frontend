@@ -444,11 +444,11 @@
       }
       
       // Extract petition data
-      const signatures = petitionData.signatures || [];
+      const signatures = Array.isArray(petitionData.signatures) ? petitionData.signatures : [];
       const petitionState = petitionData.state || 'Open';
       const targetSignatures = petitionData.targetSignatures || 100;
       const deadlineDate = petitionData.deadline ? new Date(petitionData.deadline) : null;
-      const governmentResponses = petitionData.responses || [];
+      const governmentResponses = Array.isArray(petitionData.responses) ? petitionData.responses : [];
       
       // Display petition state with appropriate styling
       const stateElement = document.getElementById('petitionState');
@@ -530,14 +530,14 @@
       }
 
       // Update signature count and progress bar
-      const signatureCount = signatures.length;
+      const signatureCount = Array.isArray(signatures) ? signatures.length : 0;
       const progressPercent = Math.min(Math.round((signatureCount / targetSignatures) * 100), 100);
 
       document.getElementById('signatureCount').innerText = `${signatureCount} signature${signatureCount !== 1 ? 's' : ''}`;
       document.getElementById('progressBar').style.width = `${progressPercent}%`;
 
       const list = document.getElementById('signatureList');
-      if (signatures.length === 0) {
+      if (!Array.isArray(signatures) || signatures.length === 0) {
         list.innerHTML = `
           <li class="bg-gray-50 p-4 rounded-lg text-center">
             <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -573,7 +573,7 @@
       // Display government responses if available
       const responsesSection = document.getElementById('governmentResponsesSection');
       const responsesContainer = document.getElementById('responsesContainer');
-      if (governmentResponses.length > 0) {
+      if (Array.isArray(governmentResponses) && governmentResponses.length > 0) {
         responsesSection.classList.remove('hidden');
         governmentResponses.forEach(response => {
           const responseDiv = document.createElement('div');
