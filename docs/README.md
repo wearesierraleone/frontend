@@ -20,7 +20,7 @@ This project uses a simplified approach with data files stored directly in the r
 To ensure the data files are kept up-to-date, use the included sync script:
 
 ```bash
-./scripts/sync_data_files.sh
+../scripts/sync_data_files.sh
 ```
 
 This script will copy all data files from the root project directory to the frontend/data directory.
@@ -29,7 +29,7 @@ This script will copy all data files from the root project directory to the fron
 
 This frontend is configured to be deployed on GitHub Pages.
 
-See `docs/GITHUB_PAGES_DEPLOYMENT.md` for detailed deployment instructions.
+See `GITHUB_PAGES_DEPLOYMENT.md` for detailed deployment instructions.
 
 ## Data Loading
 
@@ -52,7 +52,7 @@ Using GitHub Actions and repository secrets:
 1. Store a GitHub Personal Access Token as a repository secret named `DATA_TOKEN`
 2. The GitHub Actions workflow automatically injects this token during deployment
 3. Users can access the site without needing to provide their own tokens
-4. Use `scripts/setup_github_secret.sh` script or GitHub web interface to set up the secret
+4. Use `../scripts/setup_github_secret.sh` script or GitHub web interface to set up the secret
 
 #### 2. Manual
 
@@ -60,20 +60,20 @@ Using session storage for development or testing:
 
 1. Users will be prompted to enter a GitHub token when needed
 2. Tokens are stored in session storage (cleared when browser tab is closed)
-3. The diagnostics page (`diagnostics/diagnostics.html`) provides tools for managing tokens
+3. The diagnostics page (`../diagnostics/diagnostics.html`) provides tools for managing tokens
 
-See `docs/GITHUB_PAGES_LOCALSTORAGE.md` for more details on both authentication methods.
+See `GITHUB_PAGES_LOCALSTORAGE.md` for more details on both authentication methods.
 
 ### Diagnostic Tools
 
-All diagnostic and test tools are located in the `diagnostics/` directory:
-- `diagnostics/url_diagnostic.html` - Tests URL construction
-- `diagnostics/repository_test.html` - Tests repository configuration
-- `diagnostics/content_test.html` - Tests data loading
-- `diagnostics/diagnostics.html` - API connection diagnostics
-- `diagnostics/detect_github_pages_url.sh` - Auto-detect GitHub Pages URL
+All diagnostic and test tools are located in the `../diagnostics/` directory:
+- `../diagnostics/url_diagnostic.html` - Tests URL construction
+- `../diagnostics/repository_test.html` - Tests repository configuration
+- `../diagnostics/content_test.html` - Tests data loading
+- `../diagnostics/diagnostics.html` - API connection diagnostics
+- `../diagnostics/detect_github_pages_url.sh` - Auto-detect GitHub Pages URL
 
-See `docs/GITHUB_PAGES_DEPLOYMENT.md` for more details on troubleshooting deployment issues.
+See `GITHUB_PAGES_DEPLOYMENT.md` for more details on troubleshooting deployment issues.
 
 ### API Submission
 
@@ -89,4 +89,4 @@ To work on the frontend locally:
 1. Clone this repository
 2. Make your changes to the HTML, CSS, or JavaScript files
 3. Test locally by opening the HTML files in a browser
-4. Deploy to GitHub Pages using the instructions in `docs/GITHUB_PAGES_DEPLOYMENT.md`
+4. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`

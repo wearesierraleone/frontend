@@ -108,4 +108,4 @@ echo "2. Set the branch to 'gh-pages' in your repository settings"
 echo "3. Check your deployment status in your repository's 'Actions' tab"
 echo
 echo -e "${YELLOW}Support:${NC}"
-echo "If you need help with your deployment, check the GITHUB_PAGES_DEPLOYMENT.md file."
+echo "If you need help with your deployment, check the docs/GITHUB_PAGES_DEPLOYMENT.md file."

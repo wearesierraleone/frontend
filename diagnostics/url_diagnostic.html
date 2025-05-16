@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Path Diagnostics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .result-box {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #e6ffe6;
+            border-color: #99cc99;
+        }
+        .warning {
+            background-color: #fff9e6;
+            border-color: #ffcc66;
+        }
+        .error {
+            background-color: #ffe6e6;
+            border-color: #cc9999;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="../js/utils.js"></script>
+</head>
+<body>
+    <h1>URL Path Diagnostics</h1>
+    
+    <div>
+        <h2>URL Information</h2>
+        <div id="url-info" class="result-box"></div>
+        
+        <h2>Environment Detection</h2>
+        <div id="environment-detection" class="result-box"></div>
+        
+        <h2>Base URL Function Test</h2>
+        <table id="baseurl-table">
+            <tr>
+                <th>Context</th>
+                <th>Result</th>
+                <th>Status</th>
+            </tr>
+        </table>
+        
+        <h2>Data File Loading Tests</h2>
+        <button id="test-all-files">Test All Data Files</button>
+        <div id="data-files-results" class="result-box"></div>
+        
+        <h2>Test Data File Paths</h2>
+        <div id="test-paths" class="result-box"></div>
+        
+        <h2>Test Approved.json</h2>
+        <button id="test-approved">Test approved.json</button>
+        <div id="test-result" class="result-box"></div>
+
+        <h2>Manual URL Test</h2>
+        <input type="text" id="manual-url" placeholder="Enter a path to test" style="width: 80%; padding: 8px; margin-right: 10px;">
+        <button id="test-manual">Test</button>
+        <div id="manual-result" class="result-box"></div>
+    </div>
+    
+    <script src="js/utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInfo = document.getElementById('url-info');
+            const environmentDetection = document.getElementById('environment-detection');
+            const baseUrlTable = document.getElementById('baseurl-table');
+            const dataFilesResults = document.getElementById('data-files-results');
+            const testPaths = document.getElementById('test-paths');
+            const testResult = document.getElementById('test-result');
+            const manualUrl = document.getElementById('manual-url');
+            const manualResult = document.getElementById('manual-result');
+            
+            // Display URL information
+            urlInfo.innerHTML = `Current URL: ${window.location.href}\n` +
+                               `Protocol: ${window.location.protocol}\n` +
+                               `Hostname: ${window.location.hostname}\n` +
+                               `Pathname: ${window.location.pathname}\n` +
+                               `Base URL (data): ${baseUrl(true)}\n` +
+                               `Base URL (API): ${baseUrl(false)}`;
+            
+            // Environment detection
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            let environment = 'Unknown';
+            let environmentClass = 'warning';
+            
+            if (isLocal) {
+                environment = 'Local Development';
+                environmentClass = 'success';
+            } else if (isGitHubPages) {
+                environment = 'GitHub Pages';
+                environmentClass = 'success';
+            } else {
+                environment = 'Other Environment';
+            }
+            
+            environmentDetection.innerHTML = `Detected Environment: ${environment}\n` +
+                                           `Is Local: ${isLocal}\n` +
+                                           `Is GitHub Pages: ${isGitHubPages}`;
+            environmentDetection.className = `result-box ${environmentClass}`;
+            
+            // Test baseUrl function in different scenarios
+            const testBaseUrlScenarios = [
+                { name: 'baseUrl() - Default', call: () => baseUrl() },
+                { name: 'baseUrl(true) - Data', call: () => baseUrl(true) },
+                { name: 'baseUrl(false) - API', call: () => baseUrl(false) }
+            ];
+            
+            testBaseUrlScenarios.forEach(scenario => {
+                const result = scenario.call();
+                let status = 'Unknown';
+                let statusClass = '';
+                
+                if (isGitHubPages) {
+                    if (scenario.name.includes('Data') && result === '/frontend') {
+                        status = 'Correct for GitHub Pages';
+                        statusClass = 'success';
+                    } else if (scenario.name.includes('API') && result.includes('flask-submission-bot')) {
+                        status = 'Correct for GitHub Pages';
+                        statusClass = 'success';
+                    } else {
+                        status = 'May be incorrect for GitHub Pages';
+                        statusClass = 'warning';
+                    }
+                } else if (isLocal) {
+                    if (result === 'http://localhost:8080' || result.includes('localhost')) {
+                        status = 'Likely correct for local development';
+                        statusClass = 'success';
+                    } else {
+                        status = 'May be incorrect for local development';
+                        statusClass = 'warning';
+                    }
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${scenario.name}</td>
+                    <td>${result}</td>
+                    <td class="${statusClass}">${status}</td>
+                `;
+                baseUrlTable.appendChild(row);
+            });
+            
+            // Test all data files
+            document.getElementById('test-all-files').addEventListener('click', async function() {
+                dataFilesResults.innerHTML = 'Testing all data files...';
+                
+                const dataFiles = [
+                    'data/approved.json',
+                    'data/petitions.json',
+                    'data/comments.json',
+                    'data/votes.json',
+                    'data/vote_stats.json'
+                ];
+                
+                let results = '';
+                
+                for (const file of dataFiles) {
+                    try {
+                        const data = await loadData(file, null);
+                        const size = JSON.stringify(data).length;
+                        results += `✅ ${file}: Loaded successfully (${size} bytes)\n`;
+                    } catch (error) {
+                        results += `❌ ${file}: Error - ${error.message}\n`;
+                    }
+                }
+                
+                dataFilesResults.innerHTML = results;
+            });
+            
+            // Test different path combinations
+            const dataPath = 'data/approved.json';
+            const absolutePath = `/${dataPath}`;
+            const basedPath = `${baseUrl(true)}/${dataPath}`;
+            const rootRelativePath = `/frontend/${dataPath}`;
+            const fullPath = `https://${window.location.hostname}/frontend/${dataPath}`;
+            
+            testPaths.innerHTML = `Data path: ${dataPath}\n` +
+                                 `Absolute path: ${absolutePath}\n` +
+                                 `Base URL + path: ${basedPath}\n` +
+                                 `Root relative path: ${rootRelativePath}\n` +
+                                 `Full path: ${fullPath}`;
+            
+            // Test the approved.json file
+            document.getElementById('test-approved').addEventListener('click', async function() {
+                testResult.innerHTML = 'Testing approved.json access...';
+                
+                try {
+                    const data = await loadData('data/approved.json', []);
+                    testResult.innerHTML = `Success! Loaded approved.json\n\nSample data:\n${JSON.stringify(data.slice(0, 2), null, 2)}`;
+                    testResult.className = 'result-box success';
+                } catch (error) {
+                    testResult.innerHTML = `Error loading approved.json: ${error.message}`;
+                    testResult.className = 'result-box error';
+                }
+            });
+            
+            // Test manual URL
+            document.getElementById('test-manual').addEventListener('click', async function() {
+                const url = manualUrl.value.trim();
+                if (!url) {
+                    manualResult.innerHTML = 'Please enter a URL to test';
+                    manualResult.className = 'result-box warning';
+                    return;
+                }
+                
+                manualResult.innerHTML = `Testing URL: ${url}...`;
+                
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            manualResult.innerHTML = `Success! URL: ${url}\nContent type: ${contentType}\n\nSample data:\n${JSON.stringify(data, null, 2).substring(0, 500)}...`;
+                        } else {
+                            const text = await response.text();
+                            manualResult.innerHTML = `Success! URL: ${url}\nContent type: ${contentType}\n\nSample data:\n${text.substring(0, 500)}...`;
+                        }
+                        manualResult.className = 'result-box success';
+                    } else {
+                        manualResult.innerHTML = `Error ${response.status}: ${response.statusText}\nURL: ${url}`;
+                        manualResult.className = 'result-box error';
+                    }
+                } catch (error) {
+                    manualResult.innerHTML = `Network error: ${error.message}\nURL: ${url}\n\nThis could be due to CORS restrictions, network issues, or an invalid URL.`;
+                    manualResult.className = 'result-box error';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
