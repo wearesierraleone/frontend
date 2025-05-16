@@ -108,7 +108,25 @@
                 try {
                     const data = await loadData(file, []);
                     console.log('Data loaded:', data);
-                    testResult.innerHTML = `Success! Loaded ${file}\n\nData preview:\n${JSON.stringify(data.slice(0, 2), null, 2)}`;
+                    
+                    let dataPreview;
+                    if (Array.isArray(data)) {
+                        // If it's an array, show first two items
+                        dataPreview = JSON.stringify(data.slice(0, 2), null, 2);
+                    } else if (typeof data === 'object' && data !== null) {
+                        // If it's an object, show first few keys
+                        const keys = Object.keys(data).slice(0, 3);
+                        const preview = {};
+                        keys.forEach(key => {
+                            preview[key] = data[key];
+                        });
+                        dataPreview = JSON.stringify(preview, null, 2);
+                    } else {
+                        // For any other type
+                        dataPreview = JSON.stringify(data, null, 2);
+                    }
+                    
+                    testResult.innerHTML = `Success! Loaded ${file}\n\nData preview:\n${dataPreview}`;
                     testResult.className = 'result-box success';
                 } catch (error) {
                     testResult.innerHTML = `Error loading ${file}: ${error.message}`;
