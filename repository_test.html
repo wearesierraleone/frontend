@@ -75,12 +75,10 @@
         <div id="test-result" class="result-box"></div>
         
         <div class="token-input">
-            <h2>GitHub Token</h2>
-            <p>If you're getting 401 or 404 errors, you may need to provide a GitHub token to access private repositories.</p>
-            <input type="text" id="github-token" placeholder="Enter your GitHub token">
-            <button id="save-token">Save Token</button>
-            <button id="clear-token">Clear Token</button>
-            <p id="token-status"></p>
+            <h2>Local Data Files</h2>
+            <p>This site now uses local data files in the frontend repository itself.</p>
+            <p>Data files are loaded directly from the <code>/data</code> directory in the repository.</p>
+            <p>No GitHub token is needed for authentication.</p>
         </div>
     </div>
     
@@ -90,10 +88,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const configInfo = document.getElementById('config-info');
             const testResult = document.getElementById('test-result');
-            const tokenInput = document.getElementById('github-token');
-            const saveTokenBtn = document.getElementById('save-token');
-            const clearTokenBtn = document.getElementById('clear-token');
-            const tokenStatus = document.getElementById('token-status');
             
             // Show current configuration
             const dataUrl = baseUrl(true);
@@ -127,38 +121,7 @@
             document.getElementById('test-petitions').addEventListener('click', () => testDataAccess('data/petitions.json'));
             document.getElementById('test-comments').addEventListener('click', () => testDataAccess('data/comments.json'));
             
-            // Token management
-            saveTokenBtn.addEventListener('click', function() {
-                const token = tokenInput.value.trim();
-                if (token) {
-                    sessionStorage.setItem('github_access_token', token);
-                    tokenStatus.textContent = 'Token saved successfully!';
-                    // Update config info
-                    const newToken = sessionStorage.getItem('github_access_token');
-                    configInfo.innerHTML = `Base URL for data: ${baseUrl(true)}\n` +
-                                        `Base URL for API: ${baseUrl(false)}\n` +
-                                        `GitHub Pages environment: ${isGitHubPages}\n` +
-                                        `GitHub token set: ${newToken ? 'Yes' : 'No'}`;
-                } else {
-                    tokenStatus.textContent = 'Please enter a valid token.';
-                }
-            });
-            
-            clearTokenBtn.addEventListener('click', function() {
-                sessionStorage.removeItem('github_access_token');
-                tokenInput.value = '';
-                tokenStatus.textContent = 'Token cleared successfully!';
-                // Update config info
-                configInfo.innerHTML = `Base URL for data: ${baseUrl(true)}\n` +
-                                       `Base URL for API: ${baseUrl(false)}\n` +
-                                       `GitHub Pages environment: ${isGitHubPages}\n` +
-                                       `GitHub token set: No`;
-            });
-            
-            // Pre-fill token input if exists
-            if (token) {
-                tokenInput.value = token;
-            }
+            // No token management needed with the new approach
         });
     </script>
 </body>

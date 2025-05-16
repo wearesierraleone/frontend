@@ -22,38 +22,14 @@ jobs:
           echo "Current directory: $(pwd)"
           find . -type f -name "utils.js" | grep -v "node_modules"
           
-      - name: Display utils.js Content
+      - name: Verify Data Files
         run: |
-          echo "First 10 lines of utils.js:"
-          head -n 10 ./js/utils.js
-          echo "Lines containing 'token':"
-          grep -n "token" ./js/utils.js || echo "No lines with 'token' found"
+          echo "Checking for data files:"
+          find . -type f -path "*/data/*.json" | sort
           
-      - name: Inject GitHub Token
-        env:
-          DATA_TOKEN: ${{ secrets.DATA_TOKEN }}
-        run: |
-          # Find the line containing github_access_token
-          echo "Looking for the token line..."
-          TOKEN_LINE=$(grep -n "github_access_token" ./js/utils.js | head -n 1)
-          echo "Found token line: $TOKEN_LINE"
-          
-          if [ -n "$TOKEN_LINE" ]; then
-            # Extract line number
-            LINE_NUM=$(echo "$TOKEN_LINE" | cut -d':' -f1)
-            echo "Line number: $LINE_NUM"
-            
-            # Create a backup of the file
-            cp ./js/utils.js ./js/utils.js.bak
-            
-            # Insert the token at that line
-            # Use different delimiters for sed to avoid escaping issues
-            sed -i "${LINE_NUM}c\\            const token = \"$DATA_TOKEN\"; // Injected during build" ./js/utils.js
-            
-            echo "Replacement completed. Verifying new line:"
-            sed -n "${LINE_NUM}p" ./js/utils.js
-          else
-            echo "Token line not found. Continuing without replacement."
+          # Make sure we have the required data files
+          if [ ! -f "./data/approved.json" ] || [ ! -f "./data/petitions.json" ]; then
+            echo "WARNING: Some required data files are missing!"
           fi
 
       - name: Create .nojekyll file

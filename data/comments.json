@@ -1,0 +1,44 @@
+{
+  "post1": [
+    {
+      "id": "comment1",
+      "author": "Anonymous",
+      "text": "I agree! The schools in my area have the same problem. We need more government funding for education infrastructure.",
+      "timestamp": "2025-05-11T10:12:00Z"
+    },
+    {
+      "id": "comment2",
+      "author": "Anonymous",
+      "text": "Maybe we could organize a community initiative to help repair some of the most urgent cases?",
+      "timestamp": "2025-05-11T14:30:00Z"
+    }
+  ],
+  "post2": [
+    {
+      "id": "comment3",
+      "author": "Anonymous",
+      "text": "This is a critical issue. My grandmother had to be carried on a makeshift stretcher for 15km to reach medical help last year.",
+      "timestamp": "2025-05-09T08:45:00Z"
+    }
+  ],
+  "post3": [
+    {
+      "id": "comment4",
+      "author": "Anonymous",
+      "text": "We also need internship programs with major companies to give youth work experience.",
+      "timestamp": "2025-05-07T16:20:00Z"
+    },
+    {
+      "id": "comment5",
+      "author": "Anonymous",
+      "text": "Digital skills training should be a priority too. The tech sector offers many opportunities.",
+      "timestamp": "2025-05-08T09:15:00Z"
+    },
+    {
+      "id": "comment6",
+      "author": "Anonymous",
+      "text": "Entrepreneurship education would help young people create their own jobs.",
+      "timestamp": "2025-05-09T11:40:00Z"
+    }
+  ]
+}
