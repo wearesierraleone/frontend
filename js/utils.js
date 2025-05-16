@@ -40,9 +40,9 @@ function baseUrl(forDataOnly = false) {
     } else if (isGitHubPages) {
         // Use different URLs for data files vs API endpoints
         if (forDataOnly) {
-            // Use local data files in the frontend repository itself
-            // This eliminates the need for cross-repository authentication
-            return '';
+            // For GitHub Pages, we need to use the full path to the data files
+            // including the repository name in the URL
+            return '/frontend';
         } else {
             // For API submissions, use the Flask submission bot
             return 'https://flask-submission-bot.onrender.com';
