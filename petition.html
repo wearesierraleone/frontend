@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title id="pageTitle">Petition | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View and sign this civic petition for Sierra Leone">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:title" content="Petition | We Are Sierra Leone">
+  <meta property="og:description" content="View and sign this important civic petition for Sierra Leone">
+  <meta property="og:type" content="website">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/modal.js" defer></script>
+  <script src="js/github_token.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/footer.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c5c5c5;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .animate-pulse-slow {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg px-4 py-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
+      <div class="flex items-center mb-4 sm:mb-0">
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">We Are Sierra Leone</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home
+        </a>
+        <a href="submit.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Submit
+        </a>
+        <a href="petitions.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center border-b-2 border-white pb-1">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Petitions
+        </a>
+        <a href="faq.html" class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          FAQ
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="px-4 max-w-4xl mx-auto">
+    <!-- Petition Signing Modal -->
+    <div id="signingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 m-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-gray-800">Sign This Petition</h3>
+          <button id="closeSigningModal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+          <p class="text-blue-700 font-medium text-sm">This petition will be sent to relevant government officials when it reaches enough signatures. Your support is important.</p>
+        </div>
+        
+        <form id="petitionForm" class="space-y-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
+            <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Anonymous">
+            <p class="mt-1 text-sm text-gray-500">Leave blank to sign anonymously</p>
+          </div>
+          
+          <div>
+            <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <select id="location" name="location" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+              <option value="" disabled selected>Select your region</option>
+              <option value="Western Area Urban">Freetown (Western Area Urban)</option>
+              <option value="Western Area Rural">Western Area Rural</option>
+              <option value="Eastern Province">Eastern Province</option>
+              <option value="Northern Province">Northern Province</option>
+              <option value="North West Province">North West Province</option>
+              <option value="Southern Province">Southern Province</option>
+              <option value="Diaspora">Diaspora</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="reason" class="block text-sm font-medium text-gray-700 mb-1">Why are you signing? (Optional)</label>
+            <textarea id="reason" name="reason" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Share why this petition matters to you..."></textarea>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="citizen" name="citizen" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            </div>
+            <div class="ml-3">
+              <label for="citizen" class="text-sm font-medium text-gray-700">I am a Sierra Leone citizen or resident</label>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="terms" name="terms" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            </div>
+            <div class="ml-3">
+              <label for="terms" class="text-sm text-gray-700">I agree to the <a href="terms.html" target="_blank" class="text-blue-600 hover:underline">terms of service</a> and acknowledge that my information will be used in accordance with the <a href="privacy.html" target="_blank" class="text-blue-600 hover:underline">privacy policy</a>.</label>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">By signing, you agree that your information may be shared with relevant government officials and organizations working on this issue. We will not share your personal information for marketing purposes.</p>
+          </div>
+          
+          <div class="flex justify-end pt-4">
+            <button type="button" id="cancelSigningBtn" class="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+            <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Sign Petition
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+      <div class="p-8">
+        <div id="meta" class="flex flex-wrap gap-2 mb-3"></div>
+        <h1 id="title" class="text-3xl font-bold text-gray-800 mb-4"></h1>
+        
+        <!-- Petition Status Banner -->
+        <div class="mb-6 bg-blue-50 p-4 rounded-lg shadow-sm">
+          <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="flex flex-col sm:flex-row items-center gap-2">
+              <div class="flex items-center">
+                <span class="text-sm font-medium mr-2">Status:</span>
+                <span id="petitionState" class="text-sm font-bold px-3 py-1 rounded-full"></span>
+              </div>
+              <!-- State explanation will appear here for certain states -->
+              <div id="stateExplanation" class="hidden text-sm bg-white bg-opacity-70 px-3 py-1 rounded-full"></div>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-4 h-4 text-gray-600 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm">Deadline: <span id="petitionDeadline" class="font-medium"></span></span>
+            </div>
+          </div>
+          
+          <!-- Countdown timer for active petitions -->
+          <div id="countdownTimer" class="hidden mt-3 bg-white bg-opacity-50 p-3 rounded-lg">
+            <div class="flex justify-center items-center gap-4">
+              <div class="flex flex-col items-center">
+                <span id="daysLeft" class="text-2xl font-bold text-blue-800">0</span>
+                <span class="text-xs text-gray-600">Days</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span id="hoursLeft" class="text-2xl font-bold text-blue-800">0</span>
+                <span class="text-xs text-gray-600">Hours</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span id="minutesLeft" class="text-2xl font-bold text-blue-800">0</span>
+                <span class="text-xs text-gray-600">Minutes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <p id="body" class="text-gray-700 text-lg leading-relaxed mb-6"></p>
+
+        <div id="progressContainer" class="mb-8">
+          <div class="flex justify-between text-sm text-gray-600 mb-1">
+            <span id="signatureCount">0 signatures</span>
+            <span>Goal: 100 signatures</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progressBar" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="border-t pt-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Support This Petition</h2>
+              <p class="text-gray-600 mt-1">Add your voice to show support for this important issue.</p>
+            </div>
+            <button onclick="signPetition()"
+              class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md flex items-center"
+              id="signButton">
+              <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                </path>
+              </svg>
+              Sign Anonymously
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Signatures
+        </h3>
+        <div id="signatureWrapper" class="max-h-80 overflow-y-auto pr-2">
+          <ul id="signatureList" class="space-y-2"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Government Responses Section - Only visible when responses exist -->
+    <div id="governmentResponsesSection" class="bg-white shadow-lg rounded-lg overflow-hidden mb-8 hidden">
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+          </svg>
+          Government Responses
+        </h3>
+        <div id="responsesContainer" class="space-y-4">
+          <!-- Responses will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-100 rounded-lg p-6 mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <a href="petitions.html"
+          class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center shadow-sm">
+          <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Petitions
+        </a>
+
+        <div class="bg-white rounded-lg px-4 py-3 border border-gray-200 shadow-sm">
+          <div class="flex items-center">
+            <span class="font-medium text-gray-700 mr-3">Share:</span>
+            <div class="flex space-x-3">
+              <button id="twitterShare" class="text-blue-500 hover:text-blue-600 transition-colors p-1"
+                title="Share on Twitter">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                </svg>
+              </button>
+              <button id="whatsappShare" class="text-green-500 hover:text-green-600 transition-colors p-1"
+                title="Share on WhatsApp">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+              </button>
+              <button id="copyLink" class="text-blue-500 hover:text-blue-600 transition-colors p-1" title="Copy link">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.body.appendChild(createFooter());
+  </script>
+
+  <script>
+    async function loadPetition() {
+      const postId = new URLSearchParams(window.location.search).get('id');
+      const resPost = await fetch('../data/approved.json');
+      const posts = await resPost.json();
+      const post = posts.find(p => p.id === postId);
+      if (!post) {
+        document.body.innerHTML = `
+          <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
+            <svg class="w-16 h-16 text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h1 class="text-2xl font-bold text-gray-700 mb-2">Petition Not Found</h1>
+            <p class="text-gray-600 mb-6">The petition you're looking for doesn't exist or may have been removed.</p>
+            <a href="petitions.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">View All Petitions</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Update page title with petition title
+      document.getElementById('pageTitle').innerText = `${post.title} | We Are Sierra Leone`;
+      document.querySelector('meta[property="og:title"]').setAttribute('content', post.title);
+      document.querySelector('meta[property="og:description"]').setAttribute('content', post.body.substring(0, 150) + '...');
+
+      // Set up share buttons
+      const currentUrl = window.location.href;
+      document.getElementById('twitterShare').addEventListener('click', () => {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(currentUrl)}`, '_blank');
+      });
+      document.getElementById('whatsappShare').addEventListener('click', () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(post.title + ' ' + currentUrl)}`, '_blank');
+      });
+      document.getElementById('copyLink').addEventListener('click', () => {
+        navigator.clipboard.writeText(currentUrl).then(() => {
+          // Create a temporary toast notification
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300';
+          toast.innerText = 'Link copied to clipboard';
+          document.body.appendChild(toast);
+
+          // Remove the toast after 2 seconds
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 300);
+          }, 2000);
+        });
+      });
+
+      document.getElementById('title').innerText = post.title;
+      document.getElementById('body').innerText = post.body;
+
+      // Add category badge if available
+      if (post.category) {
+        const categoryElement = document.createElement('div');
+        categoryElement.className = 'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full';
+        categoryElement.innerText = post.category;
+        document.getElementById('meta').appendChild(categoryElement);
+      }
+
+      // Add date information
+      const dateObj = new Date(post.timestamp);
+      const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+      const formattedDate = dateObj.toLocaleString('en-GB', options).replace(',', '');
+      const dateElement = document.createElement('div');
+      dateElement.className = 'text-gray-500 text-sm';
+      dateElement.innerText = formattedDate;
+      document.getElementById('meta').appendChild(dateElement);
+
+      // Add image if available
+      if (post.imageUrl) {
+        const img = document.createElement('img');
+        img.src = post.imageUrl;
+        img.alt = "Petition image";
+        img.className = "w-full max-h-96 object-cover";
+        document.getElementById('imageWrap').appendChild(img);
+      }
+
+      const resPetitions = await fetch('../data/petitions.json');
+      const petitions = await resPetitions.json();
+      const petitionData = petitions[postId];
+      
+      if (!petitionData) {
+        // Handle case when the ID exists in posts but not in petitions
+        document.body.innerHTML = `
+          <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
+            <svg class="w-16 h-16 text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h1 class="text-2xl font-bold text-gray-700 mb-2">Petition Not Found</h1>
+            <p class="text-gray-600 mb-6">The petition you're looking for doesn't exist or may have been removed.</p>
+            <a href="petitions.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">View All Petitions</a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Extract petition data
+      const signatures = petitionData.signatures || [];
+      const petitionState = petitionData.state || 'Open';
+      const targetSignatures = petitionData.targetSignatures || 100;
+      const deadlineDate = petitionData.deadline ? new Date(petitionData.deadline) : null;
+      const governmentResponses = petitionData.responses || [];
+      
+      // Display petition state with appropriate styling
+      const stateElement = document.getElementById('petitionState');
+      stateElement.innerText = petitionState;
+      
+      // Set state colors based on state value
+      switch(petitionState) {
+        case 'Open':
+          stateElement.classList.add('bg-green-100', 'text-green-800');
+          break;
+        case 'Closed':
+          stateElement.classList.add('bg-red-100', 'text-red-800');
+          break;
+        case 'Draft':
+          stateElement.classList.add('bg-gray-100', 'text-gray-800');
+          break;
+        case 'Rejected':
+          stateElement.classList.add('bg-red-100', 'text-red-800');
+          break;
+        case 'Awaiting government':
+          stateElement.classList.add('bg-yellow-100', 'text-yellow-800');
+          break;
+        case 'Government responses':
+          stateElement.classList.add('bg-blue-100', 'text-blue-800');
+          break;
+        case 'Awaiting a debate':
+          stateElement.classList.add('bg-purple-100', 'text-purple-800');
+          break;
+        case 'Debated in Parliament':
+          stateElement.classList.add('bg-indigo-100', 'text-indigo-800');
+          break;
+        case 'Not debated':
+          stateElement.classList.add('bg-gray-100', 'text-gray-800');
+          break;
+        default:
+          stateElement.classList.add('bg-gray-100', 'text-gray-800');
+      }
+      
+      // Format and display deadline
+      if (deadlineDate) {
+        const deadlineOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+        const formattedDeadline = deadlineDate.toLocaleDateString('en-GB', deadlineOptions);
+        document.getElementById('petitionDeadline').innerText = formattedDeadline;
+        
+        // Check if petition is expired
+        const now = new Date();
+        if (now > deadlineDate && petitionState === 'Open') {
+          stateElement.innerText = 'Closed (Expired)';
+          stateElement.className = 'text-sm font-bold px-3 py-1 rounded-full bg-red-100 text-red-800';
+          
+          // Disable sign button and update text
+          const signButton = document.getElementById('signButton');
+          signButton.disabled = true;
+          signButton.classList.add('opacity-50', 'cursor-not-allowed');
+          signButton.classList.remove('hover:bg-green-700');
+          signButton.innerHTML = `
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Petition Closed
+          `;
+        }
+      } else {
+        document.getElementById('petitionDeadline').innerText = 'Not set';
+      }
+      
+      // Disable sign button if petition is not open
+      if (petitionState !== 'Open') {
+        const signButton = document.getElementById('signButton');
+        signButton.disabled = true;
+        signButton.classList.add('opacity-50', 'cursor-not-allowed');
+        signButton.classList.remove('hover:bg-green-700');
+        signButton.innerHTML = `
+          <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          Petition ${petitionState}
+        `;
+      }
+
+      // Update signature count and progress bar
+      const signatureCount = signatures.length;
+      const progressPercent = Math.min(Math.round((signatureCount / targetSignatures) * 100), 100);
+
+      document.getElementById('signatureCount').innerText = `${signatureCount} signature${signatureCount !== 1 ? 's' : ''}`;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+      const list = document.getElementById('signatureList');
+      if (signatures.length === 0) {
+        list.innerHTML = `
+          <li class="bg-gray-50 p-4 rounded-lg text-center">
+            <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            <p class="text-gray-500 font-medium">No signatures yet</p>
+            <p class="text-gray-400 text-sm mt-1">Be the first to sign this petition!</p>
+          </li>`;
+        return;
+      }
+
+      signatures.forEach(sig => {
+        const li = document.createElement('li');
+        li.className = "flex items-center px-4 py-3 border-b border-gray-100 last:border-0";
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = "bg-green-100 text-green-700 rounded-full p-1.5 mr-3";
+        iconDiv.innerHTML = `
+          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        `;
+
+        const textDiv = document.createElement('div');
+        textDiv.className = "text-gray-700 font-medium";
+        textDiv.innerText = sig;
+
+        li.appendChild(iconDiv);
+        li.appendChild(textDiv);
+        list.appendChild(li);
+      });
+
+      // Display government responses if available
+      const responsesSection = document.getElementById('governmentResponsesSection');
+      const responsesContainer = document.getElementById('responsesContainer');
+      if (governmentResponses.length > 0) {
+        responsesSection.classList.remove('hidden');
+        governmentResponses.forEach(response => {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = "bg-blue-50 p-4 rounded-lg shadow-sm";
+          responseDiv.innerHTML = `
+            <h4 class="text-lg font-bold text-blue-800 mb-2">${response.title}</h4>
+            <p class="text-gray-700">${response.body}</p>
+            <p class="text-sm text-gray-500 mt-2">Date: ${new Date(response.timestamp).toLocaleDateString('en-GB')}</p>
+          `;
+          responsesContainer.appendChild(responseDiv);
+        });
+      }
+    }
+
+    function signPetition() {
+      // Show the petition signing modal
+      document.getElementById('signingModal').classList.remove('hidden');
+      
+      // Enable scrolling on modal content but prevent background scrolling
+      document.body.style.overflow = 'hidden';
+      
+      // Set up modal close handlers
+      document.getElementById('closeSigningModal').addEventListener('click', closeSigningModal);
+      document.getElementById('cancelSigningBtn').addEventListener('click', closeSigningModal);
+      
+      // Set up form submit handler
+      document.getElementById('petitionForm').addEventListener('submit', submitSignature);
+    }
+    
+    function closeSigningModal() {
+      document.getElementById('signingModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+    
+    function submitSignature(event) {
+      event.preventDefault();
+      
+      // Get form data
+      const form = document.getElementById('petitionForm');
+      const name = form.elements['name'].value || 'Anonymous';
+      const location = form.elements['location'].value;
+      const reason = form.elements['reason'].value;
+      const isCitizen = form.elements['citizen'].checked;
+      
+      if (!isCitizen) {
+        alert('You must confirm that you are a Sierra Leone citizen or resident to sign this petition.');
+        return;
+      }
+      
+      // Show loading state in form button
+      const submitButton = form.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.innerHTML;
+      submitButton.disabled = true;
+      submitButton.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Processing...</span>
+      `;
+
+      const postId = new URLSearchParams(window.location.search).get('id');
+      const anonId = localStorage.getItem('anonId') || 'anon-' + Math.floor(Math.random() * 99999);
+      localStorage.setItem('anonId', anonId);
+      
+      // Prepare signature data with additional fields
+      const data = { 
+        postId, 
+        signer: name !== 'Anonymous' ? name : anonId,
+        timestamp: new Date().toISOString(),
+        location: location,
+        reason: reason,
+        isCitizen: isCitizen
+      };
+
+      // First, check if the petition is still open
+      fetch('../data/petitions.json')
+        .then(res => res.json())
+        .then(petitions => {
+          const petitionData = petitions[postId];
+          
+          // Check petition state
+          if (petitionData && petitionData.state !== 'Open') {
+            throw new Error(`This petition is ${petitionData.state.toLowerCase()} and cannot be signed.`);
+          }
+          
+          // Check deadline
+          if (petitionData && petitionData.deadline) {
+            const deadlineDate = new Date(petitionData.deadline);
+            const now = new Date();
+            if (now > deadlineDate) {
+              throw new Error('This petition has expired and cannot be signed.');
+            }
+          }
+          
+          // If checks pass, submit signature
+          return fetch('http://localhost:8080/sign', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        })
+        .then(res => {
+          if (res.ok) {
+            closeSigningModal();
+            showSuccessModal('Thank you! Your signature has been successfully added to this petition.');
+            window.location.reload();
+          } else {
+            throw new Error('Failed to submit signature. Please try again later.');
+          }
+        })
+        .catch(err => {
+          showSuccessModal(err.message || 'An error occurred. Please check your connection and try again.', null, 3000);
+          // Reset button state
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonText;
+        });
+    }
+
+    function showSuccessModal(message = 'Your action was successful.', redirectTo = null, delay = 5000) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fadeIn';
+      modal.style.animation = 'fadeIn 0.3s ease-out';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 shadow-xl text-center max-w-sm w-full m-4 transform transition-transform duration-300" style="animation: scaleIn 0.3s ease-out;">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4 mx-auto">
+            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Success</h2>
+          <p class="text-gray-700 mb-6">${message}</p>
+          <button id="confirmRedirect" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            OK
+          </button>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+      document.getElementById('confirmRedirect').addEventListener('click', () => {
+        if (redirectTo) {
+          window.location.href = redirectTo;
+        } else {
+          modal.style.animation = 'fadeOut 0.3s ease-in';
+          setTimeout(() => {
+            document.body.removeChild(modal);
+          }, 300);
+        }
+      });
+
+      if (redirectTo) {
+        setTimeout(() => {
+          window.location.href = redirectTo;
+        }, delay);
+      }
+    }
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+      @keyframes scaleIn {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    window.onload = loadPetition;
+  </script>
+</body>
+
+</html>

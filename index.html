@@ -1,0 +1,330 @@
+<!-- filepath: /Users/ernestsaidukamara/Downloads/anonymous_platform_mvp/public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>We Are Sierra Leone | Civic Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="We Are Sierra Leone is a civic platform empowering citizens to voice their concerns anonymously and engage in meaningful dialogue.">
+  <meta name="theme-color" content="#1e40af">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:title" content="We Are Sierra Leone | Civic Platform">
+  <meta property="og:description"
+    content="A civic platform empowering citizens of Sierra Leone to voice their concerns anonymously, create petitions, and engage in meaningful dialogue.">
+  <meta property="og:type" content="website">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/github_token.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/local_storage_sync.js"></script>
+  <script src="js/diagnostics.js"></script>
+  <script>
+    tailwind.config = {
+      plugins: [tailwind.plugin(({ addUtilities }) => {
+        addUtilities({
+          '.line-clamp-2': {
+            display: '-webkit-box',
+            '-webkit-line-clamp': '2',
+            '-webkit-box-orient': 'vertical',
+            overflow: 'hidden'
+          }
+        });
+      })]
+    };
+  </script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c5c5c5;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a3a3a3;
+    }
+
+    /* Focus styles for interactive elements */
+    a:focus,
+    button:focus,
+    input:focus,
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <nav class="bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg px-4 py-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between">
+      <div class="flex items-center mb-4 sm:mb-0">
+        <div class="flex-shrink-0 mr-2">
+          <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">We Are Sierra Leone</h1>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Home
+        </a>
+        <a href="submit.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Submit
+        </a>
+        <a href="petitions.html"
+          class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Petitions
+        </a>
+        <a href="faq.html" class="text-white hover:text-blue-200 font-medium transition duration-150 flex items-center">
+          <svg class="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          FAQ
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="bg-blue-50 py-8 mb-8 border-b">
+    <div class="max-w-4xl mx-auto text-center px-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-4">Sierra Leone's Anonymous Voice</h1>
+      <p class="text-lg text-blue-700 mb-6">Share your experiences, voice concerns, and make a difference anonymously.
+      </p>
+      <a href="submit.html"
+        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 transform hover:-translate-y-1">
+        Share Your Story
+      </a>
+    </div>
+  </div>
+
+  <main class="px-4 max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="relative w-full sm:w-1/2">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input type="text" id="searchInput" placeholder="Search posts..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <select id="categorySelector"
+            class="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+            <option value="all">All Categories</option>
+            <option value="governance">Governance</option>
+            <option value="education">Education</option>
+            <option value="health">Health</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="environment">Environment</option>
+            <option value="economy">Economy</option>
+            <option value="human_rights">Human Rights</option>
+            <option value="corruption">Anti-Corruption</option>
+            <option value="youth">Youth Affairs</option>
+            <option value="women">Women's Issues</option>
+            <option value="technology">Technology</option>
+            <option value="agriculture">Agriculture</option>
+            <option value="culture">Culture & Heritage</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="sortSelector"
+            class="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+            <option value="newest">Newest</option>
+            <option value="votes">Most Voted</option>
+            <option value="comments">Most Commented</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-800">Community Reports</h2>
+      <span id="postCount"
+        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Loading...</span>
+    </div>
+
+    <ul id="postList" class="space-y-5"></ul>
+  </main>
+  <script>
+    document.body.appendChild(createFooter());
+  </script>
+  <script>
+    async function loadPosts() {
+      try {
+        // Use our robust data loading function with default values
+        const fetchedPosts = await loadData('data/approved.json', []);
+        const votes = await loadData('data/votes.json', {});
+        const comments = await loadData('data/comments.json', {});
+        const petitions = await loadData('data/petitions.json', {});
+        
+        // Combine with any locally created posts (created when on GitHub Pages)
+        const posts = typeof combineWithLocalPosts === 'function' 
+          ? combineWithLocalPosts(fetchedPosts)
+          : fetchedPosts;
+        
+        // Cache successful responses in localStorage for offline use
+        localStorage.setItem('cache_data_approved.json', JSON.stringify(posts));
+        localStorage.setItem('cache_data_votes.json', JSON.stringify(votes));
+        localStorage.setItem('cache_data_comments.json', JSON.stringify(comments));
+        localStorage.setItem('cache_data_petitions.json', JSON.stringify(petitions));
+
+        const list = document.getElementById('postList');
+        list.innerHTML = '';
+
+        const category = document.getElementById('categorySelector')?.value || 'all';
+        let filteredPosts = posts;
+
+        if (category !== 'all') {
+          filteredPosts = filteredPosts.filter(p => p.category === category);
+        }
+
+        const query = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        if (query) {
+          filteredPosts = filteredPosts.filter(p => p.title.toLowerCase().includes(query) || p.body.toLowerCase().includes(query));
+        }
+
+        filteredPosts.sort((a, b) => {
+          const sortType = document.getElementById('sortSelector')?.value || 'newest';
+          if (sortType === 'votes') return (votes[b.id] || 0) - (votes[a.id] || 0);
+          if (sortType === 'comments') return (comments[b.id]?.length || 0) - (comments[a.id]?.length || 0);
+          return new Date(b.timestamp) - new Date(a.timestamp);
+        });
+
+        // Update post count in the UI
+        document.getElementById('postCount').innerText = `${filteredPosts.length} Reports`;
+
+        if (filteredPosts.length === 0) {
+          list.innerHTML = `
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-gray-600 mb-6 text-lg">No reports found for this category or sort order.</p>
+              <a href="submit.html" class="inline-block bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition transform hover:-translate-y-1">
+                ✍️ Submit a Post
+              </a>
+            </div>`;
+          return;
+        }
+
+        filteredPosts.forEach(post => {
+          const commentCount = (comments[post.id] || []).length;
+          const voteCount = votes[post.id] || 0;
+          const hasPetition = petitions[post.id] ? true : false;
+          const dateObj = new Date(post.timestamp);
+          const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+          const date = dateObj.toLocaleString('en-GB', options).replace(',', '');
+
+          const li = document.createElement('li');
+          li.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow';
+
+          li.innerHTML = `
+            <div class="flex flex-col md:flex-row">
+              ${post.imageUrl ?
+              `<div class="md:w-1/4 flex-shrink-0">
+                  <img src="${post.imageUrl}" alt="Post thumbnail" class="h-full w-full object-cover md:h-40 md:w-full">
+                </div>` : ''}
+              <div class="flex-1 p-5">
+                <div class="flex flex-wrap gap-2 mb-2">
+                  ${post.category ? `<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">${post.category}</span>` : ''}
+                  ${hasPetition ? '<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Petition Active</span>' : ''}
+                </div>
+                <a href='post.html?id=${post.id}' class='text-xl font-bold text-blue-800 hover:underline block mb-2'>${post.title}</a>
+                <p class="text-gray-700 line-clamp-2 mb-3">${post.body}</p>
+                <div class="flex items-center justify-between">
+                  <div class="text-sm text-gray-500">${date}</div>
+                  <div class="flex items-center space-x-3 text-sm">
+                    <span class="flex items-center"><svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>${voteCount}</span>
+                    <span class="flex items-center"><svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>${commentCount}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          list.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Error loading posts:", error);
+        document.getElementById('postList').innerHTML = `
+          <div class="bg-red-50 border-l-4 border-red-500 p-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-red-700 mb-2">
+                  Could not load posts. Please try again later.
+                </p>
+                <p class="text-xs text-gray-600">
+                  This could be due to network connectivity issues or because you're viewing the site offline.
+                </p>
+                <button onclick="loadPosts()" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('postCount').innerText = '0 Reports';
+      }
+    }
+
+    window.onload = () => {
+      loadPosts();
+      document.getElementById('searchInput').addEventListener('input', () => {
+        loadPosts();
+      });
+      document.getElementById('categorySelector').addEventListener('change', () => {
+        loadPosts();
+      });
+      document.getElementById('sortSelector').addEventListener('change', () => {
+        loadPosts();
+      });
+    };
+  </script>
+</body>
+
+</html>

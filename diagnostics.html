@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>API Diagnostics | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/github_token.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/test_api_connection.js"></script>
+  <script src="js/footer.js"></script>
+  
+  <style>
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #09f;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-blue-900 text-white p-4 shadow-md">
+    <div class="container mx-auto">
+      <div class="flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-bold flex items-center">
+          <span class="mr-2">🇸🇱</span> We Are Sierra Leone
+        </a>
+        <nav>
+          <a href="index.html" class="text-white ml-4 hover:underline">Home</a>
+          <a href="submit.html" class="text-white ml-4 hover:underline">Submit Post</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow container mx-auto my-8 px-4">
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <h1 class="text-2xl font-bold mb-6">API Connection Diagnostics</h1>
+      
+      <div class="mb-8">
+        <p class="mb-4">This tool helps diagnose API connection issues with the We Are Sierra Leone platform. 
+        Click the button below to test connections to both the GitHub data repository and the Flask submission API.</p>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">
+                If you're accessing a private GitHub repository, you may need to provide a personal access token.
+                The test will prompt you for a token if needed.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <button id="run-api-tests" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Run Connection Tests
+        </button>
+      </div>
+      
+      <div id="api-test-results" class="border rounded p-4 bg-gray-50 min-h-[200px]">
+        <p class="text-center text-gray-500">Click "Run Connection Tests" to begin diagnostics</p>
+      </div>
+      
+      <div class="mt-8 border-t pt-6">
+        <h2 class="text-xl font-semibold mb-4">GitHub Token Management</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-medium mb-2">Current Token Status:</h3>
+            <p id="token-status" class="mb-4">Checking...</p>
+            
+            <button id="set-token-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+              Set Token
+            </button>
+            
+            <button id="clear-token-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+              Clear Token
+            </button>
+          </div>
+          
+          <div>
+            <h3 class="font-medium mb-2">About GitHub Tokens:</h3>
+            <ul class="list-disc pl-5 text-sm">
+              <li class="mb-1">Required for accessing private GitHub repositories</li>
+              <li class="mb-1">Stored in your browser's session storage</li>
+              <li class="mb-1">Cleared when you close the browser tab</li>
+              <li class="mb-1">Create tokens at <a href="https://github.com/settings/tokens" target="_blank" class="text-blue-600 hover:underline">GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens</a></li>
+              <li class="mb-1">Only needs the 'repo' scope for read access</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer" class="bg-gray-800 text-white py-8 mt-8">
+    <!-- Footer content will be injected by footer.js -->
+  </footer>
+
+  <script>
+    // Update token status on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      function updateTokenStatus() {
+        const tokenStatus = document.getElementById('token-status');
+        const token = sessionStorage.getItem('github_access_token');
+        
+        if (token) {
+          tokenStatus.innerHTML = '<span class="text-green-600 font-medium">✅ Token is set</span>';
+        } else {
+          tokenStatus.innerHTML = '<span class="text-red-600 font-medium">❌ No token set</span>';
+        }
+      }
+      
+      // Initial status update
+      updateTokenStatus();
+      
+      // Set up button handlers
+      document.getElementById('set-token-btn').addEventListener('click', function() {
+        if (typeof promptForGitHubToken === 'function') {
+          promptForGitHubToken();
+          // Check token status after modal is closed
+          setTimeout(updateTokenStatus, 1000);
+        } else {
+          alert('GitHub token management is not available');
+        }
+      });
+      
+      document.getElementById('clear-token-btn').addEventListener('click', function() {
+        if (typeof clearGitHubToken === 'function') {
+          clearGitHubToken();
+          updateTokenStatus();
+        } else {
+          sessionStorage.removeItem('github_access_token');
+          updateTokenStatus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
