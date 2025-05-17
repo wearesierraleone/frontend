@@ -1,0 +1,17 @@
+{
+  "id": "comment-reply-test-1747525521",
+  "author": "Auto-created",
+  "text": "Placeholder comment (auto-created for reply reply-1747525540 after directory listing failed)",
+  "timestamp": "2025-05-18T00:45:45.268671",
+  "status": "pending",
+  "replies": [
+    {
+      "id": "reply-1747525540",
+      "parentId": "comment-reply-test-1747525521",
+      "author": "Reply User",
+      "text": "This is a reply to the test comment.",
+      "timestamp": "2025-05-18T00:45:44.675652",
+      "status": "pending"
+    }
+  ]
+}
