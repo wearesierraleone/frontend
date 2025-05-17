@@ -503,87 +503,105 @@ function setupSyncListeners() {
 setupSyncListeners();
 
 /**
- * Handle conflicts between local and server data
- * @param {string} type - Type of data ('votes', 'comments')
- * @param {string} postId - The ID of the post
- * @param {object} localData - The local data
- * @param {object} serverData - The server data
- * @returns {object} - The resolved data
+ * Sync localStorage data to GitHub repository using GitHub Actions
+ * This function triggers a GitHub repository_dispatch event to start the workflow
+ * @param {string} githubToken - GitHub personal access token with repo scope
+ * @returns {Promise<boolean>} - Whether the sync was successful
  */
-function resolveConflicts(type, postId, localData, serverData) {
-  console.log(`Resolving conflicts for ${type} on post ${postId}`);
-  
-  switch (type) {
-    case 'votes':
-      // For votes, we take the higher count for each type (upvote/downvote)
-      // This assumes we don't track individual votes but just count them
-      return {
-        upvotes: Math.max(localData.upvotes || 0, serverData.upvotes || 0),
-        downvotes: Math.max(localData.downvotes || 0, serverData.downvotes || 0)
+async function triggerGitHubSync(githubToken) {
+  try {
+    // Get data counts for summary
+    const posts = JSON.parse(localStorage.getItem('collection_posts') || '[]');
+    const comments = JSON.parse(localStorage.getItem('collection_comments') || '[]');
+    const votes = JSON.parse(localStorage.getItem('collection_votes') || '[]');
+    
+    // Log counts for debugging
+    console.log(`Data to sync: ${posts.length} posts, ${comments.length} comments, ${votes.length} votes`);
+    
+    // Check if there's any data to sync
+    const hasData = posts.length > 0 || comments.length > 0 || votes.length > 0;
+    
+    if (!hasData) {
+      console.log('No localStorage data to sync');
+      if (typeof showSuccessModal === 'function') {
+        showSuccessModal('No local data to sync', null, 3000, 'info');
+      }
+      return false;
+    }
+    
+    // Collect data for sync
+    const localData = { posts, comments, votes };
+    
+    // If we have data and a token, trigger the GitHub Action
+    if (githubToken) {
+      const owner = 'wearesierraleone'; // Repository owner
+      const repo = 'frontend'; // Repository name
+      
+      console.log('Sending sync request to GitHub API...');
+      
+      // Create a summary of data being synced
+      const summary = {
+        posts: posts.length,
+        comments: comments.length,
+        votes: votes.length,
+        total: posts.length + comments.length + votes.length
       };
       
-    case 'comments':
-      // For comments, we need to merge by timestamp
-      // This is a simple approach that ignores possible duplicates
-      
-      // Create a map of timestamps to comments from both sources
-      const commentMap = new Map();
-      
-      // Add server comments first
-      (serverData || []).forEach(comment => {
-        commentMap.set(comment.timestamp, { ...comment, source: 'server' });
+      // Trigger repository_dispatch event
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          event_type: 'localstorage-sync',
+          client_payload: {
+            localData: JSON.stringify(localData),
+            summary: JSON.stringify(summary),
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          }
+        })
       });
       
-      // Then add local comments, potentially overwriting server comments
-      // with the same timestamp (rare but possible)
-      (localData || []).forEach(comment => {
-        if (!commentMap.has(comment.timestamp)) {
-          commentMap.set(comment.timestamp, { ...comment, source: 'local' });
-        }
-      });
-      
-      // Convert back to array and sort by timestamp
-      return Array.from(commentMap.values())
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      
-    default:
-      console.warn(`Unknown conflict type: ${type}`);
-      return serverData || localData;
+      if (response.ok) {
+        console.log('GitHub Actions sync workflow triggered successfully');
+        
+        // Record successful sync timestamp
+        localStorage.setItem('last_sync_timestamp', new Date().toISOString());
+        localStorage.setItem('last_sync_summary', JSON.stringify(summary));
+        
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to trigger GitHub Actions workflow:', response.status, errorText);
+        return false;
+      }
+    } else {
+      console.warn('GitHub token not provided, cannot sync data');
+      return false;
+    }
+  } catch (error) {
+    console.error('Error triggering GitHub sync:', error);
+    return false;
   }
 }
 
 /**
- * Merge server data with local data, resolving conflicts
- * @param {object} options - Options for merging
- * @param {string} options.type - Type of data ('votes', 'comments')
- * @param {string} options.postId - The ID of the post
- * @param {object} options.serverData - The server data
- * @returns {object} - The merged data
+ * Helper function to resolve conflicts between local and server data
+ * @param {string} type - The type of data (posts, comments, votes)
+ * @param {string} postId - The ID of the post
+ * @param {any} localData - The local data
+ * @param {any} serverData - The server data
+ * @returns {any} The resolved data
  */
-function mergeWithLocalData({ type, postId, serverData }) {
-  let localData;
+function resolveConflicts(type, postId, localData, serverData) {
+  // Default conflict resolution simply prioritizes local data
+  // In a more sophisticated approach, you might want to merge data more intelligently
   
   switch (type) {
-    case 'votes':
-      localData = getLocalVotes(postId);
-      break;
-      
-    case 'comments':
-      // Get local comments for the post
-      try {
-        const localCommentsStr = localStorage.getItem('local_comments');
-        if (localCommentsStr) {
-          const localComments = JSON.parse(localCommentsStr);
-          localData = localComments[postId] || [];
-        } else {
-          localData = [];
-        }
-      } catch (e) {
-        console.error('Error getting local comments:', e);
-        localData = [];
-      }
-      break;
-      
     default:
       console.warn(`Unknown data type for merging: ${type}`);
       return serverData;

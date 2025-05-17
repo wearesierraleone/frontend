@@ -11,6 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
   
+  // Check if user already voted on this post
+  const alreadyVoted = localStorage.getItem(`voted-${postId}`) === 'true';
+  if (alreadyVoted) {
+    voteBtn.innerText = 'Voted';
+    voteBtn.disabled = true;
+    voteBtn.classList.add('cursor-not-allowed', 'opacity-50');
+    return;
+  }
+  
   voteBtn.addEventListener('click', async () => {
     // Disable button immediately to prevent double clicks
     voteBtn.disabled = true;
@@ -18,25 +27,54 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const vote = { 
       postId,
-      type: 'vote',
+      type: 'upvote', // Changed from 'vote' to be more specific
       timestamp: new Date().toISOString() 
     };
 
-    postContentWithCallback(
-      '/vote',  // Updated to match Flask API endpoint '/votes'
-      vote,
-      () => {
-        voteBtn.innerText = 'Voted';
-        voteBtn.classList.add('cursor-not-allowed');
-        // No success modal
-      },
-      'Failed to submit vote. Please try again.'
-    )
-    .catch((error) => {
-      console.error('Error submitting vote:', error);
-      // Reset the button if there's an error
-      voteBtn.disabled = false;
-      voteBtn.classList.remove('opacity-50');
-    });
+    // Check if we're on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
+    if (isGitHubPages) {
+      try {
+        // Use local storage for GitHub Pages
+        if (typeof saveVoteLocally === 'function') {
+          saveVoteLocally(vote);
+          voteBtn.innerText = 'Voted';
+          voteBtn.classList.add('cursor-not-allowed');
+          
+          // Update vote count in the UI if possible
+          const voteCountElement = document.getElementById('voteCount');
+          if (voteCountElement) {
+            const currentCount = parseInt(voteCountElement.textContent || '0', 10);
+            voteCountElement.textContent = (currentCount + 1).toString();
+          }
+        } else {
+          throw new Error('localStorage sync functionality not available');
+        }
+      } catch (error) {
+        console.error('Vote error:', error);
+        voteBtn.disabled = false;
+        voteBtn.classList.remove('opacity-50');
+        alert('Failed to save your vote. Please try again later.');
+      }
+    } else {
+      // For non-GitHub Pages, use API
+      postContentWithCallback(
+        '/vote',
+        vote,
+        () => {
+          voteBtn.innerText = 'Voted';
+          voteBtn.classList.add('cursor-not-allowed');
+          // No success modal
+        },
+        'Failed to submit vote. Please try again.'
+      )
+      .catch((error) => {
+        console.error('Vote error:', error);
+        // Reset the button if there's an error
+        voteBtn.disabled = false;
+        voteBtn.classList.remove('opacity-50');
+      });
+    }
   });
 });

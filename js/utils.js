@@ -68,11 +68,11 @@ function postContent(
     
     // Check if we're in offline/static mode or on GitHub Pages
     const isGitHubPages = window.location.hostname.includes('github.io');
-    // If we're on GitHub Pages, we should be using the Flask API
-    const hasSubmissionAPI = apiUrl.includes('flask-submission-bot.onrender.com') || apiUrl.includes('localhost');
+    // If we're on GitHub Pages, we should be using the local storage (raw.githubusercontent.com doesn't support POST)
+    const hasSubmissionAPI = !isGitHubPages && (apiUrl.includes('flask-submission-bot.onrender.com') || apiUrl.includes('localhost'));
     
-    // Use localStorage fallback only if we don't have a submission API
-    if (apiUrl === '' || apiUrl === '/api') {
+    // Use localStorage fallback for GitHub Pages or if we don't have a submission API
+    if (isGitHubPages || apiUrl === '' || apiUrl === '/api') {
         console.log('Running in static/GitHub Pages mode - saving to localStorage', data);
         // Store in localStorage for demo purposes
         try {
