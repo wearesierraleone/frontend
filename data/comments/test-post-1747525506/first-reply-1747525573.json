@@ -1,0 +1,17 @@
+{
+  "id": "first-reply-1747525573",
+  "author": "Auto-created",
+  "text": "Placeholder comment (auto-created for reply nested-reply-1747525573)",
+  "timestamp": "2025-05-18T00:46:40.510506",
+  "status": "pending",
+  "replies": [
+    {
+      "id": "nested-reply-1747525573",
+      "parentId": "first-reply-1747525573",
+      "author": "Nested Reply Author",
+      "text": "This is a nested reply (reply to a reply).",
+      "timestamp": "2025-05-18T00:46:39.932077",
+      "status": "pending"
+    }
+  ]
+}
