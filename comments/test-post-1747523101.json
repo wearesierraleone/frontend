@@ -1,0 +1,11 @@
+{
+  "test-post-1747523101": [
+    {
+      "id": "comment-reply-test-1747523115",
+      "author": "Test User",
+      "text": "This is a parent comment for testing replies",
+      "timestamp": "2025-05-17T23:05:20Z",
+      "status": "pending"
+    }
+  ]
+}
