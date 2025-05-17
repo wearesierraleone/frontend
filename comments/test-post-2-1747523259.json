@@ -1,0 +1,39 @@
+{
+  "postId": "test-post-2-1747523259",
+  "test-post-2-1747523259": [
+    {
+      "id": "comment-bulk-1-1747523290",
+      "author": "Bulk Comment User 1",
+      "text": "This is the first bulk comment.",
+      "timestamp": "2025-05-17T23:08:10Z",
+      "status": "pending",
+      "replies": [
+        {
+          "id": "reply-1-1747523290",
+          "parentId": "comment-bulk-1-1747523290",
+          "author": "Reply User 1",
+          "text": "Reply to the first bulk comment.",
+          "timestamp": "2025-05-17T23:08:10Z",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "comment-bulk-2-1747523290",
+      "author": "Bulk Comment User 2",
+      "text": "This is the second bulk comment.",
+      "timestamp": "2025-05-17T23:08:10Z",
+      "status": "pending",
+      "replies": [
+        {
+          "id": "reply-2-1747523290",
+          "parentId": "comment-bulk-2-1747523290",
+          "author": "Reply User 2",
+          "text": "Reply to the second bulk comment.",
+          "timestamp": "2025-05-17T23:08:10Z",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}
