@@ -23,5 +23,32 @@
     "category": "youth",
     "timestamp": "2025-05-06T11:20:00Z",
     "status": "approved"
+  },
+  {
+    "title": "Hellow",
+    "body": "http://localhost:5501/http://localhost:5501/http://localhost:5501/",
+    "category": "health",
+    "imageUrl": "",
+    "timestamp": "2025-05-16T19:19:33.741Z",
+    "status": "rejected",
+    "id": "post1747423173747"
+  },
+  {
+    "title": "http://localhost:5501/",
+    "body": "http://localhost:5501/http://localhost:5501/",
+    "category": "technology",
+    "imageUrl": "https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/370c/live/d15c0910-30e1-11f0-8519-3b5a01ebe413.jpg.webp",
+    "timestamp": "2025-05-16T19:20:06.182Z",
+    "status": "pending",
+    "id": "post1747423206191"
+  },
+  {
+    "title": "Comment Moderation should be free",
+    "body": "Comment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\nComment Moderation\n",
+    "category": "education",
+    "imageUrl": "https://media.sierraloaded.sl/wp-content/uploads/2025/03/Fatima-Bio-koidu-workers.jpg",
+    "timestamp": "2025-05-17T12:34:12.181Z",
+    "status": "approved",
+    "id": "post1747485252194"
   }
 ]

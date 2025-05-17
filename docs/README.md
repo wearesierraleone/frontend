@@ -15,6 +15,23 @@ This project uses a simplified approach with data files stored directly in the r
 - CSS styles in `style.css`
 - Data files in the `data/` directory
 
+## Key Features
+
+### Expandable FAQ Section
+The FAQ page (`faq.html`) includes an enhanced user experience:
+- Collapsible content sections with smooth animations
+- Table of contents with smooth scrolling navigation
+- Accessibility features including ARIA attributes and keyboard navigation
+- "Expand All" and "Collapse All" controls
+- "Back to Top" button for improved user experience
+- Fully responsive design for all device sizes
+
+### Direct Petition Submission
+The petition creation process (`post.html`) has been streamlined:
+- Direct server submission without modal interruptions
+- Improved user flow with immediate feedback
+- Simple error handling with alert messages
+
 ## Keeping Data Files Synchronized
 
 To ensure the data files are kept up-to-date, use the included sync script:
@@ -88,5 +105,15 @@ To work on the frontend locally:
 
 1. Clone this repository
 2. Make your changes to the HTML, CSS, or JavaScript files
-3. Test locally by opening the HTML files in a browser
-4. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`
+3. Start a local development server (see below)
+4. Test locally using the server URL
+5. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`
+
+### Local Development Servers
+
+This project supports multiple local development server options with dynamic port selection to avoid conflicts. See `LOCAL_DEVELOPMENT.md` for detailed instructions on:
+
+- Basic static file server
+- Enhanced API server with post submission support
+- VS Code Live Server compatible options
+- Troubleshooting connection issues

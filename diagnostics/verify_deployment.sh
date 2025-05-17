@@ -41,8 +41,8 @@ if [ -d "data" ] && [ -d "frontend/data" ]; then
     else
         echo "✗ Data files are not in sync!"
         echo "  Running sync script..."
-        chmod +x frontend/scripts/sync_data_files.sh
-        frontend/scripts/sync_data_files.sh
+        chmod +x frontend/sync_data_files.sh
+        frontend/sync_data_files.sh
     fi
 fi
 

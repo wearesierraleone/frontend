@@ -34,8 +34,6 @@ function createFooter() {
             <li><a href="submit.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline">Submit a Post</a></li>
             <li><a href="petitions.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline">Petitions</a></li>
             <li><a href="faq.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline">FAQ</a></li>
-            <li><a href="terms.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline">Terms of Service</a></li>
-            <li><a href="privacy.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline">Privacy Policy</a></li>
           </ul>
         </nav>
         
@@ -47,6 +45,9 @@ function createFooter() {
       
       <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-center items-center">
         <p class="text-gray-400">&copy; ${currentYear} We Are Sierra Leone. All rights reserved.</p>
+          <a href="terms.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline ml-2 mt-2 md:mt-0">Terms of Service</a>
+          <a href="privacy.html" class="text-blue-300 hover:text-white transition-colors focus:outline-none focus:underline ml-2 mt-2 md:mt-0">Privacy Policy</a>
+          <a href="admin.html" class="text-xs text-gray-500 hover:text-gray-400 ml-2 mt-2 md:mt-0">Moderator Access</a>
       </div>
     </div>
     `;

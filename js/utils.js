@@ -27,28 +27,20 @@ function logApiRequest(url, method, data = null) {
  * @returns {string} The base URL for API requests or data files
  */
 function baseUrl(forDataOnly = false) {
-    // Check if we're running locally or in production
-    const isLocal = window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1';
-    
     // Check if we're on GitHub Pages
     const isGitHubPages = window.location.hostname.includes('github.io');
     
-    // In a production environment, this could be loaded from a config file or environment variable
-    if (isLocal) {
-        return 'http://localhost:8080';
-    } else if (isGitHubPages) {
+    if (isGitHubPages) {
         // Use different URLs for data files vs API endpoints
         if (forDataOnly) {
-            // For GitHub Pages, we need to use the full path to the data files
-            // including the repository name in the URL
-            return '/frontend';
+            // When loading data (JSON files), use the raw GitHub content
+            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/refs/heads/main';
         } else {
             // For API submissions, use the Flask submission bot
             return 'https://flask-submission-bot.onrender.com';
         }
     } else {
-        // For other static deployments, use relative paths
+        // For all other cases, just use empty base URL (relative paths)
         return '';
     }
 }
@@ -96,23 +88,45 @@ function postContent(
             // Also add to the specific collection in localStorage if path indicates a collection
             const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
             if (collectionPath) {
-                // Try to get existing collection data
-                const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
-                try {
-                    const collection = JSON.parse(existingData);
-                    // Add new item with generated ID
-                    const newItem = { ...data, id: `local_${Date.now()}` };
-                    collection.push(newItem);
-                    localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
-                } catch (e) {
-                    console.error('Error updating collection:', e);
+                // Special handling for comment updates with replies
+                if (path === '/update-comments' && data.postId && data.comments) {
+                    try {
+                        // Get existing comments collection
+                        const commentsData = localStorage.getItem('collection_comments') || '{}';
+                        const allComments = JSON.parse(commentsData);
+                        
+                        // Update the comments for this specific post
+                        allComments[data.postId] = data.comments;
+                        
+                        // Save the updated comments back to localStorage
+                        localStorage.setItem('collection_comments', JSON.stringify(allComments));
+                        
+                        // Also update the cache to ensure consistent data
+                        localStorage.setItem('cache_data_comments.json', JSON.stringify(allComments));
+                    } catch (e) {
+                        console.error('Error updating comments collection:', e);
+                    }
+                } else {
+                    // Try to get existing collection data for standard collections
+                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                    try {
+                        const collection = JSON.parse(existingData);
+                        // Add new item with generated ID
+                        const newItem = { ...data, id: `local_${Date.now()}` };
+                        collection.push(newItem);
+                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                    } catch (e) {
+                        console.error('Error updating collection:', e);
+                    }
                 }
             }
             
-            // Show success and redirect after a delay to simulate server response
-            setTimeout(() => {
-                showSuccessModal(successMsg + ' (Static Mode)', redirectTo, 2000, 'success');
-            }, 1000);
+            // Show success and redirect after a delay to simulate server response, only if successMsg is provided
+            if (successMsg) {
+                setTimeout(() => {
+                    showSuccessModal(successMsg + ' (Static Mode)', redirectTo, 2000, 'success');
+                }, 1000);
+            }
             
             return Promise.resolve({});
         } catch (e) {
@@ -124,7 +138,7 @@ function postContent(
     
     // Set timeout for fetch to prevent infinite waiting
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     return fetch(url, {
         method: 'POST',
@@ -140,7 +154,10 @@ function postContent(
     .then(res => {
         clearTimeout(timeoutId);
         if (res.ok) {
-            showSuccessModal(successMsg, redirectTo, 2000, 'success');
+            // Only show success modal if successMsg is provided
+            if (successMsg) {
+                showSuccessModal(successMsg, redirectTo, 2000, 'success');
+            }
             return res.json().catch(() => ({})); // Return empty object if response isn't JSON
         } else {
             console.error(`API error: ${res.status} ${res.statusText}`);
@@ -151,37 +168,6 @@ function postContent(
     .catch(err => {
         clearTimeout(timeoutId);
         console.error('Request failed:', err);
-        
-        // If we're on GitHub Pages and get an abort error (timeout), use localStorage as fallback
-        if (isGitHubPages && err.name === 'AbortError') {
-            console.log('API request timed out, falling back to localStorage storage');
-            try {
-                // Create a unique ID for this submission
-                const submissionId = 'submission_' + Date.now();
-                localStorage.setItem(submissionId, JSON.stringify(data));
-                
-                // Also add to the specific collection
-                const collectionPath = path.replace(/^\/+|\/+$/g, '');
-                if (collectionPath) {
-                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
-                    try {
-                        const collection = JSON.parse(existingData);
-                        const newItem = { ...data, id: `local_${Date.now()}` };
-                        collection.push(newItem);
-                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
-                    } catch (e) {
-                        console.error('Error updating collection:', e);
-                    }
-                }
-                
-                showSuccessModal(successMsg + ' (Saved locally)', redirectTo, 2000, 'success');
-                return Promise.resolve({});
-            } catch (e) {
-                console.error('localStorage fallback error:', e);
-                showSuccessModal('Server unavailable and local storage failed. Please try again later.', null, 0, 'error');
-                return Promise.reject(e);
-            }
-        }
         
         let errorMessage = 'Network error. Please try again later.';
         if (err.name === 'AbortError') {
@@ -263,7 +249,7 @@ function postContentWithCallback(
     
     // Set timeout for fetch to prevent infinite waiting
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     return fetch(url, {
         method: 'POST',
@@ -299,39 +285,6 @@ function postContentWithCallback(
         clearTimeout(timeoutId);
         console.error('Request failed:', err);
         
-        // If we're on GitHub Pages and get an abort error (timeout), use localStorage as fallback
-        if (isGitHubPages && err.name === 'AbortError') {
-            console.log('API request timed out, falling back to localStorage storage');
-            try {
-                // Create a unique ID for this submission
-                const submissionId = 'callback_submission_' + Date.now();
-                localStorage.setItem(submissionId, JSON.stringify(data));
-                
-                // Also add to the specific collection
-                const collectionPath = path.replace(/^\/+|\/+$/g, '');
-                if (collectionPath) {
-                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
-                    try {
-                        const collection = JSON.parse(existingData);
-                        const newItem = { ...data, id: `local_${Date.now()}` };
-                        collection.push(newItem);
-                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
-                    } catch (e) {
-                        console.error('Error updating collection:', e);
-                    }
-                }
-                
-                // Execute callback with the local data
-                callback(data);
-                showSuccessModal('Operation successful (Saved locally)', null, 0, 'success');
-                return Promise.resolve(data);
-            } catch (e) {
-                console.error('localStorage fallback error:', e);
-                showSuccessModal('Server unavailable and local storage failed. Please try again later.', null, 0, 'error');
-                return Promise.reject(e);
-            }
-        }
-        
         let errorMessage = 'Network error. Please try again later.';
         if (err.name === 'AbortError') {
             errorMessage = 'Request timed out. The server may be down or unreachable.';
@@ -343,86 +296,56 @@ function postContentWithCallback(
 }
 
 /**
- * Loads data from either API or static JSON files with fallbacks
+ * Loads data from either API or static JSON files with simplified approach
  * @param {string} path - The path to the data file (e.g., 'data/approved.json')
  * @param {object} defaultValue - The default value to return if loading fails
  * @returns {Promise<object>} - The data from the API or default value
  */
 async function loadData(path, defaultValue = {}) {
-    // Check if we're on GitHub Pages - if so, first check for local collections
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
-    
-    // First, check if we have a local collection for this path (created via POST)
-    if (isGitHubPages) {
-        try {
-            const localCollection = localStorage.getItem(`collection_${collectionPath}`);
-            if (localCollection) {
-                console.log(`Loading local collection data for ${path}`);
-                const localData = JSON.parse(localCollection);
-                if (localData && localData.length > 0) {
-                    return localData;
-                }
-            }
-        } catch (localError) {
-            console.warn(`Error reading local collection for ${path}:`, localError);
-        }
-    }
-    
     try {
-        // Construct the URL using baseUrl() with forDataOnly=true to get the data URL
-        // With our new approach, this will be a local path within the repository
-        let url = `${baseUrl(true)}/${path}`;
+        // Simple direct URL construction - just get the file directly
+        let url = path;
         
-        // Use enhanced logging
-        logApiRequest(url, 'GET');
+        // Only use baseUrl if we're on GitHub Pages or other special environments
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        if (isGitHubPages) {
+            url = `${baseUrl(true)}/${path}`;
+        }
         
-        // Try loading from the data URL or direct file path
-        const response = await fetch(url);
+        console.log(`Loading data from ${url}`);
+        
+        // Set up a timeout for the fetch operation
+        const fetchPromise = fetch(url);
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request timed out')), 5000); // 5 second timeout
+        });
+        
+        // Race between fetch and timeout
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
         
         // Check if the response is ok
         if (!response.ok) {
-            // If we get a 401 (Unauthorized) or 403 (Forbidden) from GitHub, we need a token
-            if ((response.status === 401 || response.status === 403) && 
-                (url.includes('githubusercontent.com') || url.includes('github'))) {
-                
-                // Mark that we need GitHub authentication
-                localStorage.setItem('github_auth_required', 'true');
-                
-                // If we have the promptForGitHubToken function available, call it
-                if (typeof promptForGitHubToken === 'function') {
-                    promptForGitHubToken();
-                }
-            }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Parse the JSON data
-        const data = await response.json();
-        
-        // Cache the data in localStorage
         try {
-            localStorage.setItem(`cache_${path.replace(/\//g, '_')}`, JSON.stringify(data));
-        } catch (cacheError) {
-            console.warn('Could not cache data:', cacheError);
+            // Parse the JSON data
+            const data = await response.json();
+            return data;
+        } catch (jsonError) {
+            console.error(`JSON parsing error for ${path}:`, jsonError);
+            throw new Error(`Invalid JSON in ${path}`);
         }
-        
-        return data;
     } catch (error) {
-        console.warn(`Error loading data from ${path}:`, error);
+        console.error(`Error loading data from ${path}:`, error);
         
-        // Try to retrieve from localStorage if available
-        try {
-            const storedData = localStorage.getItem(`cache_${path.replace(/\//g, '_')}`);
-            if (storedData) {
-                console.log(`Loaded cached data for ${path}`);
-                return JSON.parse(storedData);
-            }
-        } catch (cacheError) {
-            console.error('Cache retrieval failed:', cacheError);
+        // Try to use fallback data if available
+        if (path === 'data/approved.json' && typeof getFallbackPosts === 'function') {
+            console.log('Using fallback posts data');
+            return getFallbackPosts();
         }
         
-        // Return the default value as a last resort
+        // Just return the default value
         console.log(`Using default data for ${path}`);
         return defaultValue;
     }

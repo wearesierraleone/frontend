@@ -1,43 +1,131 @@
 # We Are Sierra Leone - Frontend
 
-This is the frontend component of the We Are Sierra Leone civic platform. It's designed to be deployed on GitHub Pages.
+This is the frontend component of the We Are Sierra Leone civic platform. It's designed to be deployed on GitHub Pages and fetches data from the main backend repository.
 
 ## Repository Structure
 
-This project uses a simplified approach with data files stored directly in the repository:
-1. **Frontend Code**: HTML, CSS, and JavaScript files for the public-facing website.
-2. **Data Files**: JSON files in the `data/` directory containing posts, petitions, comments, and votes.
+This project has been split into two repositories:
+1. **Frontend Repository** (this repo): Contains all HTML, CSS, and JavaScript files needed for the public-facing website.
+2. **Backend Repository**: Located at https://github.com/wearesierraleone/wearesalone - Contains the data files and server-side code.
 
 ## Structure
 
 - HTML files for all pages
 - JavaScript files in the `js/` directory
 - CSS styles in `style.css`
-- Data files in the `data/` directory
-
-## Keeping Data Files Synchronized
-
-To ensure the data files are kept up-to-date, use the included sync script:
-
-```bash
-./scripts/sync_data_files.sh
-```
-
-This script will copy all data files from the root project directory to the frontend/data directory.
 
 ## Deployment
 
-This frontend is configured to be deployed on GitHub Pages.
+This frontend is configured to be deployed on GitHub Pages. It will automatically fetch data from the main backend repository.
 
-See `docs/GITHUB_PAGES_DEPLOYMENT.md` for detailed deployment instructions.
+See `GITHUB_PAGES_DEPLOYMENT.md` for detailed deployment instructions.
 
 ## Data Loading
 
-The application uses the following approach for data management:
+The application uses the following simplified approach for data management:
 
-1. Fetches data from the backend repository's raw GitHub content
-2. Falls back to local storage cache if the fetch fails
-3. Uses default values as a last resort
+1. Fetches data directly from the data directory
+2. Falls back to built-in fallback data if fetching fails
+3. Implements retry mechanism for better reliability
+
+## Post Status System
+
+Posts follow a simple status workflow:
+
+1. **Pending**: New posts are added with "pending" status and are not shown on the public site
+2. **Approved**: Only posts with "approved" status are displayed on the homepage
+3. **Rejected**: Posts that have been reviewed and rejected
+
+Administrators can use the admin.html page to review pending posts and change their status.
+
+## Local Development
+
+### Using the Local Server
+
+For local development, you have three options:
+
+#### 1. Basic Local Server
+
+```bash
+# Start a simple local development server
+./scripts/start_local_server.sh
+```
+
+This will start a Python HTTP server on port 8080, allowing you to access the site at:
+http://localhost:8080
+
+*Note: The basic server only serves static files and doesn't support saving new posts.*
+
+#### 2. Enhanced Local Server with API Endpoints
+
+```bash
+# Start the enhanced server with API support
+./scripts/start_local_server_with_api.sh
+```
+
+This starts a Node.js server that includes API endpoints for saving posts.
+It allows you to test the full post submission flow locally.
+The server automatically finds an available port (starting with 5500, 5501, etc.) and shows the URL in the terminal.
+
+#### 3. VS Code Live Server Compatible API Server
+
+```bash
+# Start a server compatible with VS Code's Live Server
+./scripts/start_vscode_server_with_api.sh
+```
+
+If you're using VS Code's Live Server extension, this server will detect an available port
+and provide API endpoints to avoid CORS issues. It tries to use port 5500 first (VS Code's default),
+but will automatically choose another port (5501, 5502, etc.) if the default is already in use.
+
+### Post Management Demo
+
+You can use the approve_demo.sh script to simulate changing a post's status:
+
+```bash
+# Change post status (replace with actual post ID)
+./scripts/approve_demo.sh post1234 approved
+```
+
+Valid status values are: `approved`, `pending`, and `rejected`
+
+## Diagnostics & Validation
+
+Several diagnostic tools are available to help debug issues:
+
+### Browser Console Diagnostics
+
+The `diagnostics.js` file includes automatic checks that run in the browser console:
+- Form submission monitoring
+- Post status validation
+- Data loading diagnostics
+
+### Command Line Tools
+
+```bash
+# Validate JSON files
+./scripts/validate_json.sh
+
+# Check post status counts
+./scripts/validate_json.sh | grep Statistics -A 4
+```
+
+## Features
+
+### Expandable FAQ Section
+The FAQ page includes an interactive, accessible implementation with the following features:
+- Collapsible FAQ items with smooth animations
+- Table of contents with smooth scrolling
+- "Expand All" and "Collapse All" functionality
+- "Back to Top" button for better navigation
+- ARIA attributes for better accessibility
+- Responsive design for mobile devices
+
+### Direct Petition Creation
+The petition creation process has been streamlined:
+- Direct server submission without modal interruptions
+- Improved user flow with immediate feedback
+- Enhanced error handling with simple alert messages
 
 ## Authentication
 
@@ -52,7 +140,7 @@ Using GitHub Actions and repository secrets:
 1. Store a GitHub Personal Access Token as a repository secret named `DATA_TOKEN`
 2. The GitHub Actions workflow automatically injects this token during deployment
 3. Users can access the site without needing to provide their own tokens
-4. Use `scripts/setup_github_secret.sh` script or GitHub web interface to set up the secret
+4. Use `setup_github_secret.sh` script or GitHub web interface to set up the secret
 
 #### 2. Manual
 
@@ -60,20 +148,9 @@ Using session storage for development or testing:
 
 1. Users will be prompted to enter a GitHub token when needed
 2. Tokens are stored in session storage (cleared when browser tab is closed)
-3. The diagnostics page (`diagnostics/diagnostics.html`) provides tools for managing tokens
+3. The diagnostics page (`diagnostics.html`) provides tools for managing tokens
 
-See `docs/GITHUB_PAGES_LOCALSTORAGE.md` for more details on both authentication methods.
-
-### Diagnostic Tools
-
-All diagnostic and test tools are located in the `diagnostics/` directory:
-- `diagnostics/url_diagnostic.html` - Tests URL construction
-- `diagnostics/repository_test.html` - Tests repository configuration
-- `diagnostics/content_test.html` - Tests data loading
-- `diagnostics/diagnostics.html` - API connection diagnostics
-- `diagnostics/detect_github_pages_url.sh` - Auto-detect GitHub Pages URL
-
-See `docs/GITHUB_PAGES_DEPLOYMENT.md` for more details on troubleshooting deployment issues.
+See `GITHUB_PAGES_LOCALSTORAGE.md` for more details on both authentication methods.
 
 ### API Submission
 
@@ -89,4 +166,4 @@ To work on the frontend locally:
 1. Clone this repository
 2. Make your changes to the HTML, CSS, or JavaScript files
 3. Test locally by opening the HTML files in a browser
-4. Deploy to GitHub Pages using the instructions in `docs/GITHUB_PAGES_DEPLOYMENT.md`
+4. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`

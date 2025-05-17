@@ -19,10 +19,9 @@
   <script src="js/github_token.js"></script>
   <script src="js/utils.js" defer></script>
   <script src="js/modal.js" defer></script>
-  <script src="js/local_storage_sync.js" defer></script>
+  <script src="js/fallback_data.js"></script>
   <script src="js/vote.js" defer></script>
   <script src="js/comment.js" defer></script>
-  <script src="js/sync_status.js" defer></script>
   <script src="js/footer.js"></script>
   <script src="js/diagnostics.js"></script>
 
@@ -199,6 +198,7 @@
               </svg>
               Back to Home
             </a>
+            
             <a href="#" id="reportLink"
               class="text-red-600 hover:text-red-700 font-medium transition-colors flex items-center">
               <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -228,13 +228,6 @@
                       d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
                 </a>
-                <button id="copyLink" class="text-blue-500 hover:text-blue-600 transition-colors p-1" title="Copy link">
-                  <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
                 <button id="copyLink" class="text-blue-500 hover:text-blue-600 transition-colors p-1" title="Copy link">
                   <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -278,58 +271,25 @@
   <script>
     async function updateVoteStats(postId) {
       try {
-        // Try to fetch server stats first
-        const fetchStats = async () => {
-          try {
-            return await loadData('data/vote_stats.json', {});
-          } catch (e) {
-            console.log('Could not load vote stats, using localStorage fallback');
-            return null;
-          }
-        };
+        // Fetch vote stats from server
+        let stats;
+        try {
+          stats = await loadData('data/vote_stats.json', {});
+        } catch (e) {
+          console.error('Could not load vote stats from server', e);
+          throw e;
+        }
         
-        // Get stats from server 
-        let stats = await fetchStats();
-        let serverUpvotes = 0;
-        let serverDownvotes = 0;
+        // Get upvote and downvote counts
+        let upvotes = 0;
+        let downvotes = 0;
         
         if (stats && stats[postId]) {
-          // We have stats from the server
-          serverUpvotes = stats[postId].upvotes || 0;
-          serverDownvotes = stats[postId].downvotes || 0;
+          upvotes = stats[postId].upvotes || 0;
+          downvotes = stats[postId].downvotes || 0;
         }
         
-        // Get local votes from localStorage
-        let localVotes;
-        if (typeof getLocalVotes === 'function') {
-          // Use the function from local_storage_sync.js if available
-          localVotes = getLocalVotes(postId);
-        } else {
-          // Fallback to counting votes directly
-          localVotes = { upvotes: 0, downvotes: 0 };
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith(`upvote-${postId}`)) {
-              localVotes.upvotes++;
-            } else if (key.startsWith(`downvote-${postId}`)) {
-              localVotes.downvotes++;
-            }
-          }
-        }
-        
-        // If server data is available, use it as a base and add any local votes not yet synced
-        // In a real app, you would need to track which votes have already been synced
-        // For simplicity, we'll just take the maximum of server and local counts
-        const upvotes = Math.max(serverUpvotes, localVotes.upvotes);
-        const downvotes = Math.max(serverDownvotes, localVotes.downvotes);
-        
-        // If user already voted (from localStorage), ensure vote is counted
-        if (localStorage.getItem(`voted-${postId}`) === 'true' && upvotes + downvotes === 0) {
-          upvotes = 1; // Default to assuming it was an upvote
-        }
-        
-        console.log(`Combined vote stats for ${postId}: ${upvotes} up, ${downvotes} down (server: ${serverUpvotes}/${serverDownvotes}, local: ${localVotes.upvotes}/${localVotes.downvotes})`);
-        
+        console.log(`Vote stats for ${postId}: ${upvotes} up, ${downvotes} down`);
         
         document.getElementById('voteStats').innerHTML = `
     <div class="flex items-center space-x-3">
@@ -383,6 +343,14 @@
       document.getElementById('title').innerText = post.title;
       document.getElementById('body').innerText = post.body;
 
+      // Add status indicator for moderators (visible only for moderators and admins)
+      if (post.status) {
+        const statusElement = document.createElement('div');
+        statusElement.className = `text-sm ${post.status === 'approved' ? 'text-green-600' : 'text-yellow-600'} font-medium mt-2`;
+        statusElement.innerHTML = `Status: ${post.status.toUpperCase()}`;
+        document.getElementById('title').parentNode.insertBefore(statusElement, document.getElementById('body'));
+      }
+
       // Update the page title with the post title
       document.getElementById('pageTitle').innerText = `${post.title} | We Are Sierra Leone`;
 
@@ -415,51 +383,404 @@
       // Check if we should show the petition conversion option
       const voteStats = await loadData('data/vote_stats.json', {});
       const upvotes = voteStats[postId]?.upvotes || 0;
-
-      if (upvotes >= 10 && !post.isPetition) {
+      
+      // Load petitions data to check if this post already has a petition
+      const petitions = await loadData('data/petitions.json', {});
+      const hasPetition = petitions && petitions[postId];
+      
+      // Show the button if has enough votes or already has a petition
+      if ((upvotes >= 10 && !post.isPetition) || hasPetition) {
+        // Get reference to button and text elements
+        const convertBtn = document.getElementById('convertToPetition');
+        const helpText = convertBtn.parentNode.querySelector('p');
+        
+        if (hasPetition) {
+          // Update button to "Go to Petition" if petition exists
+          convertBtn.innerHTML = `
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            Go to Petition
+          `;
+          convertBtn.classList.replace('bg-yellow-500', 'bg-blue-500');
+          convertBtn.classList.replace('hover:bg-yellow-600', 'hover:bg-blue-600');
+          
+          // Update the help text
+          helpText.textContent = "This post has been converted to a petition. Click to view and sign it.";
+        }
+        
         document.getElementById('convertPetitionWrap').classList.remove('hidden');
       }
 
       const postComments = allComments[postId] || [];
-      document.getElementById('commentCount').innerText = postComments.length;
-      const commentList = document.getElementById('commentList');
+      
+      // Filter comments to show all except rejected ones
+      const visibleComments = postComments.filter(comment => comment.status !== 'rejected');
+      
+      // Update comment count to show visible comments count
+      document.getElementById('commentCount').innerText = visibleComments.length;
 
-      if (postComments.length === 0) {
-        commentList.innerHTML = `
-          <li class="bg-gray-50 p-6 rounded-lg text-center">
-            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <p class="text-gray-500 font-medium">No comments yet.</p>
-            <p class="text-gray-400 text-sm mt-1">Be the first to share your thoughts!</p>
-          </li>`;
-      } else {
-        postComments.forEach(c => {
-          const li = document.createElement('li');
-          li.className = "bg-white border border-gray-100 p-4 rounded-lg shadow-sm";
-          const date = new Date(c.timestamp);
-          const dateStr = date.toLocaleString('en-GB', {
-            day: 'numeric', month: 'long', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', hour12: false
-          }).replace(',', '');
-          li.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center">
-                <div class="bg-blue-100 text-blue-700 rounded-full p-2 mr-3">
-                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                  </svg>
-                </div>
-                <strong class="font-medium text-gray-800">${c.anonId}</strong>
+      // Display comments
+      const commentList = document.getElementById('commentList');
+      commentList.innerHTML = '';
+
+      const commentCount = visibleComments.length;
+
+      // Update the comment count display
+      document.getElementById('commentCount').innerText = `${commentCount}`;
+
+      // No comments message
+      if (commentCount === 0) {
+        const noCommentsEl = document.createElement('div');
+        noCommentsEl.className = 'bg-white rounded-lg shadow-sm p-8 text-center';
+        noCommentsEl.innerHTML = `
+          <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <p class="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
+        `;
+        commentList.appendChild(noCommentsEl);
+      }
+
+      visibleComments.forEach(c => {
+        const li = document.createElement('li');
+        li.className = "bg-white border border-gray-100 p-4 rounded-lg shadow-sm mb-4";
+        li.id = `comment-${c.id}`;
+        const date = new Date(c.timestamp);
+        const dateStr = date.toLocaleString('en-GB', {
+          day: 'numeric', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        }).replace(',', '');
+        
+        // Create comment HTML with reply button
+        li.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center">
+              <div class="bg-blue-100 text-blue-700 rounded-full p-2 mr-3">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
               </div>
-              <span class="text-gray-500 text-sm">${dateStr}</span>
+              <strong class="font-medium text-gray-800">${c.author || 'Anonymous'}</strong>
             </div>
-            <div class="pl-10 text-gray-700 leading-relaxed">${c.text}</div>`;
-          commentList.appendChild(li);
-        });
+            <span class="text-gray-500 text-sm">${dateStr}</span>
+          </div>
+          <div class="pl-10 text-gray-700 leading-relaxed mb-2">${c.text}</div>
+          <div class="pl-10 flex justify-between items-center text-sm">
+            <div class="flex items-center space-x-4">
+              <button class="text-gray-500 hover:text-blue-600 flex items-center text-xs" onclick="showReplyForm('${c.id}')">
+                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                Reply
+              </button>
+              ${c.status === 'flagged' ? '<span class="text-orange-600">This comment has been flagged for review</span>' : ''}
+            </div>
+            <button class="text-gray-500 hover:text-orange-600 flex items-center text-xs" onclick="flagComment('${postId}', '${c.id}')">
+              <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" />
+              </svg>
+              Flag
+            </button>
+          </div>
+          <div id="reply-form-${c.id}" class="pl-10 mt-3 hidden">
+            <div class="bg-gray-50 p-3 rounded border border-gray-200">
+              <textarea id="reply-text-${c.id}" class="w-full border border-gray-300 p-2 rounded text-sm" rows="2" placeholder="Write your reply..."></textarea>
+              <div class="flex justify-end mt-2 space-x-2">
+                <button class="text-gray-500 text-xs px-2 py-1 rounded hover:bg-gray-200" onclick="hideReplyForm('${c.id}')">Cancel</button>
+                <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700" onclick="submitReply('${postId}', '${c.id}')">Reply</button>
+              </div>
+            </div>
+          </div>
+          ${c.replies && c.replies.length > 0 ? 
+            `<div id="replies-${c.id}" class="pl-10 mt-3">
+              ${renderReplies(c, postId)}
+             </div>` 
+            : ''}`;
+        
+        commentList.appendChild(li);
+      });
+    }
+
+    // Helper function to render nested replies
+    function renderReplies(comment, postId) {
+      if (!comment.replies || comment.replies.length === 0) {
+        return '';
+      }
+      
+      let repliesHtml = '';
+      
+      // Filter out rejected replies
+      const visibleReplies = comment.replies.filter(reply => reply.status !== 'rejected') || [];
+      
+      visibleReplies.forEach(reply => {
+        const replyDate = new Date(reply.timestamp);
+        const replyDateStr = replyDate.toLocaleString('en-GB', {
+          day: 'numeric', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        }).replace(',', '');
+        
+        repliesHtml += `
+      <div class="border-l-2 border-gray-200 pl-4 py-2 mt-2 ml-2 bg-gray-50 rounded-r-md">
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center">
+            <div class="bg-blue-50 text-blue-600 rounded-full p-1 mr-2">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </div>
+            <strong class="font-medium text-sm text-gray-800">${reply.author || 'Anonymous'}</strong>
+          </div>
+          <span class="text-gray-500 text-xs">${replyDateStr}</span>
+        </div>
+        <div class="text-gray-700 text-sm ml-6">${reply.text}</div>
+        <div class="flex justify-between items-center mt-1 ml-6">
+          <div>
+            <button class="text-gray-500 hover:text-blue-600 flex items-center text-xs" onclick="showReplyForm('${reply.id}')">
+              <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              Reply
+            </button>
+          </div>
+          <button class="text-gray-500 hover:text-orange-600 flex items-center text-xs" onclick="flagComment('${postId}', '${reply.id}')">
+            <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" />
+            </svg>
+            Flag
+          </button>
+        </div>
+        <div id="reply-form-${reply.id}" class="mt-2 hidden ml-6">
+          <div class="bg-white p-2 rounded border border-gray-200">
+            <textarea class="w-full border border-gray-300 p-2 rounded text-sm" rows="2" placeholder="Write your reply..."></textarea>
+            <div class="flex justify-end mt-2 space-x-2">
+              <button class="text-gray-500 text-xs px-2 py-1 rounded hover:bg-gray-200" onclick="hideReplyForm('${reply.id}')">Cancel</button>
+              <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700" onclick="submitReply('${postId}', '${reply.id}')">Reply</button>
+            </div>
+          </div>
+        </div>
+        ${reply.replies && reply.replies.length > 0 ? 
+          `<div id="replies-${reply.id}" class="ml-4 mt-2">
+            ${renderReplies(reply, postId)}
+           </div>` 
+          : ''}
+      </div>
+    `;
+      });
+      
+      return repliesHtml;
+    }
+    
+    // Helper functions for showing/hiding reply forms and submitting replies
+
+    function showReplyForm(commentId) {
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      if (replyForm) {
+        replyForm.classList.remove('hidden');
+        const textarea = document.getElementById(`reply-text-${commentId}`) || replyForm.querySelector('textarea');
+        if (textarea) {
+          textarea.focus();
+        }
       }
     }
 
+    function hideReplyForm(commentId) {
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      if (replyForm) {
+        replyForm.classList.add('hidden');
+        const textarea = document.getElementById(`reply-text-${commentId}`) || replyForm.querySelector('textarea');
+        if (textarea) {
+          textarea.value = '';
+        }
+      }
+    }
+
+    async function submitReply(postId, parentCommentId) {
+      try {
+        const replyForm = document.getElementById(`reply-form-${parentCommentId}`);
+        if (!replyForm) return;
+        
+        const textarea = document.getElementById(`reply-text-${parentCommentId}`) || replyForm.querySelector('textarea');
+        if (!textarea || !textarea.value.trim()) {
+          showSuccessModal('Please enter a reply', null, 0, 'warning');
+          return;
+        }
+        
+        const replyText = textarea.value.trim();
+        
+        // Get anonymous ID from localStorage or generate a new one
+        const anonId = localStorage.getItem('anonId') || 'anon-' + Math.floor(Math.random() * 99999);
+        localStorage.setItem('anonId', anonId);
+        
+        // Create the reply object
+        const reply = {
+          id: 'reply-' + Date.now(),
+          parentId: parentCommentId,
+          author: anonId,
+          text: replyText,
+          timestamp: new Date().toISOString(),
+          status: 'approved'
+        };
+        
+        // Get existing comments
+        const allComments = await loadData('data/comments.json', {});
+        
+        // Find the parent comment to attach the reply
+        let parentComment = null;
+        let parentCommentFound = false;
+        
+        // Function to recursively search for and update the parent comment
+        function findAndAddReply(commentList, targetId, newReply) {
+          for (let i = 0; i < commentList.length; i++) {
+            const comment = commentList[i];
+            
+            // Check if this is the target comment
+            if (comment.id === targetId) {
+              if (!comment.replies) comment.replies = [];
+              comment.replies.push(newReply);
+              return true;
+            }
+            
+            // Check replies recursively
+            if (comment.replies && comment.replies.length > 0) {
+              const found = findAndAddReplyInReplies(comment.replies, targetId, newReply);
+              if (found) return true;
+            }
+          }
+          return false;
+        }
+        
+        // Function to search through nested replies
+        function findAndAddReplyInReplies(replies, targetId, newReply) {
+          for (let i = 0; i < replies.length; i++) {
+            const reply = replies[i];
+            
+            // Check if this is the target reply
+            if (reply.id === targetId) {
+              if (!reply.replies) reply.replies = [];
+              reply.replies.push(newReply);
+              return true;
+            }
+            
+            // Check nested replies recursively
+            if (reply.replies && reply.replies.length > 0) {
+              const found = findAndAddReplyInReplies(reply.replies, targetId, newReply);
+              if (found) return true;
+            }
+          }
+          return false;
+        }
+        
+        // Try to find and update the parent comment
+        if (allComments[postId]) {
+          parentCommentFound = findAndAddReply(allComments[postId], parentCommentId, reply);
+        }
+        
+        if (parentCommentFound) {
+          // Submit directly to the server - no offline fallback and no success modal
+          await postContent('/update-comments', {
+            postId,
+            comments: allComments[postId]
+          }, null, null, 'Failed to submit reply');
+          
+          // Refresh the page to show the updated comments
+          loadPost();
+          
+          // Hide the reply form
+          hideReplyForm(parentCommentId);
+        } else {
+          throw new Error('Parent comment not found');
+        }
+      } catch (error) {
+        console.error('Error submitting reply:', error);
+        showSuccessModal('Error submitting reply', 'Please try again later.', 2000, 'error');
+      }
+    }
+
+    // Helper function for flagging comments
+    async function flagComment(postId, commentId) {
+      try {
+        // Get existing comments
+        const allComments = await loadData('data/comments.json', {});
+        
+        // Function to recursively find and flag a comment or reply
+        function findAndFlagComment(commentsList, targetId) {
+          for (let i = 0; i < commentsList.length; i++) {
+            const comment = commentsList[i];
+            
+            // Check if this is the target comment
+            if (comment.id === targetId) {
+              comment.status = 'flagged';
+              return true;
+            }
+            
+            // Check replies recursively
+            if (comment.replies && comment.replies.length > 0) {
+              const found = findAndFlagInReplies(comment.replies, targetId);
+              if (found) return true;
+            }
+          }
+          return false;
+        }
+        
+        // Function to search through nested replies
+        function findAndFlagInReplies(replies, targetId) {
+          for (let i = 0; i < replies.length; i++) {
+            const reply = replies[i];
+            
+            // Check if this is the target reply
+            if (reply.id === targetId) {
+              reply.status = 'flagged';
+              return true;
+            }
+            
+            // Check nested replies recursively
+            if (reply.replies && reply.replies.length > 0) {
+              const found = findAndFlagInReplies(reply.replies, targetId);
+              if (found) return true;
+            }
+          }
+          return false;
+        }
+        
+        // Try to find and flag the comment
+        let flagged = false;
+        if (allComments[postId]) {
+          flagged = findAndFlagComment(allComments[postId], commentId);
+        }
+        
+        if (flagged) {
+          // Try to save via API
+          try {
+            await postContent('/update-comments', {
+              postId,
+              comments: allComments[postId]
+            }, 'Comment flagged for review', null, 'Failed to flag comment');
+            
+            // Refresh the page to show updated status
+            loadPost();
+          } catch (apiError) {
+            console.log('API not available, flagging locally', apiError);
+            showSuccessModal('Comment flagged locally', 'Moderators will be notified of this comment.', 2000, 'info');
+            
+            // Add flagged indicator to the UI
+            const commentElement = document.getElementById(`comment-${commentId}`);
+            if (commentElement) {
+              const flagIndicator = document.createElement('div');
+              flagIndicator.className = 'text-orange-600 text-sm mt-2 pl-10';
+              flagIndicator.innerText = 'This comment has been flagged for review';
+              commentElement.appendChild(flagIndicator);
+            }
+          }
+        } else {
+          throw new Error('Comment not found');
+        }
+      } catch (error) {
+        console.error('Error flagging comment:', error);
+        showSuccessModal('Error flagging comment', 'Please try again later.', 2000, 'error');
+      }
+    }
+    
     window.onload = () => {
       loadPost();
 
@@ -488,18 +809,10 @@
           timestamp: new Date().toISOString()
         };
         
-        // Get API URL from utils.js baseUrl() function or fall back to static mode
-        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
-        const isStaticMode = apiUrl === '/api';
-        
-        // Always store vote locally first for immediate feedback regardless of API mode
-        const voteKey = `upvote-${postId}-${Date.now()}`;
-        localStorage.setItem(voteKey, JSON.stringify(voteObj));
-        localStorage.setItem(`voted-${postId}`, 'true');
-        
-        // Update UI immediately to show the vote
-        setTimeout(() => {
-          // Update UI with local vote
+        // Direct server submission without offline fallback
+        postContent('/upvote', voteObj, null, null, 'Vote submission failed')
+        .then(res => {
+          // Update UI to show the vote
           this.innerHTML = `
             <svg class="w-5 h-5 mr-1 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -509,34 +822,16 @@
           this.classList.add('bg-green-700');
           this.classList.remove('bg-green-600', 'hover:bg-green-700');
           
-          // Update stats immediately with local votes
+          document.getElementById('upvoteBtn').disabled = true;
+          document.getElementById('downvoteBtn').disabled = true;
           updateVoteStats(postId);
-        }, 300);
-        
-        if (isStaticMode) {
-          // Handle static mode (no backend server)
-          console.log('Static mode: simulating upvote');
-          showSuccessModal('Vote saved locally and will be submitted when connected.', null, 2000, 'success');
-          return;
-        }
-        
-        // Regular API mode
-        postContent('/upvote', voteObj, 'Upvote recorded.', null, 'Vote submission failed')
-        .then(res => {
-          if (res.ok || res === true) {
-            showSuccessModal('Upvote recorded.', null, 2000, 'success');
-            document.getElementById('upvoteBtn').disabled = true;
-            document.getElementById('downvoteBtn').disabled = true;
-            updateVoteStats(postId);
-          } else {
-            // Don't reset button state since we already counted the vote locally
-            showSuccessModal('Vote saved locally. Will be synchronized later.', null, 2000, 'info');
-          }
         })
         .catch(err => {
           console.error('Vote error:', err);
-          showSuccessModal('Vote saved locally. Will try to sync later.', null, 2000, 'info');
-          // Don't reset UI - we still have the local vote
+          // Reset buttons on error
+          upvoteBtn.disabled = false;
+          downvoteBtn.disabled = false;
+          this.innerHTML = originalText;
         });
       });
 
@@ -565,18 +860,10 @@
           timestamp: new Date().toISOString()
         };
         
-        // Get API URL from utils.js baseUrl() function or fall back to static mode
-        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
-        const isStaticMode = apiUrl === '/api';
-        
-        // Always store vote locally first for immediate feedback regardless of API mode
-        const voteKey = `downvote-${postId}-${Date.now()}`;
-        localStorage.setItem(voteKey, JSON.stringify(voteObj));
-        localStorage.setItem(`voted-${postId}`, 'true');
-        
-        // Update UI immediately to show the vote
-        setTimeout(() => {
-          // Update UI with local vote
+        // Direct server submission without offline fallback
+        postContent('/downvote', voteObj, null, null, 'Vote submission failed')
+        .then(res => {
+          // Update UI to show the vote
           this.innerHTML = `
             <svg class="w-5 h-5 mr-1 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -586,94 +873,214 @@
           this.classList.add('bg-red-700');
           this.classList.remove('bg-red-600', 'hover:bg-red-700');
           
-          // Update stats immediately with local votes
+          document.getElementById('upvoteBtn').disabled = true;
+          document.getElementById('downvoteBtn').disabled = true;
           updateVoteStats(postId);
-        }, 300);
-        
-        if (isStaticMode) {
-          // Handle static mode (no backend server)
-          console.log('Static mode: simulating downvote');
-          showSuccessModal('Vote saved locally and will be submitted when connected.', null, 2000, 'success');
-          return;
-        }
-        
-        // Regular API mode
-        postContent('/downvote', voteObj, 'Vote recorded', null, 'Vote submission failed')
-        .then(res => {
-          if (res.ok || res === true) {
-            showSuccessModal('Your vote has been recorded.', null, 2000, 'success');
-            document.getElementById('upvoteBtn').disabled = true;
-            document.getElementById('downvoteBtn').disabled = true;
-            updateVoteStats(postId);
-          } else {
-            // Don't reset button state since we already counted the vote locally
-            showSuccessModal('Vote saved locally. Will be synchronized later.', null, 2000, 'info');
-          }
         })
         .catch(err => {
           console.error('Vote error:', err);
-          showSuccessModal('Vote saved locally. Will try to sync later.', null, 2000, 'info');
-          
-          // Don't reset UI - we still have the local vote
+          // Reset buttons on error
+          upvoteBtn.disabled = false;
+          downvoteBtn.disabled = false;
+          this.innerHTML = originalText;
         });
       });
 
-      document.getElementById('convertToPetition').addEventListener('click', function () {
+      document.getElementById('convertToPetition').addEventListener('click', async function () {
         const convertBtn = document.getElementById('convertToPetition');
-        const originalText = convertBtn.innerHTML;
-        convertBtn.disabled = true;
-        convertBtn.innerHTML = `
-          <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>Converting...</span>
-        `;
-
         const postId = new URLSearchParams(window.location.search).get('id');
         
-        // Get API URL from utils.js baseUrl() function or fall back to static mode
-        const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
-        const isStaticMode = apiUrl === '/api';
+        // Check if petition already exists for this post
+        const petitions = await loadData('data/petitions.json', {});
+        const hasPetition = petitions && petitions[postId];
         
-        if (isStaticMode) {
-          // Handle static mode (no backend server)
-          console.log('Static mode: simulating petition conversion');
-          
-          // Store conversion in localStorage
-          const conversionKey = `petition-${postId}-${Date.now()}`;
-          localStorage.setItem(conversionKey, JSON.stringify({
-            postId,
-            action: 'petition',
-            timestamp: new Date().toISOString()
-          }));
-          
-          // Simulate successful response
-          setTimeout(() => {
-            showSuccessModal('Post successfully converted to petition! (Static Mode)', window.location.href);
-          }, 800);
+        // If petition exists, navigate to the petition page
+        if (hasPetition) {
+          window.location.href = `petition.html?id=${postId}`;
           return;
         }
+
+        // Get the current post title to use in the modal
+        const post = await loadData(`data/approved.json`, {})
+          .then(posts => posts.find(p => p.id === postId) || {});
         
-        // Regular API mode
-        postContent('/convert', { postId, action: 'petition', timestamp: new Date().toISOString() }, 
-                   'Post converted to petition', null, 'Conversion failed')
-        .then(res => {
-          if (res.ok || res === true) {
-            showSuccessModal('Post successfully converted to petition! People can now sign it to show support.', window.location.href);
-          } else {
-            showSuccessModal('Failed to convert post to petition. Please try again later.', null, 0, 'error');
-            // Reset button state
-            convertBtn.disabled = false;
-            convertBtn.innerHTML = originalText;
+        // Create and show a modal dialog for creating a petition
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full m-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-bold text-gray-800">Create Petition</h3>
+              <button id="closePetitionModal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <form id="petitionForm" class="space-y-4">
+              <div>
+                <label for="petitionTitle" class="block text-sm font-medium text-gray-700 mb-1">
+                  Petition Title
+                </label>
+                <input 
+                  type="text" 
+                  id="petitionTitle" 
+                  value="${post.title || ''}"
+                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+              </div>
+              <div>
+                <label for="petitionGoal" class="block text-sm font-medium text-gray-700 mb-1">
+                  Signature Goal
+                </label>
+                <input 
+                  type="number" 
+                  id="petitionGoal" 
+                  value="5000"
+                  min="100"
+                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+              </div>
+              <div>
+                <label for="petitionDeadline" class="block text-sm font-medium text-gray-700 mb-1">
+                  Deadline
+                </label>
+                <input 
+                  type="date" 
+                  id="petitionDeadline" 
+                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+              </div>
+              <div class="flex justify-end gap-3 pt-2">
+                <button type="button" id="cancelPetition" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" id="submitPetition" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                  Create Petition
+                </button>
+              </div>
+            </form>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Set default deadline to 3 months from now
+        const threeMonthsFromNow = new Date();
+        threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+        document.getElementById('petitionDeadline').valueAsDate = threeMonthsFromNow;
+
+        // Handle the close/cancel buttons
+        const closeModal = () => document.body.removeChild(modal);
+        document.getElementById('closePetitionModal').addEventListener('click', closeModal);
+        document.getElementById('cancelPetition').addEventListener('click', closeModal);
+
+        // Handle form submission
+        document.getElementById('petitionForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Disable submit button to prevent double submissions
+          const submitBtn = document.getElementById('submitPetition');
+          const originalBtnText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating...
+          `;
+          
+          // Get form values
+          const title = document.getElementById('petitionTitle').value;
+          const goal = parseInt(document.getElementById('petitionGoal').value);
+          const deadlineDate = new Date(document.getElementById('petitionDeadline').value);
+          const deadlineISOString = deadlineDate.toISOString();
+          
+          // Create petition object
+          const newPetition = {
+            id: `petition-${Date.now()}`,
+            title: title,
+            goal: goal,
+            signatures: 0,
+            deadline: deadlineISOString
+          };
+          
+          // Get API URL from utils.js baseUrl() function or fall back to static mode
+          const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
+          const isStaticMode = apiUrl === '/api';
+          
+          if (isStaticMode) {
+            // Handle static mode (no backend server)
+            console.log('Static mode: simulating petition creation');
+            
+            // Add to petitions in localStorage or create a new petitions object
+            try {
+              // First try to load existing petitions from localStorage
+              let existingPetitions = {};
+              try {
+                const storedPetitions = localStorage.getItem('cache_data_petitions.json');
+                if (storedPetitions) {
+                  existingPetitions = JSON.parse(storedPetitions);
+                }
+              } catch (loadErr) {
+                console.warn('Could not load existing petitions from localStorage:', loadErr);
+              }
+              
+              // Add the new petition
+              existingPetitions[postId] = newPetition;
+              localStorage.setItem('cache_data_petitions.json', JSON.stringify(existingPetitions));
+              
+              // Also store it as a separate request that would be sent once online
+              const petitionRequest = {
+                postId,
+                petition: newPetition,
+                timestamp: new Date().toISOString()
+              };
+              localStorage.setItem(`petition_request_${Date.now()}`, JSON.stringify(petitionRequest));
+              
+              closeModal();
+              // Direct navigation instead of showing success modal
+              window.location.href = `petition.html?id=${postId}`;
+            } catch (err) {
+              console.error('Error creating petition in static mode:', err);
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnText;
+              // Just show an alert instead of modal for errors
+              alert('Failed to create petition. Please try again.');
+            }
+            return;
           }
-        })
-        .catch(err => {
-          console.error('Petition conversion error:', err);
-          showSuccessModal('Network error while converting to petition. Please try again later.', null, 0, 'error');
-          // Reset button state
-          convertBtn.disabled = false;
-          convertBtn.innerHTML = originalText;
+          
+          // Regular API mode - submit petition and conversion request
+          postContent('/create-petition', {
+            postId,
+            petition: newPetition,
+            timestamp: new Date().toISOString()
+          }, null, `petition.html?id=${postId}`, 'Petition creation failed')
+          .then(res => {
+            console.log('Petition creation response:', res);
+            // Check if response is successful from our server endpoint
+            if (res && (res.success === true || res === true || res.ok)) {
+              closeModal();
+              // Direct navigation instead of showing success modal
+              window.location.href = `petition.html?id=${postId}`;
+            } else {
+              alert('Failed to create petition. Please try again later.');
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnText;
+            }
+          })
+          .catch(err => {
+            console.error('Petition creation error:', err);
+            // Use simple alert instead of modal for error
+            alert('Network error while creating petition. Please try again later.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+          });
         });
       });
 
@@ -813,10 +1220,8 @@
         });
       });
       
-      document.getElementById('commentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleCommentSubmission();
-      });  
+      // Comments are handled by event listener in comment.js
+      // No need for duplicate handler here
     }
   </script>
 </body>
