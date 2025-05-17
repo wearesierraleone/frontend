@@ -1,0 +1,72 @@
+name: LocalStorage Sync
+
+on:
+  # Triggered by a custom event dispatched from the frontend
+  repository_dispatch:
+    types: [localstorage-sync]
+  
+  # Optional: Run on a schedule
+  schedule:
+    # Run once a day
+    - cron: '0 0 * * *'
+
+jobs:
+  sync-localstorage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install axios js-yaml
+      
+      - name: Process local storage data
+        run: |
+          node .github/scripts/process_local_storage_data.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLIENT_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+      
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git diff --quiet data/ || echo "changes_detected=true" >> $GITHUB_OUTPUT
+      
+      - name: Count changes
+        id: count_changes
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        run: |
+          # Count changed items by type
+          POST_COUNT=$(jq 'length' data/pending.json)
+          COMMENT_COUNT=$(jq 'length' data/comments.json)
+          VOTE_COUNT=$(jq 'length' data/votes.json)
+          
+          echo "posts=$POST_COUNT" >> $GITHUB_OUTPUT
+          echo "comments=$COMMENT_COUNT" >> $GITHUB_OUTPUT
+          echo "votes=$VOTE_COUNT" >> $GITHUB_OUTPUT
+          
+          echo "Total counts - Posts: $POST_COUNT, Comments: $COMMENT_COUNT, Votes: $VOTE_COUNT"
+      
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update data files with user submissions"
+          title: "Sync user-submitted content from localStorage"
+          body: |
+            This PR includes user-submitted content from localStorage.
+            
+            - Posts: ${{ steps.count_changes.outputs.posts || 0 }}
+            - Comments: ${{ steps.count_changes.outputs.comments || 0 }}
+            - Votes: ${{ steps.count_changes.outputs.votes || 0 }}
+            
+            Please review and merge if appropriate.
+          branch: localstorage-sync
+          base: main

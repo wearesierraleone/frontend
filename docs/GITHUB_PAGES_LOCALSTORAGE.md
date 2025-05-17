@@ -9,6 +9,7 @@ When deployed on GitHub Pages, the website operates in "Local Storage Mode" whic
 1. All form submissions (posts, comments, votes) are saved to your browser's localStorage
 2. Data is fetched from the main backend repository's JSON files
 3. Locally created content is combined with remote content for a seamless experience
+4. Users can synchronize their local data with the main repository through a GitHub Actions workflow
 
 ## How It Works
 
@@ -43,7 +44,27 @@ The site uses these localStorage collections:
 - Your local submissions will persist across visits as long as you:
   - Use the same browser
   - Don't clear your browser data/localStorage
-- If you want to share content with others, it must be submitted to the backend repository maintainers
+- If you want to share content with others, you can:
+  - Use our automated GitHub sync feature (see below)
+  - Or contact the repository maintainers directly
+
+### Automatic Synchronization with GitHub Actions
+
+The site includes an automated sync feature that can submit your locally stored content to the main repository using GitHub Actions:
+
+1. **How It Works:**
+   - The system collects your localStorage data (posts, comments, votes)
+   - Triggers a GitHub Actions workflow via the GitHub API
+   - Creates a Pull Request with your submissions for review
+   - Repository maintainers review and approve the content
+
+2. **Using the Sync Feature:**
+   - Look for the "Sync Data" button in the bottom right corner of the screen
+   - You'll be prompted to enter a GitHub personal access token with 'repo' scope
+   - Create a token at https://github.com/settings/tokens/new if you don't have one
+   - Your content will be submitted for review and a Pull Request will be created
+   - You'll see a success message if the submission was successful
+   - Repository maintainers will review and merge your changes
 
 ## GitHub Token Authentication
 

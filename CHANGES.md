@@ -2,6 +2,14 @@
 
 ## May 2025 Updates
 
+### GitHub Pages Sync UI Component Addition
+- **Added Sync UI Component**: Created new sync-ui.js that provides a UI to trigger GitHub Actions sync
+- **Enhanced Sync Functionality**: Improved triggerGitHubSync function with better error handling
+- **Added GitHub Actions Workflow**: Created localstorage_sync.yml for processing user data
+- **Improved Data Processing Script**: Enhanced process_local_storage_data.js to handle localStorage data
+- **Added Testing Tool**: Created sync_ui_test.html diagnostic tool for testing sync functionality
+- **Updated Documentation**: Created SYNC_UI_COMPONENT.md and updated GITHUB_PAGES_LOCALSTORAGE.md
+
 ### Repository Structure Update
 - **Data File Location Change**: Data files moved from `wearesierraleone/wearesalone` repository to `wearesierraleone/frontend/data`
 - **Updated URL References**: Changed all repository URL references from the old backend repository to the new frontend repository
@@ -18,6 +26,8 @@
 - **GitHub Pages URL Update**: Modified baseUrl function to always use raw GitHub content URL on GitHub Pages
 - **URL Construction Fix**: Improved path handling in loadData function to prevent double slashes in URLs
 - **Data Loading Improvement**: Updated all pages to use baseUrl for proper GitHub Pages data loading
+- **Voting Fix on GitHub Pages**: Fixed voting functionality to use localStorage on GitHub Pages instead of attempting POST requests to raw.githubusercontent.com
+- **API Detection Fix**: Improved detection of available APIs to prevent CORS errors when deployed on GitHub Pages
 
 ### Image Preview Enhancement
 - **Improved Error Handling**: Replaced disruptive modal errors with inline validation messages

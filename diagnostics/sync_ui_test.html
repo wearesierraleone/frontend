@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sync UI Test | We Are Sierra Leone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇸🇱</text></svg>">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../js/modal.js"></script>
+  <script src="../js/github_token.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/footer.js"></script>
+  <script src="../js/local_storage_sync.js"></script>
+  <script src="../js/sync-ui.js"></script>
+  
+  <style>
+    .button-primary {
+      @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md transition-all;
+    }
+    .button-secondary {
+      @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded shadow-md transition-all;
+    }
+    pre {
+      @apply bg-gray-100 p-4 rounded-lg overflow-auto max-h-96;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <header class="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-4">
+    <div class="container mx-auto px-4">
+      <h1 class="text-2xl font-bold">We Are Sierra Leone - Sync UI Test</h1>
+    </div>
+  </header>
+  
+  <main class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-xl font-bold mb-4">Sync UI Component Test</h2>
+      <p class="mb-4">This page tests the functionality of the Sync UI component for GitHub Pages synchronization.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Mock Data Generation</h3>
+          <p class="mb-4">Create test data in localStorage to test sync functionality:</p>
+          
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button id="createPostBtn" class="button-primary">Create Mock Post</button>
+            <button id="createCommentBtn" class="button-primary">Create Mock Comment</button>
+            <button id="createVoteBtn" class="button-primary">Create Mock Vote</button>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Actions</h3>
+          <p class="mb-4">Test various actions related to data synchronization:</p>
+          
+          <div class="flex flex-wrap gap-3">
+            <button id="checkDataBtn" class="button-secondary">Check Local Data</button>
+            <button id="clearDataBtn" class="button-secondary">Clear Local Data</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">Local Storage Data</h3>
+        <pre id="dataOutput">Loading...</pre>
+      </div>
+      
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <p class="text-yellow-700">
+          <strong>Testing Instructions:</strong> Generate mock data using the buttons above, then use 
+          the Sync Data button that should appear at the bottom right corner of this page. 
+          Enter your GitHub token when prompted to test the sync functionality.
+        </p>
+      </div>
+      
+      <div id="statusOutput" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <p>Status messages will appear here...</p>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize footer
+      if (typeof loadFooter === 'function') {
+        loadFooter();
+      }
+      
+      // Update the data display on load
+      updateDataDisplay();
+      
+      // Mock data generation buttons
+      document.getElementById('createPostBtn').addEventListener('click', createMockPost);
+      document.getElementById('createCommentBtn').addEventListener('click', createMockComment);
+      document.getElementById('createVoteBtn').addEventListener('click', createMockVote);
+      
+      // Action buttons
+      document.getElementById('checkDataBtn').addEventListener('click', updateDataDisplay);
+      document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+      
+      // Inject the sync button manually to ensure it appears on this test page
+      injectSyncButton('footer');
+    });
+    
+    function updateStatus(message) {
+      const statusEl = document.getElementById('statusOutput');
+      statusEl.innerHTML = `<p><strong>${new Date().toLocaleTimeString()}</strong>: ${message}</p>` + statusEl.innerHTML;
+    }
+    
+    function updateDataDisplay() {
+      const dataOutput = document.getElementById('dataOutput');
+      
+      try {
+        const data = {
+          posts: JSON.parse(localStorage.getItem('collection_posts') || '[]'),
+          comments: JSON.parse(localStorage.getItem('collection_comments') || '[]'),
+          votes: JSON.parse(localStorage.getItem('collection_votes') || '[]')
+        };
+        
+        dataOutput.textContent = JSON.stringify(data, null, 2);
+        updateStatus(`Found ${data.posts.length} posts, ${data.comments.length} comments, and ${data.votes.length} votes in localStorage.`);
+      } catch (error) {
+        dataOutput.textContent = 'Error retrieving localStorage data: ' + error.message;
+        updateStatus('Error retrieving data from localStorage.');
+      }
+    }
+    
+    function createMockPost() {
+      try {
+        const post = {
+          title: `Test Post ${new Date().toISOString()}`,
+          body: 'This is a mock post created for testing the sync functionality.',
+          author: 'Test User',
+          category: 'Test',
+          timestamp: new Date().toISOString()
+        };
+        
+        if (typeof savePostLocally === 'function') {
+          const id = savePostLocally(post);
+          updateStatus(`Created mock post with ID: ${id}`);
+          updateDataDisplay();
+        } else {
+          const posts = JSON.parse(localStorage.getItem('collection_posts') || '[]');
+          post.id = `mock_post_${Date.now()}`;
+          posts.push(post);
+          localStorage.setItem('collection_posts', JSON.stringify(posts));
+          updateStatus('Created mock post (fallback method)');
+          updateDataDisplay();
+        }
+      } catch (error) {
+        updateStatus(`Error creating mock post: ${error.message}`);
+      }
+    }
+    
+    function createMockComment() {
+      try {
+        const posts = JSON.parse(localStorage.getItem('collection_posts') || '[]');
+        
+        if (posts.length === 0) {
+          updateStatus('Cannot create comment: No posts found. Create a post first.');
+          return;
+        }
+        
+        const randomPost = posts[Math.floor(Math.random() * posts.length)];
+        
+        const comment = {
+          postId: randomPost.id,
+          text: `Test comment created at ${new Date().toLocaleTimeString()}`,
+          author: 'Test Commenter',
+          timestamp: new Date().toISOString()
+        };
+        
+        if (typeof saveCommentLocally === 'function') {
+          const id = saveCommentLocally(comment);
+          updateStatus(`Created mock comment with ID: ${id} on post: ${randomPost.id}`);
+          updateDataDisplay();
+        } else {
+          const comments = JSON.parse(localStorage.getItem('collection_comments') || '[]');
+          comment.id = `mock_comment_${Date.now()}`;
+          comments.push(comment);
+          localStorage.setItem('collection_comments', JSON.stringify(comments));
+          updateStatus('Created mock comment (fallback method)');
+          updateDataDisplay();
+        }
+      } catch (error) {
+        updateStatus(`Error creating mock comment: ${error.message}`);
+      }
+    }
+    
+    function createMockVote() {
+      try {
+        const posts = JSON.parse(localStorage.getItem('collection_posts') || '[]');
+        
+        if (posts.length === 0) {
+          updateStatus('Cannot create vote: No posts found. Create a post first.');
+          return;
+        }
+        
+        const randomPost = posts[Math.floor(Math.random() * posts.length)];
+        const voteType = Math.random() > 0.5 ? 'up' : 'down';
+        
+        const vote = {
+          postId: randomPost.id,
+          type: voteType,
+          timestamp: new Date().toISOString()
+        };
+        
+        if (typeof saveVoteLocally === 'function') {
+          const id = saveVoteLocally(vote);
+          updateStatus(`Created mock ${voteType} vote with ID: ${id} on post: ${randomPost.id}`);
+          updateDataDisplay();
+        } else {
+          const votes = JSON.parse(localStorage.getItem('collection_votes') || '[]');
+          vote.id = `mock_vote_${Date.now()}`;
+          votes.push(vote);
+          localStorage.setItem('collection_votes', JSON.stringify(votes));
+          updateStatus(`Created mock ${voteType} vote (fallback method)`);
+          updateDataDisplay();
+        }
+      } catch (error) {
+        updateStatus(`Error creating mock vote: ${error.message}`);
+      }
+    }
+    
+    function clearAllData() {
+      try {
+        localStorage.removeItem('collection_posts');
+        localStorage.removeItem('collection_comments');
+        localStorage.removeItem('collection_votes');
+        updateStatus('Cleared all localStorage data collections.');
+        updateDataDisplay();
+      } catch (error) {
+        updateStatus(`Error clearing data: ${error.message}`);
+      }
+    }
+  </script>
+</body>
+</html>
