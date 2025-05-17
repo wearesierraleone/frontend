@@ -1,0 +1,17 @@
+{
+  "id": "reply-1747524647",
+  "author": "Auto-created",
+  "text": "Placeholder comment (auto-created for reply nested-reply-1747524647 after directory listing failed)",
+  "timestamp": "2025-05-18T00:30:51.935784",
+  "status": "pending",
+  "replies": [
+    {
+      "id": "nested-reply-1747524647",
+      "parentId": "reply-1747524647",
+      "author": "Nested Reply User",
+      "text": "This is a nested reply to test deep comment threads.",
+      "timestamp": "2025-05-18T00:30:51.316475",
+      "status": "pending"
+    }
+  ]
+}
