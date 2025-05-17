@@ -1,0 +1,11 @@
+{
+  "test-post-1747521237": [
+    {
+      "id": "comment-1747521247",
+      "author": "Test User",
+      "text": "This is a test comment for the per-post file structure.",
+      "timestamp": "2025-05-17T23:34:07.597299",
+      "status": "pending"
+    }
+  ]
+}
