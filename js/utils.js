@@ -23,7 +23,7 @@ function logApiRequest(url, method, data = null) {
 
 /**
  * Returns the base URL for API requests
- * @param {boolean} forDataOnly - If true, returns the URL for data files only, not API endpoints
+ * @param {boolean} forDataOnly - If true, returns the URL for data files only, not API endpoints (DEPRECATED: always uses GitHub raw content URL when on GitHub Pages)
  * @returns {string} The base URL for API requests or data files
  */
 function baseUrl(forDataOnly = false) {
@@ -31,14 +31,9 @@ function baseUrl(forDataOnly = false) {
     const isGitHubPages = window.location.hostname.includes('github.io');
     
     if (isGitHubPages) {
-        // Use different URLs for data files vs API endpoints
-        if (forDataOnly) {
-            // When loading data (JSON files), use the raw GitHub content
-            return 'https://raw.githubusercontent.com/wearesierraleone/wearesalone/refs/heads/main';
-        } else {
-            // For API submissions, use the Flask submission bot
-            return 'https://flask-submission-bot.onrender.com';
-        }
+        // Always use the raw GitHub content URL when on GitHub Pages
+        // This ensures proper data synchronization with GitHub Pages deployment
+        return 'https://raw.githubusercontent.com/wearesierraleone/frontend/main';
     } else {
         // For all other cases, just use empty base URL (relative paths)
         return '';
@@ -309,7 +304,16 @@ async function loadData(path, defaultValue = {}) {
         // Only use baseUrl if we're on GitHub Pages or other special environments
         const isGitHubPages = window.location.hostname.includes('github.io');
         if (isGitHubPages) {
-            url = `${baseUrl(true)}/${path}`;
+            const base = baseUrl(true);
+            
+            // Ensure we don't have double slashes in the URL
+            if (path.startsWith('/')) {
+                url = `${base}${path}`; 
+            } else {
+                url = `${base}/${path}`;
+            }
+            
+            console.log(`GitHub Pages environment detected, using URL: ${url}`);
         }
         
         console.log(`Loading data from ${url}`);
@@ -317,7 +321,7 @@ async function loadData(path, defaultValue = {}) {
         // Set up a timeout for the fetch operation
         const fetchPromise = fetch(url);
         const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Request timed out')), 5000); // 5 second timeout
+            setTimeout(() => reject(new Error('Request timed out')), 8000); // Increased to 8 second timeout
         });
         
         // Race between fetch and timeout
@@ -331,6 +335,7 @@ async function loadData(path, defaultValue = {}) {
         try {
             // Parse the JSON data
             const data = await response.json();
+            console.log(`Successfully loaded data from ${url}`);
             return data;
         } catch (jsonError) {
             console.error(`JSON parsing error for ${path}:`, jsonError);
@@ -338,6 +343,11 @@ async function loadData(path, defaultValue = {}) {
         }
     } catch (error) {
         console.error(`Error loading data from ${path}:`, error);
+        
+        // If we're on GitHub Pages and getting 404s, this might be a repository path issue
+        if (window.location.hostname.includes('github.io') && error.message.includes('404')) {
+            console.warn(`GitHub Pages 404 error detected. This might indicate an incorrect repository path or branch name.`);
+        }
         
         // Try to use fallback data if available
         if (path === 'data/approved.json' && typeof getFallbackPosts === 'function') {

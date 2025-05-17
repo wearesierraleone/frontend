@@ -32,12 +32,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle successful load
     previewImage.onload = function() {
       previewContainer.classList.remove('hidden', 'opacity-50');
+      
+      // Clear any previous error message
+      const errorMsg = document.getElementById('imageUrlError');
+      if (errorMsg) {
+        errorMsg.textContent = '';
+        errorMsg.classList.add('hidden');
+      }
     };
     
     // Handle load error
     previewImage.onerror = function() {
       previewContainer.classList.add('hidden');
-      showSuccessModal('Unable to load image. Please check the URL.', null, 3000);
+      
+      // Display inline error message instead of modal
+      let errorMsg = document.getElementById('imageUrlError');
+      
+      // Create error message element if it doesn't exist
+      if (!errorMsg) {
+        errorMsg = document.createElement('div');
+        errorMsg.id = 'imageUrlError';
+        errorMsg.className = 'text-red-600 text-sm mt-1';
+        imageUrlInput.parentNode.insertBefore(errorMsg, imageUrlInput.nextSibling);
+      }
+      
+      // Show the error message
+      errorMsg.textContent = 'Unable to load image. Please check the URL.';
+      errorMsg.classList.remove('hidden');
     };
   }
   
@@ -47,6 +68,33 @@ document.addEventListener('DOMContentLoaded', function() {
   function clearPreview() {
     previewContainer.classList.add('hidden');
     previewImage.src = '';
+    clearInlineError();
+  }
+
+  // Helper function to show an inline error message
+  function showInlineError(message) {
+    let errorMsg = document.getElementById('imageUrlError');
+    
+    // Create error message element if it doesn't exist
+    if (!errorMsg) {
+      errorMsg = document.createElement('div');
+      errorMsg.id = 'imageUrlError';
+      errorMsg.className = 'text-red-600 text-sm mt-1';
+      imageUrlInput.parentNode.insertBefore(errorMsg, imageUrlInput.nextSibling);
+    }
+    
+    // Show the error message
+    errorMsg.textContent = message;
+    errorMsg.classList.remove('hidden');
+  }
+  
+  // Helper function to clear inline error message
+  function clearInlineError() {
+    const errorMsg = document.getElementById('imageUrlError');
+    if (errorMsg) {
+      errorMsg.textContent = '';
+      errorMsg.classList.add('hidden');
+    }
   }
 
   // Preview image when button is clicked
@@ -54,15 +102,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageUrl = imageUrlInput.value.trim();
     
     if (!imageUrl) {
-      showSuccessModal('Please enter an image URL first', null, 2000);
+      showInlineError('Please enter an image URL first');
       return;
     }
 
     if (!validImageUrlRegex.test(imageUrl)) {
-      showSuccessModal('Please enter a valid image URL ending in .jpg, .png, .gif, etc.', null, 3000);
+      showInlineError('Please enter a valid image URL ending in .jpg, .png, .gif, etc.');
       return;
     }
 
+    clearInlineError();
     previewImageFromUrl(imageUrl);
   });
 
@@ -80,9 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
     debounceTimer = setTimeout(function() {
       const imageUrl = imageUrlInput.value.trim();
       if (imageUrl && validImageUrlRegex.test(imageUrl)) {
+        clearInlineError();
         previewImageFromUrl(imageUrl);
       } else if (!imageUrl) {
         clearPreview();
+      } else if (imageUrl) {
+        // If URL doesn't pass validation but exists, clear preview but don't show error
+        // (Only show validation errors when the preview button is clicked)
+        previewContainer.classList.add('hidden');
       }
     }, 500);
   }

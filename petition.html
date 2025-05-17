@@ -689,35 +689,37 @@
     }
 
     function showSuccessModal(message = 'Your action was successful.', redirectTo = null, delay = 5000) {
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 animate-fadeIn';
-      modal.style.animation = 'fadeIn 0.3s ease-out';
-      modal.innerHTML = `
-        <div class="bg-white rounded-lg p-6 shadow-xl text-center max-w-sm w-full m-4 transform transition-transform duration-300" style="animation: scaleIn 0.3s ease-out;">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4 mx-auto">
-            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Success</h2>
-          <p class="text-gray-700 mb-6">${message}</p>
-          <button id="confirmRedirect" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-            OK
-          </button>
+      // Instead of showing a confirmation modal, simply display a temporary toast message
+      // and redirect immediately if a redirect URL is provided
+      
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+      toast.innerHTML = `
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>${message}</span>
         </div>
       `;
-
-      document.body.appendChild(modal);
-      document.getElementById('confirmRedirect').addEventListener('click', () => {
-        if (redirectTo) {
-          window.location.href = redirectTo;
-        } else {
-          modal.style.animation = 'fadeOut 0.3s ease-in';
-          setTimeout(() => {
-            document.body.removeChild(modal);
-          }, 300);
-        }
-      });
+      
+      document.body.appendChild(toast);
+      
+      // Auto-hide toast after a short delay
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      }, delay);
+      
+      // If redirect URL is provided, navigate immediately
+      if (redirectTo) {
+        window.location.href = redirectTo;
+      }
 
       if (redirectTo) {
         setTimeout(() => {

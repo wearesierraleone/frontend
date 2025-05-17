@@ -2,6 +2,28 @@
 
 ## May 2025 Updates
 
+### Repository Structure Update
+- **Data File Location Change**: Data files moved from `wearesierraleone/wearesalone` repository to `wearesierraleone/frontend/data`
+- **Updated URL References**: Changed all repository URL references from the old backend repository to the new frontend repository
+- **Added Diagnostics**: Created repository path checker tool for troubleshooting data loading issues
+- **Added Automated Fix Script**: Added `scripts/update_repository_path.sh` to automatically fix repository paths in all files
+
+### Direct Submission Workflow Improvements
+- **Post Submission**: Changed to use direct saving without confirmation modals
+- **Petition Creation**: Updated to use direct server submission and redirects with toast notifications
+- **GitHub Pages Support**: Fixed posts not being saved on GitHub Pages by using direct local storage
+- **Error Handling**: Replaced disruptive modal errors with simple alerts/inline messages
+- **Improved UX**: Streamlined user flow by removing intermediate confirmation steps
+- **Script Inclusion Fix**: Added missing local_storage_sync.js to all pages (index.html, post.html, submit.html, petitions.html) for GitHub Pages functionality
+- **GitHub Pages URL Update**: Modified baseUrl function to always use raw GitHub content URL on GitHub Pages
+- **URL Construction Fix**: Improved path handling in loadData function to prevent double slashes in URLs
+- **Data Loading Improvement**: Updated all pages to use baseUrl for proper GitHub Pages data loading
+
+### Image Preview Enhancement
+- **Improved Error Handling**: Replaced disruptive modal errors with inline validation messages
+- **Enhanced User Experience**: Provides contextual error messages next to the image URL input
+- **Cleaner Interface**: Eliminated unnecessary popup modals during image preview
+
 ### Expandable FAQ Section
 Enhanced the FAQ section (`faq.html`) with the following features:
 

@@ -5,8 +5,10 @@ This is the frontend component of the We Are Sierra Leone civic platform. It's d
 ## Repository Structure
 
 This project has been split into two repositories:
-1. **Frontend Repository** (this repo): Contains all HTML, CSS, and JavaScript files needed for the public-facing website.
-2. **Backend Repository**: Located at https://github.com/wearesierraleone/wearesalone - Contains the data files and server-side code.
+1. **Frontend Repository** (this repo): Located at https://github.com/wearesierraleone/frontend - Contains all HTML, CSS, and JavaScript files needed for the public-facing website.
+2. **Backend Repository**: Located at https://github.com/wearesierraleone/wearesalone - Contains the server-side code.
+
+**Note (May 2025 Update)**: Data files are now stored in the frontend repository under the `/data` directory.
 
 ## Structure
 
