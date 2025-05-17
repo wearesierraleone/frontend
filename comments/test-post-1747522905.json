@@ -1,0 +1,11 @@
+{
+  "test-post-1747522905": [
+    {
+      "id": "root-comment-1747522936",
+      "author": "Root Comment Author",
+      "text": "This is a root comment to test nested reply search.",
+      "timestamp": "2025-05-17T23:02:16Z",
+      "status": "pending"
+    }
+  ]
+}
