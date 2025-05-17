@@ -1,0 +1,17 @@
+{
+  "id": "root-comment-1747525573",
+  "author": "Auto-created",
+  "text": "Placeholder comment (auto-created for reply first-reply-1747525573)",
+  "timestamp": "2025-05-18T00:46:28.717098",
+  "status": "pending",
+  "replies": [
+    {
+      "id": "first-reply-1747525573",
+      "parentId": "root-comment-1747525573",
+      "author": "First Reply Author",
+      "text": "This is a first-level reply.",
+      "timestamp": "2025-05-18T00:46:28.117070",
+      "status": "pending"
+    }
+  ]
+}
