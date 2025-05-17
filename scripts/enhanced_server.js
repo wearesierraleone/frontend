@@ -1,25 +1,12 @@
-#!/bin/zsh
-# Enhanced local server script with API endpoints for development
-# This script starts a Node.js server that can handle API requests
-
-# Change to the directory of the script
-cd "$(dirname "$0")/.."
-FRONTEND_DIR="$(pwd)"
-
-echo "🚀 Starting enhanced local server in $FRONTEND_DIR"
-echo "📂 Files will be served from this directory"
-echo "🔌 API endpoints will be available for development"
-echo "🔍 Finding an available port..."
-
-# Check if Node.js is installed
-if ! command -v node &> /dev/null; then
-  echo "❌ Error: Node.js is required for the enhanced server. Please install Node.js."
-  exit 1
-fi
-
-# Create a temporary server.js file for development
-TMP_SERVER_FILE=$(mktemp)
-cat > $TMP_SERVER_FILE << 'EOF'
+/**
+ * Enhanced Local Development Server with API Support
+ * 
+ * This server provides endpoints for:
+ * - Saving posts
+ * - Updating comments
+ * - Managing comment status
+ * - Adding new comments
+ */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -81,7 +68,8 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   console.log(`${req.method} ${req.url}`);
   
-  const parsedUrl = url.parse(req.url, true);
+  // Get the request path
+  const parsedUrl = url.parse(req.url);
   const pathname = parsedUrl.pathname;
   
   // Handle API endpoints
@@ -98,6 +86,9 @@ const server = http.createServer((req, res) => {
     } else if (pathname === '/comment') {
       handleAddComment(req, res);
       return;
+    } else if (pathname === '/create-petition') {
+      handleCreatePetition(req, res);
+      return;
     }
   }
   
@@ -112,12 +103,56 @@ async function startServer() {
   
   server.listen(availablePort, () => {
     console.log(`\n✅ Server running at http://localhost:${availablePort}/`);
-    console.log(`✅ API endpoints available: POST /save-post, /update-comments, /update-comment, /comment\n`);
+    console.log(`✅ API endpoints available: POST /save-post, /update-comments, /update-comment, /comment, /create-petition\n`);
   });
 }
 
-// Start the server
-startServer();
+// Function to handle POST /save-post endpoint
+function handleSavePost(req, res) {
+  let body = '';
+  
+  req.on('data', chunk => {
+    body += chunk.toString();
+  });
+  
+  req.on('end', () => {
+    try {
+      const data = JSON.parse(body);
+      const post = data.post;
+      const allPosts = data.allPosts;
+      
+      // Check if post data is valid
+      if (!post || !post.id || !post.title || !post.body) {
+        sendJsonResponse(res, 400, { success: false, error: 'Invalid post data' });
+        return;
+      }
+      
+      // Write the updated posts array to the approved.json file
+      fs.writeFile(
+        path.join(ROOT_DIR, 'data', 'approved.json'),
+        JSON.stringify(allPosts, null, 2),
+        err => {
+          if (err) {
+            console.error('Error writing to approved.json:', err);
+            sendJsonResponse(res, 500, { success: false, error: 'Failed to save post' });
+            return;
+          }
+          
+          sendJsonResponse(res, 200, { 
+            success: true, 
+            message: 'Post saved successfully',
+            postId: post.id
+          });
+          
+          console.log(`✅ New post saved: ${post.title} (ID: ${post.id})`);
+        }
+      );
+    } catch (error) {
+      console.error('Error processing post data:', error);
+      sendJsonResponse(res, 400, { success: false, error: 'Invalid JSON' });
+    }
+  });
+}
 
 // Function to handle POST /update-comments endpoint
 function handleUpdateComments(req, res) {
@@ -344,10 +379,9 @@ function handleAddComment(req, res) {
   });
 }
 
-// Function to handle POST /save-post endpoint
-function handleSavePost(req, res) {
+// Function to handle POST /create-petition endpoint
+function handleCreatePetition(req, res) {
   let body = '';
-  
   req.on('data', chunk => {
     body += chunk.toString();
   });
@@ -355,37 +389,53 @@ function handleSavePost(req, res) {
   req.on('end', () => {
     try {
       const data = JSON.parse(body);
-      const post = data.post;
-      const allPosts = data.allPosts;
+      const { postId, petition, timestamp } = data;
       
-      // Check if post data is valid
-      if (!post || !post.id || !post.title || !post.body) {
-        sendJsonResponse(res, 400, { success: false, error: 'Invalid post data' });
+      // Validate petition data
+      if (!postId || !petition || !petition.id || !petition.title || !petition.goal || !petition.deadline) {
+        console.error('Invalid petition data received:', data);
+        sendJsonResponse(res, 400, { success: false, error: 'Invalid petition data' });
         return;
       }
       
-      // Write the updated posts array to the approved.json file
-      fs.writeFile(
-        path.join(ROOT_DIR, 'data', 'approved.json'),
-        JSON.stringify(allPosts, null, 2),
-        err => {
-          if (err) {
-            console.error('Error writing to approved.json:', err);
-            sendJsonResponse(res, 500, { success: false, error: 'Failed to save post' });
-            return;
+      // Read the existing petitions
+      fs.readFile(path.join(ROOT_DIR, 'data', 'petitions.json'), (err, fileData) => {
+        let petitions = {};
+        
+        if (!err) {
+          try {
+            petitions = JSON.parse(fileData);
+          } catch (parseErr) {
+            console.error('Error parsing petitions.json:', parseErr);
           }
-          
-          sendJsonResponse(res, 200, { 
-            success: true, 
-            message: 'Post saved successfully',
-            postId: post.id
-          });
-          
-          console.log(`✅ New post saved: ${post.title} (ID: ${post.id})`);
         }
-      );
+        
+        // Add the new petition
+        petitions[postId] = petition;
+        
+        // Write the updated petitions back to file
+        fs.writeFile(
+          path.join(ROOT_DIR, 'data', 'petitions.json'),
+          JSON.stringify(petitions, null, 2),
+          writeErr => {
+            if (writeErr) {
+              console.error('Error writing to petitions.json:', writeErr);
+              sendJsonResponse(res, 500, { success: false, error: 'Failed to save petition' });
+              return;
+            }
+            
+            sendJsonResponse(res, 200, { 
+              success: true, 
+              message: 'Petition created successfully', 
+              petitionId: petition.id,
+              postId: postId
+            });
+            console.log(`✅ New petition created for post ${postId} with ID ${petition.id}`);
+          }
+        );
+      });
     } catch (error) {
-      console.error('Error processing post data:', error);
+      console.error('Error processing petition data:', error);
       sendJsonResponse(res, 400, { success: false, error: 'Invalid JSON' });
     }
   });
@@ -429,11 +479,6 @@ function sendJsonResponse(res, statusCode, data) {
   res.writeHead(statusCode, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify(data));
 }
-EOF
 
-# Start the Node.js server
-echo "📡 Starting API-enabled server..."
-node $TMP_SERVER_FILE
-
-# Clean up the temporary file when the server exits
-trap 'rm -f $TMP_SERVER_FILE' EXIT
+// Start the server
+startServer();

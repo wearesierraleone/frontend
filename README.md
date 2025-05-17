@@ -110,6 +110,23 @@ The `diagnostics.js` file includes automatic checks that run in the browser cons
 ./scripts/validate_json.sh | grep Statistics -A 4
 ```
 
+## Features
+
+### Expandable FAQ Section
+The FAQ page includes an interactive, accessible implementation with the following features:
+- Collapsible FAQ items with smooth animations
+- Table of contents with smooth scrolling
+- "Expand All" and "Collapse All" functionality
+- "Back to Top" button for better navigation
+- ARIA attributes for better accessibility
+- Responsive design for mobile devices
+
+### Direct Petition Creation
+The petition creation process has been streamlined:
+- Direct server submission without modal interruptions
+- Improved user flow with immediate feedback
+- Enhanced error handling with simple alert messages
+
 ## Authentication
 
 ### Private Repository Access

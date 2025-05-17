@@ -103,6 +103,37 @@ Submit a vote on a post.
 }
 ```
 
+### POST /create-petition
+
+Create a new petition associated with a post.
+
+**Request body:**
+```json
+{
+  "postId": "post_id",
+  "petition": {
+    "id": "petition_id",
+    "title": "Petition title",
+    "goal": 1000,
+    "deadline": "2025-12-31",
+    "description": "Petition description" 
+  },
+  "timestamp": "2025-05-17T12:34:56Z"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Petition created successfully",
+  "petitionId": "petition_id",
+  "postId": "post_id"
+}
+```
+
+> Note: As of May 2025, petition creation has been updated to use direct server submission without modal notifications.
+
 ## Data URLs
 
 The following data files are available at the backend repository:

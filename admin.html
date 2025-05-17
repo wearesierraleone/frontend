@@ -103,6 +103,47 @@
     <div id="postList" class="space-y-5">
       <!-- Posts will be displayed here -->
     </div>
+
+    <div class="mt-12 pt-8 border-t border-gray-200">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Comment Moderation</h2>
+        <div class="flex gap-2">
+          <span id="flaggedCount"
+            class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">0 flagged</span>
+          <span id="commentCount"
+            class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Loading...</span>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="relative w-full sm:w-1/2">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input type="text" id="commentSearchInput" placeholder="Search comments..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <select id="commentStatusFilter"
+              class="border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+              <option value="all">All Comments</option>
+              <option value="flagged" selected>Flagged</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div id="commentList" class="space-y-5">
+        <!-- Comments will be displayed here -->
+      </div>
+    </div>
   </main>
 
   <script>
@@ -388,12 +429,216 @@
       }
     }
 
+    async function loadComments() {
+      try {
+        // Fetch comments data
+        const allComments = await loadData('data/comments.json', {});
+        const commentList = document.getElementById('commentList');
+        
+        // Clear existing comments
+        commentList.innerHTML = '';
+        
+        // Get filter values
+        const statusFilter = document.getElementById('commentStatusFilter').value;
+        const searchQuery = document.getElementById('commentSearchInput').value.toLowerCase();
+        
+        // Count comments by status
+        let flaggedCount = 0;
+        let totalComments = 0;
+        
+        // Process and display comments
+        let foundComments = false;
+        
+        // Convert comments object to array of comment objects with postId
+        const commentsArray = [];
+        
+        // Helper function to process comments and replies recursively
+        function processComments(comments, postId) {
+          if (!comments) return;
+          
+          comments.forEach(comment => {
+            totalComments++;
+            if (comment.status === 'flagged') {
+              flaggedCount++;
+            }
+            
+            commentsArray.push({
+              ...comment, 
+              postId
+            });
+            
+            // Process replies if they exist
+            if (comment.replies && comment.replies.length > 0) {
+              processComments(comment.replies, postId);
+            }
+          });
+        }
+        
+        // Process all comments and their replies
+        for (const [postId, comments] of Object.entries(allComments)) {
+          processComments(comments, postId);
+        }
+        
+        // Sort comments by timestamp (newest first)
+        commentsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        // Apply filters
+        let filteredComments = commentsArray;
+        
+        if (statusFilter !== 'all') {
+          filteredComments = filteredComments.filter(comment => comment.status === statusFilter);
+        }
+        
+        if (searchQuery) {
+          filteredComments = filteredComments.filter(comment => 
+            (comment.text && comment.text.toLowerCase().includes(searchQuery)) || 
+            (comment.author && comment.author.toLowerCase().includes(searchQuery)) ||
+            (comment.anonId && comment.anonId.toLowerCase().includes(searchQuery))
+          );
+        }
+        
+        // Update count display
+        document.getElementById('flaggedCount').innerText = `${flaggedCount} flagged`;
+        document.getElementById('commentCount').innerText = `${totalComments} total`;
+        
+        if (filteredComments.length === 0) {
+          commentList.innerHTML = `
+            <div class="bg-gray-50 p-8 text-center rounded-lg border border-gray-200">
+              <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p class="text-gray-500 font-medium text-lg">No comments found</p>
+              <p class="text-gray-400 mt-2">Try adjusting your filters to see more comments</p>
+            </div>`;
+          return;
+        }
+        
+        // Display filtered comments
+        filteredComments.forEach(comment => {
+          const date = new Date(comment.timestamp);
+          const formattedDate = date.toLocaleString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', hour12: false
+          });
+          
+          const commentCard = document.createElement('div');
+          
+          // Style differently based on status
+          let statusClass = 'border-gray-200 bg-white';
+          if (comment.status === 'flagged') {
+            statusClass = 'border-orange-300 bg-orange-50';
+          } else if (comment.status === 'rejected') {
+            statusClass = 'border-red-300 bg-red-50';
+          } else if (comment.status === 'approved') {
+            statusClass = 'border-green-300 bg-green-50';
+          }
+          
+          commentCard.className = `rounded-lg border ${statusClass} shadow-sm overflow-hidden`;
+          
+          // Determine status badge
+          let statusBadge = '';
+          if (comment.status === 'flagged') {
+            statusBadge = '<span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Flagged</span>';
+          } else if (comment.status === 'approved') {
+            statusBadge = '<span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Approved</span>';
+          } else if (comment.status === 'rejected') {
+            statusBadge = '<span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Rejected</span>';
+          }
+          
+          // Indicate if this is a reply
+          const isReply = comment.parentId ? true : false;
+          const replyBadge = isReply ? '<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-2">Reply</span>' : '';
+          
+          commentCard.innerHTML = `
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <p class="text-sm text-gray-500">Comment on post: <a href="post.html?id=${comment.postId}" class="text-blue-600 hover:underline" target="_blank">View Post</a></p>
+                  <p class="text-sm text-gray-500 mt-1">By: ${comment.author || comment.anonId || 'Anonymous'} ${replyBadge}</p>
+                </div>
+                ${statusBadge}
+              </div>
+              
+              <div class="border-l-4 border-gray-100 pl-4 py-2 mb-4">
+                <p class="text-gray-700">${comment.text}</p>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500">${formattedDate}</span>
+                <div class="space-x-2">
+                  <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm" onclick="updateCommentStatus('${comment.postId}', '${comment.id}', 'flagged')">
+                    Flag
+                  </button>
+                  <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick="updateCommentStatus('${comment.postId}', '${comment.id}', 'rejected')">
+                    Reject
+                  </button>
+                  <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm" onclick="updateCommentStatus('${comment.postId}', '${comment.id}', 'approved')">
+                    Approve
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          commentList.appendChild(commentCard);
+        });
+        
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        document.getElementById('commentList').innerHTML = `
+          <div class="bg-red-50 p-4 rounded-lg border border-red-200 text-center">
+            <p class="text-red-600">Error loading comments. Please try again later.</p>
+          </div>`;
+      }
+    }
+    
+    async function updateCommentStatus(postId, commentId, status) {
+      try {
+        // Find the comment in the data
+        const allComments = await loadData('data/comments.json', {});
+        
+        if (!allComments[postId]) {
+          throw new Error('Post not found');
+        }
+        
+        const commentIndex = allComments[postId].findIndex(c => c.id === commentId);
+        if (commentIndex === -1) {
+          throw new Error('Comment not found');
+        }
+        
+        // Update the status
+        allComments[postId][commentIndex].status = status;
+        
+        // Save changes to comments.json
+        await postContent('/update-comment', {
+          postId, 
+          commentId,
+          status
+        }, 'Comment status updated successfully', null, 'Failed to update comment status');
+        
+        // Reload comments
+        loadComments();
+        
+        // Show success message
+        showSuccessModal(`Comment ${status}`, null, 2000, 'success');
+        
+      } catch (error) {
+        console.error('Error updating comment status:', error);
+        showSuccessModal(`Error updating comment status: ${error.message}`, null, 0, 'error');
+      }
+    }
+    
     window.onload = () => {
       loadPosts();
+      loadComments();
       
-      // Add event listeners
+      // Add event listeners for posts
       document.getElementById('searchInput').addEventListener('input', loadPosts);
       document.getElementById('statusFilter').addEventListener('change', loadPosts);
+      
+      // Add event listeners for comments
+      document.getElementById('commentSearchInput').addEventListener('input', loadComments);
+      document.getElementById('commentStatusFilter').addEventListener('change', loadComments);
     };
   </script>
 </body>

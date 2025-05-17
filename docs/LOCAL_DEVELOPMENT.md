@@ -29,7 +29,9 @@ This starts a Node.js server with dynamic port selection that includes API endpo
 - **Features**:
   - Automatically finds an available port (tries 5500, 5501, 5502, etc.)
   - Provides `/save-post` API endpoint
-  - Writes directly to data/approved.json
+  - Provides `/create-petition` endpoint with direct submission
+  - Provides `/update-comments` and `/comment` endpoints
+  - Writes directly to data/approved.json and data/petitions.json
 
 ### 3. VS Code Live Server Compatible API Server
 

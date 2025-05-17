@@ -15,6 +15,23 @@ This project uses a simplified approach with data files stored directly in the r
 - CSS styles in `style.css`
 - Data files in the `data/` directory
 
+## Key Features
+
+### Expandable FAQ Section
+The FAQ page (`faq.html`) includes an enhanced user experience:
+- Collapsible content sections with smooth animations
+- Table of contents with smooth scrolling navigation
+- Accessibility features including ARIA attributes and keyboard navigation
+- "Expand All" and "Collapse All" controls
+- "Back to Top" button for improved user experience
+- Fully responsive design for all device sizes
+
+### Direct Petition Submission
+The petition creation process (`post.html`) has been streamlined:
+- Direct server submission without modal interruptions
+- Improved user flow with immediate feedback
+- Simple error handling with alert messages
+
 ## Keeping Data Files Synchronized
 
 To ensure the data files are kept up-to-date, use the included sync script:

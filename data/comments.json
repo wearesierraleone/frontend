@@ -4,13 +4,43 @@
       "id": "comment1",
       "author": "Anonymous",
       "text": "I agree! The schools in my area have the same problem. We need more government funding for education infrastructure.",
-      "timestamp": "2025-05-11T10:12:00Z"
+      "timestamp": "2025-05-11T10:12:00Z",
+      "status": "approved",
+      "replies": [
+        {
+          "id": "reply-1684141921000",
+          "parentId": "comment1",
+          "author": "anon-45678",
+          "text": "I work at the Ministry of Education. We're currently evaluating funding increases for rural school infrastructure.",
+          "timestamp": "2025-05-12T09:45:00Z",
+          "status": "approved"
+        },
+        {
+          "id": "reply-1684228321000",
+          "parentId": "comment1",
+          "author": "anon-89123",
+          "text": "Have you considered reaching out to international NGOs for support? Some provide grants for education infrastructure.",
+          "timestamp": "2025-05-13T11:30:00Z",
+          "status": "approved",
+          "replies": [
+            {
+              "id": "reply-1684314721000",
+              "parentId": "reply-1684228321000",
+              "author": "anon-34521",
+              "text": "Yes! Organizations like Education Forward and BuildBright have specific programs for this.",
+              "timestamp": "2025-05-14T08:20:00Z",
+              "status": "approved"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "comment2",
       "author": "Anonymous",
       "text": "Maybe we could organize a community initiative to help repair some of the most urgent cases?",
-      "timestamp": "2025-05-11T14:30:00Z"
+      "timestamp": "2025-05-11T14:30:00Z",
+      "status": "approved"
     }
   ],
   "post2": [
@@ -18,7 +48,8 @@
       "id": "comment3",
       "author": "Anonymous",
       "text": "This is a critical issue. My grandmother had to be carried on a makeshift stretcher for 15km to reach medical help last year.",
-      "timestamp": "2025-05-09T08:45:00Z"
+      "timestamp": "2025-05-09T08:45:00Z",
+      "status": "approved"
     }
   ],
   "post3": [
@@ -26,19 +57,47 @@
       "id": "comment4",
       "author": "Anonymous",
       "text": "We also need internship programs with major companies to give youth work experience.",
-      "timestamp": "2025-05-07T16:20:00Z"
+      "timestamp": "2025-05-07T16:20:00Z",
+      "status": "approved"
     },
     {
       "id": "comment5",
       "author": "Anonymous",
       "text": "Digital skills training should be a priority too. The tech sector offers many opportunities.",
-      "timestamp": "2025-05-08T09:15:00Z"
+      "timestamp": "2025-05-08T09:15:00Z",
+      "status": "approved"
     },
     {
       "id": "comment6",
       "author": "Anonymous",
       "text": "Entrepreneurship education would help young people create their own jobs.",
-      "timestamp": "2025-05-09T11:40:00Z"
+      "timestamp": "2025-05-09T11:40:00Z",
+      "status": "approved"
+    },
+    {
+      "id": "comment7",
+      "author": "Anonymous",
+      "text": "Government should also create incentive programs for businesses that hire young graduates.",
+      "timestamp": "2025-05-15T13:25:00Z",
+      "status": "approved"
+    }
+  ],
+  "post1747423173747": [
+    {
+      "id": "comment8",
+      "author": "Anonymous",
+      "text": "This doesn't seem like a genuine post.",
+      "timestamp": "2025-05-16T10:05:00Z",
+      "status": "flagged"
+    }
+  ],
+  "post4": [
+    {
+      "id": "comment9",
+      "author": "Anonymous",
+      "text": "I would like to volunteer my medical expertise to help improve rural healthcare access. Is there a way to connect with local initiatives?",
+      "timestamp": "2025-05-16T11:30:00Z",
+      "status": "approved"
     }
   ]
 }

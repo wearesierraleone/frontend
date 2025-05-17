@@ -88,23 +88,45 @@ function postContent(
             // Also add to the specific collection in localStorage if path indicates a collection
             const collectionPath = path.replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
             if (collectionPath) {
-                // Try to get existing collection data
-                const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
-                try {
-                    const collection = JSON.parse(existingData);
-                    // Add new item with generated ID
-                    const newItem = { ...data, id: `local_${Date.now()}` };
-                    collection.push(newItem);
-                    localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
-                } catch (e) {
-                    console.error('Error updating collection:', e);
+                // Special handling for comment updates with replies
+                if (path === '/update-comments' && data.postId && data.comments) {
+                    try {
+                        // Get existing comments collection
+                        const commentsData = localStorage.getItem('collection_comments') || '{}';
+                        const allComments = JSON.parse(commentsData);
+                        
+                        // Update the comments for this specific post
+                        allComments[data.postId] = data.comments;
+                        
+                        // Save the updated comments back to localStorage
+                        localStorage.setItem('collection_comments', JSON.stringify(allComments));
+                        
+                        // Also update the cache to ensure consistent data
+                        localStorage.setItem('cache_data_comments.json', JSON.stringify(allComments));
+                    } catch (e) {
+                        console.error('Error updating comments collection:', e);
+                    }
+                } else {
+                    // Try to get existing collection data for standard collections
+                    const existingData = localStorage.getItem(`collection_${collectionPath}`) || '[]';
+                    try {
+                        const collection = JSON.parse(existingData);
+                        // Add new item with generated ID
+                        const newItem = { ...data, id: `local_${Date.now()}` };
+                        collection.push(newItem);
+                        localStorage.setItem(`collection_${collectionPath}`, JSON.stringify(collection));
+                    } catch (e) {
+                        console.error('Error updating collection:', e);
+                    }
                 }
             }
             
-            // Show success and redirect after a delay to simulate server response
-            setTimeout(() => {
-                showSuccessModal(successMsg + ' (Static Mode)', redirectTo, 2000, 'success');
-            }, 1000);
+            // Show success and redirect after a delay to simulate server response, only if successMsg is provided
+            if (successMsg) {
+                setTimeout(() => {
+                    showSuccessModal(successMsg + ' (Static Mode)', redirectTo, 2000, 'success');
+                }, 1000);
+            }
             
             return Promise.resolve({});
         } catch (e) {
@@ -132,7 +154,10 @@ function postContent(
     .then(res => {
         clearTimeout(timeoutId);
         if (res.ok) {
-            showSuccessModal(successMsg, redirectTo, 2000, 'success');
+            // Only show success modal if successMsg is provided
+            if (successMsg) {
+                showSuccessModal(successMsg, redirectTo, 2000, 'success');
+            }
             return res.json().catch(() => ({})); // Return empty object if response isn't JSON
         } else {
             console.error(`API error: ${res.status} ${res.statusText}`);

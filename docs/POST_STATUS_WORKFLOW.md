@@ -111,3 +111,38 @@ If submitted posts aren't appearing on the homepage:
 2. **Security**: No public visibility of pending or rejected posts
 3. **Moderation**: Clear workflow for content moderation
 4. **Performance**: No reliance on complex bot systems or external databases
+
+## Comment and Reply Workflow
+
+### Direct Server Submission
+
+Comments and replies use a direct server submission approach:
+
+1. **User Submits Comment**: The comment is immediately sent to the server
+   - Comments are submitted to the server via API endpoints
+   - New comments have status="approved" by default (post-moderation)
+   - Server validates and stores the comment in comments.json
+
+2. **Server Response**: The server confirms successful storage
+   - UI is updated only after server confirmation
+   - The comment becomes visible to all users simultaneously
+   - For replies, the nested structure is maintained in comments.json
+
+### Advantages of This Approach
+
+- **Simplicity**: Straightforward submission flow
+- **Consistency**: All users see the same comments at the same time
+- **Reliability**: Comments are only shown when successfully saved
+- **Security**: Better moderation through consistent server-side storage
+
+### Technical Implementation
+
+For local development, the enhanced server handles three key endpoints:
+
+- `/comment`: For adding new top-level comments
+- `/update-comments`: For saving replies to existing comments
+- `/update-comment`: For moderating comment status (approved/rejected/flagged)
+
+### Network Requirements
+
+This implementation requires an internet connection to submit comments. Due to the nature of the platform as a civic engagement tool, we've determined that online connectivity is a reasonable requirement, as users need to be online to access the website in the first place.
