@@ -1,0 +1,17 @@
+{
+  "id": "comment-bulk-2-1747525560",
+  "author": "Bulk Comment User 2",
+  "text": "This is the second bulk comment.",
+  "timestamp": "2025-05-17T23:46:00Z",
+  "status": "pending",
+  "replies": [
+    {
+      "id": "reply-2-1747525560",
+      "parentId": "comment-bulk-2-1747525560",
+      "author": "Reply User 2",
+      "text": "Reply to the second bulk comment.",
+      "timestamp": "2025-05-17T23:46:00Z",
+      "status": "pending"
+    }
+  ]
+}
