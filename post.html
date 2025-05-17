@@ -20,6 +20,7 @@
   <script src="js/utils.js" defer></script>
   <script src="js/modal.js" defer></script>
   <script src="js/fallback_data.js"></script>
+  <script src="js/local_storage_sync.js"></script>
   <script src="js/vote.js" defer></script>
   <script src="js/comment.js" defer></script>
   <script src="js/footer.js"></script>
@@ -900,134 +901,53 @@
           return;
         }
 
-        // Get the current post title to use in the modal
-        const post = await loadData(`data/approved.json`, {})
-          .then(posts => posts.find(p => p.id === postId) || {});
-        
-        // Create and show a modal dialog for creating a petition
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn';
-        modal.innerHTML = `
-          <div class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full m-4">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-bold text-gray-800">Create Petition</h3>
-              <button id="closePetitionModal" class="text-gray-400 hover:text-gray-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-            <form id="petitionForm" class="space-y-4">
-              <div>
-                <label for="petitionTitle" class="block text-sm font-medium text-gray-700 mb-1">
-                  Petition Title
-                </label>
-                <input 
-                  type="text" 
-                  id="petitionTitle" 
-                  value="${post.title || ''}"
-                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
-              </div>
-              <div>
-                <label for="petitionGoal" class="block text-sm font-medium text-gray-700 mb-1">
-                  Signature Goal
-                </label>
-                <input 
-                  type="number" 
-                  id="petitionGoal" 
-                  value="5000"
-                  min="100"
-                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
-              </div>
-              <div>
-                <label for="petitionDeadline" class="block text-sm font-medium text-gray-700 mb-1">
-                  Deadline
-                </label>
-                <input 
-                  type="date" 
-                  id="petitionDeadline" 
-                  class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
-              </div>
-              <div class="flex justify-end gap-3 pt-2">
-                <button type="button" id="cancelPetition" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" id="submitPetition" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
-                  Create Petition
-                </button>
-              </div>
-            </form>
-          </div>
+        // Disable the button to prevent double clicks
+        convertBtn.disabled = true;
+        convertBtn.innerHTML = `
+          <svg class="animate-spin mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Processing...
         `;
 
-        document.body.appendChild(modal);
-
-        // Set default deadline to 3 months from now
-        const threeMonthsFromNow = new Date();
-        threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
-        document.getElementById('petitionDeadline').valueAsDate = threeMonthsFromNow;
-
-        // Handle the close/cancel buttons
-        const closeModal = () => document.body.removeChild(modal);
-        document.getElementById('closePetitionModal').addEventListener('click', closeModal);
-        document.getElementById('cancelPetition').addEventListener('click', closeModal);
-
-        // Handle form submission
-        document.getElementById('petitionForm').addEventListener('submit', function(e) {
-          e.preventDefault();
+        try {
+          // Get the current post to use for the petition
+          const posts = await loadData('data/approved.json', []);
+          const post = posts.find(p => p.id === postId);
           
-          // Disable submit button to prevent double submissions
-          const submitBtn = document.getElementById('submitPetition');
-          const originalBtnText = submitBtn.innerHTML;
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Creating...
-          `;
+          if (!post || !post.title) {
+            throw new Error('Could not find post data');
+          }
           
-          // Get form values
-          const title = document.getElementById('petitionTitle').value;
-          const goal = parseInt(document.getElementById('petitionGoal').value);
-          const deadlineDate = new Date(document.getElementById('petitionDeadline').value);
-          const deadlineISOString = deadlineDate.toISOString();
+          // Create petition with sensible defaults
+          const threeMonthsFromNow = new Date();
+          threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
           
-          // Create petition object
+          // Create petition object with defaults
           const newPetition = {
             id: `petition-${Date.now()}`,
-            title: title,
-            goal: goal,
+            title: post.title,
+            goal: 5000,  // Default signature goal
             signatures: 0,
-            deadline: deadlineISOString
+            deadline: threeMonthsFromNow.toISOString()
           };
           
-          // Get API URL from utils.js baseUrl() function or fall back to static mode
+          // Check if we're on GitHub Pages
+          const isGitHubPages = window.location.hostname.includes('github.io');
           const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '/api';
-          const isStaticMode = apiUrl === '/api';
+          const isStaticMode = apiUrl === '/api' || isGitHubPages; // Treat GitHub Pages as static mode
           
           if (isStaticMode) {
             // Handle static mode (no backend server)
-            console.log('Static mode: simulating petition creation');
+            console.log('Static mode: direct petition creation');
             
-            // Add to petitions in localStorage or create a new petitions object
             try {
-              // First try to load existing petitions from localStorage
+              // Try to load existing petitions from localStorage
               let existingPetitions = {};
-              try {
-                const storedPetitions = localStorage.getItem('cache_data_petitions.json');
-                if (storedPetitions) {
-                  existingPetitions = JSON.parse(storedPetitions);
-                }
-              } catch (loadErr) {
-                console.warn('Could not load existing petitions from localStorage:', loadErr);
+              const storedPetitions = localStorage.getItem('cache_data_petitions.json');
+              if (storedPetitions) {
+                existingPetitions = JSON.parse(storedPetitions);
               }
               
               // Add the new petition
@@ -1042,46 +962,41 @@
               };
               localStorage.setItem(`petition_request_${Date.now()}`, JSON.stringify(petitionRequest));
               
-              closeModal();
               // Direct navigation instead of showing success modal
               window.location.href = `petition.html?id=${postId}`;
             } catch (err) {
               console.error('Error creating petition in static mode:', err);
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalBtnText;
-              // Just show an alert instead of modal for errors
               alert('Failed to create petition. Please try again.');
+              convertBtn.disabled = false;
+              convertBtn.innerHTML = 'Convert to Petition';
             }
-            return;
+          } else {
+            // Regular API mode - direct submit
+            const response = await fetch('/create-petition', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                postId,
+                petition: newPetition,
+                timestamp: new Date().toISOString()
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            
+            // Navigate directly to petition page
+            window.location.href = `petition.html?id=${postId}`;
           }
-          
-          // Regular API mode - submit petition and conversion request
-          postContent('/create-petition', {
-            postId,
-            petition: newPetition,
-            timestamp: new Date().toISOString()
-          }, null, `petition.html?id=${postId}`, 'Petition creation failed')
-          .then(res => {
-            console.log('Petition creation response:', res);
-            // Check if response is successful from our server endpoint
-            if (res && (res.success === true || res === true || res.ok)) {
-              closeModal();
-              // Direct navigation instead of showing success modal
-              window.location.href = `petition.html?id=${postId}`;
-            } else {
-              alert('Failed to create petition. Please try again later.');
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalBtnText;
-            }
-          })
-          .catch(err => {
-            console.error('Petition creation error:', err);
-            // Use simple alert instead of modal for error
-            alert('Network error while creating petition. Please try again later.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-          });
-        });
+        } catch (error) {
+          console.error('Petition creation error:', error);
+          alert('Failed to create petition. Please try again later.');
+          convertBtn.disabled = false;
+          convertBtn.innerHTML = 'Convert to Petition';
+        }
       });
 
       document.getElementById('reportLink').addEventListener('click', e => {

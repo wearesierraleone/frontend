@@ -24,6 +24,7 @@
   <script src="js/utils.js"></script>
   <script src="js/footer.js"></script>
   <script src="js/fallback_data.js"></script>
+  <script src="js/local_storage_sync.js"></script>
   <script src="js/diagnostics.js"></script>
   <script>
     tailwind.config = {
@@ -283,23 +284,27 @@
         const list = document.getElementById('postList');
         list.innerHTML = '<div class="text-center p-4"><div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div><p class="mt-2 text-gray-600">Loading posts...</p></div>';
         
-        // Directly load posts using fetch for simplicity - no caching or localStorage
-        const postsResponse = await fetch('data/approved.json');
+        // Get base URL for GitHub Pages compatibility
+        const base = baseUrl(true);
+        console.log(`Using base URL: ${base} for data loading`);
+        
+        // Load posts using the appropriate base URL
+        const postsResponse = await fetch(`${base}/data/approved.json`);
         if (!postsResponse.ok) {
           throw new Error(`Failed to load posts: ${postsResponse.status}`);
         }
         const posts = await postsResponse.json();
         
-        // Directly load votes
-        const votesResponse = await fetch('data/votes.json');
+        // Load votes with base URL
+        const votesResponse = await fetch(`${base}/data/votes.json`);
         const votes = votesResponse.ok ? await votesResponse.json() : {};
         
-        // Directly load comments
-        const commentsResponse = await fetch('data/comments.json');
+        // Load comments with base URL
+        const commentsResponse = await fetch(`${base}/data/comments.json`);
         const comments = commentsResponse.ok ? await commentsResponse.json() : {};
         
-        // Directly load petitions
-        const petitionsResponse = await fetch('data/petitions.json');
+        // Load petitions with base URL
+        const petitionsResponse = await fetch(`${base}/data/petitions.json`);
         const petitions = petitionsResponse.ok ? await petitionsResponse.json() : {};
         
         // Simply use our display posts function with the fetched data
@@ -326,7 +331,9 @@
           // Direct fetch with a small delay
           setTimeout(async () => {
             try {
-              const retryResponse = await fetch('data/approved.json');
+              // Get base URL for GitHub Pages compatibility on retry
+              const base = baseUrl(true);
+              const retryResponse = await fetch(`${base}/data/approved.json`);
               const posts = await retryResponse.json();
               
               if (posts && Array.isArray(posts)) {

@@ -10,20 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const validImageUrlRegex = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i;
   
   /**
-   * Helper function to create an error message element if it doesn't exist
-   */
-  function createErrorElement() {
-    const errorElement = document.createElement('div');
-    errorElement.id = 'form-error';
-    errorElement.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
-    errorElement.style.display = 'none';
-    
-    // Insert at the top of the form
-    postForm.insertBefore(errorElement, postForm.firstChild);
-    return errorElement;
-  }
-  
-  /**
    * Validates the post form data
    * @param {object} formData - The form data object
    * @returns {object} - Validation result with isValid flag and error message
@@ -144,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
           })
           .then(data => {
             console.log('Success:', data);
-            // Direct redirect without showing a modal
+            // Redirect directly without showing a modal
             window.location.href = 'index.html';
           })
           .catch(saveError => {
@@ -152,41 +138,70 @@ document.addEventListener('DOMContentLoaded', function() {
             // Use a simple alert instead of modal
             alert(`Unable to save the post. Server connection error.\nMake sure you started the enhanced server with:\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`);
           });
+          });
         } else if (isGitHubPages) {
-          // We're on GitHub Pages - using direct save instead of Flask API
-          console.log('Running on GitHub Pages - using direct save');
+          // We're on GitHub Pages - actually save to Flask API
+          console.log('Running on GitHub Pages - submitting to Flask API');
           
-          // Directly save to localStorage and redirect
-          if (typeof savePostLocally === 'function') {
-            savePostLocally(post);
-            console.log('Post saved to localStorage for GitHub Pages');
-            // Direct redirect without showing a modal
+          // Prepare the data for the Flask API
+          const apiUrl = baseUrl(false); // Get the API base URL
+          fetch(`${apiUrl}/submit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(post)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('API response error: ' + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Post saved successfully to API:', data);
+            // Save to localStorage as well for local data consistency
+            if (typeof savePostLocally === 'function') {
+              savePostLocally(post);
+            }
+            // Redirect to index without showing a modal
             window.location.href = 'index.html';
-          } else {
-            // Only show an alert if localStorage save fails
-            alert('Failed to save post. localStorage functionality not available.');
-          }
+          })
+          .catch(apiError => {
+            console.error('Error saving to API:', apiError);
+            // Try localStorage fallback if API fails
+            if (typeof savePostLocally === 'function') {
+              savePostLocally(post);
+              console.log('Saved post to localStorage as fallback');
+              window.location.href = 'index.html';
+            } else {
+              // Only show an alert if both API and localStorage fail
+              alert('Failed to save post. Please try again later.');
+            }
+          });
         } else {
           // We're on another development server without API support
           console.log('Not using enhanced server. Port: ' + window.location.port);
-          // Instead of a modal, alert and redirect
-          alert(`Demo mode: Post would be saved with pending status. To actually save posts, run one of the API servers:\n\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`);
-          window.location.href = 'index.html';
+          showSuccessModal(
+            `Demo mode: Post would be saved with pending status. To actually save posts, run one of the API servers:\n\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`, 
+            'index.html', 
+            4000, 
+            'info'
+          );
         }
       })
       .catch(error => {
         console.error('Error processing post:', error);
-        // Use alert instead of modal
-        alert('Failed to submit post, please try again.');
+        showSuccessModal('Failed to submit post, please try again.', null, 0, 'error');
       })
-      .finally(() => {
-        // Re-enable submit button regardless of outcome after a short delay
-        setTimeout(() => {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Post';
-          }
-        }, 500);
-      });
+    .finally(() => {
+      // Re-enable submit button regardless of outcome after a short delay
+      setTimeout(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Post';
+        }
+      }, 500);
+    });
   });
 });
