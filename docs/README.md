@@ -17,6 +17,14 @@ This project uses a simplified approach with data files stored directly in the r
 
 ## Key Features
 
+### Modular Comment System
+The comment and reply system has been refactored to improve code organization:
+- Dedicated reply-handler.js module for reply functionality
+- Integrated with the post display system via post-loader.js
+- Support for nested replies and comment flagging
+- Default "approved" status with post-moderation approach
+- See `COMMENT_SYSTEM.md` for detailed architecture documentation
+
 ### Expandable FAQ Section
 The FAQ page (`faq.html`) includes an enhanced user experience:
 - Collapsible content sections with smooth animations

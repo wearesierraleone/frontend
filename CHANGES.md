@@ -2,6 +2,13 @@
 
 ## May 2025 Updates
 
+### Comment System Code Refactor
+- **Improved Code Organization**: Moved reply handling functionality from post.html to a separate reply-handler.js file
+- **Enhanced Maintainability**: Separated UI rendering, event handlers, and data operations for better code organization
+- **Proper Integration**: Updated post-loader.js to use the new reply-handler.js functionality
+- **Consistent Status Handling**: Ensured all comments and replies are set to "approved" status by default
+- **Better Error Handling**: Improved error handling for comment and reply submission
+
 ### GitHub Pages Sync UI Component Addition
 - **Added Sync UI Component**: Created new sync-ui.js that provides a UI to trigger GitHub Actions sync
 - **Enhanced Sync Functionality**: Improved triggerGitHubSync function with better error handling

@@ -4,13 +4,19 @@ This quick reference guide covers the recent enhancements to the "We Are Sierra 
 
 ## Recent Platform Enhancements
 
-### 1. Expandable FAQ Section
+### 1. Comment System Refactoring
+- Implementation: See `js/reply-handler.js` and `js/post-loader.js` for the implementation
+- Architecture: Separates reply handling functionality into a dedicated module for better maintainability
+- Integration: Properly integrates with the post display system via updated post-loader.js
+- Documentation: See changes documented in `CHANGES.md`
+
+### 2. Expandable FAQ Section
 - Implementation: See `faq.html` for the complete implementation
 - Architecture: Uses semantic HTML with CSS transitions and JavaScript for interactivity
 - Accessibility: Includes ARIA attributes and keyboard navigation support
 - Documentation: See `/docs/ENHANCEMENTS.md` for technical details
 
-### 2. Direct Petition Submission
+### 3. Direct Petition Submission
 - Implementation: See `post.html` for the updated petition creation flow
 - API Endpoint: `/create-petition` (documented in `/docs/API_REFERENCE.md`)
 - Local Testing: Enhanced server provides this endpoint for local development

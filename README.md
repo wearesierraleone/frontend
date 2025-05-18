@@ -114,6 +114,14 @@ The `diagnostics.js` file includes automatic checks that run in the browser cons
 
 ## Features
 
+### Modular Comment System
+The comment and reply system has been refactored for better maintainability:
+- Separated reply functionality into dedicated reply-handler.js module
+- Clean integration with post display via post-loader.js
+- Improved error handling and user feedback
+- Default "approved" status for all comments and replies
+- Support for multi-level nested replies
+
 ### Expandable FAQ Section
 The FAQ page includes an interactive, accessible implementation with the following features:
 - Collapsible FAQ items with smooth animations
