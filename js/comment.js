@@ -7,7 +7,7 @@ function handleCommentSubmission(event) {
   const text = form.comment.value;
   
   if (!text.trim()) {
-    showSuccessModal('Please enter a comment', null, 0, 'warning');
+    console.log('Comment text is empty');
     return;
   }
   
@@ -47,7 +47,6 @@ function handleCommentSubmission(event) {
     })
     .catch(error => {
       console.error('Failed to submit comment:', error);
-      showSuccessModal('Failed to submit comment', null, 0, 'error');
     })
     .finally(() => {
       // Reset form

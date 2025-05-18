@@ -45,7 +45,7 @@ async function submitReply(postId, parentCommentId) {
     
     const textarea = document.getElementById(`reply-text-${parentCommentId}`) || replyForm.querySelector('textarea');
     if (!textarea || !textarea.value.trim()) {
-      showSuccessModal('Please enter a reply', null, 0, 'warning');
+      console.log('Reply text is empty');
       return;
     }
     
@@ -108,7 +108,6 @@ async function submitReply(postId, parentCommentId) {
     }
   } catch (error) {
     console.error('Error submitting reply:', error);
-    showSuccessModal('Error submitting reply', 'Please try again later.', 2000, 'error');
   }
 }
 
@@ -198,8 +197,6 @@ async function flagComment(postId, commentId) {
       });
       
       if (success) {
-        showSuccessModal('Comment flagged for review', 'Moderators will be notified.', 2000, 'info');
-        
         // Refresh the comments section to show the updated status
         if (typeof loadPostComments === 'function') {
           loadPostComments(postId);
@@ -209,7 +206,6 @@ async function flagComment(postId, commentId) {
         }
       } else {
         // Add flagged indicator to the UI even if API failed
-        showSuccessModal('Comment flagged locally', 'Moderators will be notified of this comment.', 2000, 'info');
         
         // Add flagged indicator to the UI
         const commentElement = document.getElementById(`comment-${commentId}`);
@@ -225,7 +221,6 @@ async function flagComment(postId, commentId) {
     }
   } catch (error) {
     console.error('Error flagging comment:', error);
-    showSuccessModal('Error flagging comment', 'Please try again later.', 2000, 'error');
   }
 }
 

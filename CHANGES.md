@@ -8,6 +8,7 @@
 - **Proper Integration**: Updated post-loader.js to use the new reply-handler.js functionality
 - **Consistent Status Handling**: Ensured all comments and replies are set to "approved" status by default
 - **Better Error Handling**: Improved error handling for comment and reply submission
+- **Removed Modal Popups**: Eliminated showSuccessModal calls from submitComment, submitReply, and flagComment functions for a cleaner user experience
 
 ### GitHub Pages Sync UI Component Addition
 - **Added Sync UI Component**: Created new sync-ui.js that provides a UI to trigger GitHub Actions sync

@@ -8,7 +8,8 @@ This quick reference guide covers the recent enhancements to the "We Are Sierra 
 - Implementation: See `js/reply-handler.js` and `js/post-loader.js` for the implementation
 - Architecture: Separates reply handling functionality into a dedicated module for better maintainability
 - Integration: Properly integrates with the post display system via updated post-loader.js
-- Documentation: See changes documented in `CHANGES.md`
+- Modal-Free UX: Uses direct UI updates instead of modal notifications for commenting features
+- Documentation: See changes documented in `CHANGES.md` and `docs/COMMENT_SYSTEM.md`
 
 ### 2. Expandable FAQ Section
 - Implementation: See `faq.html` for the complete implementation
@@ -35,6 +36,7 @@ This quick reference guide covers the recent enhancements to the "We Are Sierra 
 - Keep JavaScript functions small and focused
 - Prefer CSS transitions over JavaScript animations when possible
 - Document complex functionality with code comments
+- Avoid modal popups for routine operations to create a smoother user experience
 
 ### Testing Workflow
 1. Test locally using the enhanced server

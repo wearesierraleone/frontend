@@ -868,7 +868,7 @@ function setupCommentForm() {
     // Get the comment text
     const textarea = commentForm.querySelector('textarea');
     if (!textarea || !textarea.value.trim()) {
-      showSuccessModal('Please enter a comment', null, 0, 'warning');
+      console.log('Comment text is empty');
       return;
     }
     
@@ -913,9 +913,6 @@ function setupCommentForm() {
         // Clear the form
         textarea.value = '';
         
-        // Show success message
-        showSuccessModal('Comment posted successfully', null, 2000, 'success');
-        
         // Refresh the comments section
         loadPostComments(postId);
       } else {
@@ -923,7 +920,6 @@ function setupCommentForm() {
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
-      showSuccessModal('Error posting comment', 'Please try again later.', 2000, 'error');
     } finally {
       // Re-enable the submit button
       submitBtn.disabled = false;

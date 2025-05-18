@@ -89,25 +89,26 @@ Comments and replies follow a post-moderation approach:
 - `flagComment(postId, commentId)`: Flags a comment or reply for moderation
 - `renderReplies(comment, postId)`: Renders the HTML for a comment's nested replies
 
-## Usage Examples
+## UI Interaction Philosophy
 
-### Adding Reply Functionality to a New Element
+The comment system implements a clean, non-intrusive user experience:
 
-```javascript
-// 1. Add the reply button to your HTML
-<button onclick="showReplyForm('${comment.id}')">Reply</button>
+- **No Modal Popups**: The system avoids using modal popups (`showSuccessModal`) for routine operations:
+  - Comment submission 
+  - Reply submission
+  - Comment flagging
+  
+- **Visual Feedback**: Instead of modals, the system provides feedback through:
+  - Immediate content updates (new comments/replies appear)
+  - Form clearing after successful submission
+  - Error logging to console for debugging
+  
+- **Error Handling**: Errors are handled gracefully without interrupting the user experience:
+  - Invalid inputs prevent submission but don't trigger modals
+  - Network errors are logged to console
+  - The UI remains responsive even when errors occur
 
-// 2. Add the reply form container
-<div id="reply-form-${comment.id}" class="hidden">
-  <textarea id="reply-text-${comment.id}"></textarea>
-  <button onclick="submitReply('${postId}', '${comment.id}')">Submit</button>
-  <button onclick="hideReplyForm('${comment.id}')">Cancel</button>
-</div>
-
-// 3. If the comment has replies, render them
-${comment.replies && comment.replies.length > 0 ? 
-  renderReplies(comment, postId) : ''}
-```
+This approach creates a smoother, more seamless commenting experience without disrupting the user's flow with unnecessary popups.
 
 ## Extending the System
 
