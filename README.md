@@ -26,9 +26,48 @@ See `GITHUB_PAGES_DEPLOYMENT.md` for detailed deployment instructions.
 
 The application uses the following simplified approach for data management:
 
-1. Fetches data directly from the data directory
+1. Fetches data directly from the data directory using the new per-post file structure
 2. Falls back to built-in fallback data if fetching fails
 3. Implements retry mechanism for better reliability
+
+### New Per-Post File Structure
+
+As of May 2025, we've migrated to a more scalable per-post file structure:
+
+- `/data/posts/post-{id}.json` - Individual post data
+- `/data/comments/{postId}/comment-{id}.json` - Individual comment data
+- `/data/votes/{postId}.json` - Combined vote data for a post
+- `/data/upvotes/{postId}.json` - Upvote data for a post
+- `/data/downvotes/{postId}.json` - Downvote data for a post
+- `/data/petitions/{postId}.json` - Petition data for a post
+- `/data/signatures/{postId}.json` - Signature data for a petition
+
+This structure is more scalable and easier to maintain than the previous single-file approach.
+
+### Testing the Data Structure
+
+To verify that the new data structure is working properly, run the testing script:
+
+```bash
+cd /Users/ernestsaidukamara/Documents/wearesalone/frontend
+./scripts/test_data_structure.sh
+```
+
+This script will:
+1. Verify the data structure directories and files
+2. Test loading data from the new structure
+3. Test API operations with the new structure
+4. Provide a comprehensive report
+
+### Data Structure (May 2025 Update)
+
+The platform now uses a per-post file structure for better scalability:
+- Individual post files: `/data/posts/post-{id}.json`
+- Per-post comment files: `/data/comments/{postId}/comment-{id}.json`
+- Per-post votes: `/data/votes/{postId}.json`, `/data/upvotes/{postId}.json`
+- Per-post petitions: `/data/petitions/{postId}.json`
+
+See `docs/DATA_MIGRATION.md` for details on the data structure.
 
 ## Post Status System
 

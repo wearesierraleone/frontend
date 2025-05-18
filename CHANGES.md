@@ -2,6 +2,17 @@
 
 ## May 2025 Updates
 
+### Data Structure Migration
+- **New Per-Post File Structure**: Migrated from single aggregated files to individual files per post
+- **Enhanced Scalability**: Improved performance for handling large numbers of posts and comments
+- **Better Granularity**: Simplified updating individual posts, comments, votes, and signatures
+- **Backward Compatibility**: Added fallback to legacy structure for smooth transition
+- **Migration Tools**: Created scripts for data migration and updating code references
+- **Comprehensive Documentation**: Added DATA_MIGRATION.md explaining the new architecture
+- **Testing Framework**: Created test_data_structure.js and test_data_structure.sh to verify proper migration
+- **Enhanced Server**: Updated enhanced_server.js to fully support the new data structure
+- **Local Development Testing**: Added tools to test both structures side-by-side
+
 ### Comment System Code Refactor
 - **Improved Code Organization**: Moved reply handling functionality from post.html to a separate reply-handler.js file
 - **Enhanced Maintainability**: Separated UI rendering, event handlers, and data operations for better code organization

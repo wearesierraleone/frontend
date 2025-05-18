@@ -1,0 +1,35 @@
+{
+  "id": "comment1",
+  "author": "Anonymous",
+  "text": "I agree! The schools in my area have the same problem. We need more government funding for education infrastructure.",
+  "timestamp": "2025-05-11T10:12:00Z",
+  "status": "approved",
+  "replies": [
+    {
+      "id": "reply-1684141921000",
+      "parentId": "comment1",
+      "author": "anon-45678",
+      "text": "I work at the Ministry of Education. We're currently evaluating funding increases for rural school infrastructure.",
+      "timestamp": "2025-05-12T09:45:00Z",
+      "status": "approved"
+    },
+    {
+      "id": "reply-1684228321000",
+      "parentId": "comment1",
+      "author": "anon-89123",
+      "text": "Have you considered reaching out to international NGOs for support? Some provide grants for education infrastructure.",
+      "timestamp": "2025-05-13T11:30:00Z",
+      "status": "approved",
+      "replies": [
+        {
+          "id": "reply-1684314721000",
+          "parentId": "reply-1684228321000",
+          "author": "anon-34521",
+          "text": "Yes! Organizations like Education Forward and BuildBright have specific programs for this.",
+          "timestamp": "2025-05-14T08:20:00Z",
+          "status": "approved"
+        }
+      ]
+    }
+  ]
+}
