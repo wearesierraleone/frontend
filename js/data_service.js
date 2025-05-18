@@ -141,25 +141,39 @@ async function loadComments(postId) {
  */
 async function loadVotes(postId) {
   try {
-    // Try loading from the new structure - first check upvotes
-    const upvotesResponse = await fetchWithTimeout(getDataUrl(`/data/upvotes/${postId}.json`));
-    const downvotesResponse = await fetchWithTimeout(getDataUrl(`/data/downvotes/${postId}.json`));
-    
     let upvotes = 0;
     let downvotes = 0;
+    let foundInNewStructure = false;
     
-    if (upvotesResponse.ok) {
-      const upvotesData = await upvotesResponse.json();
-      upvotes = upvotesData.count || upvotesData.length || 0;
+    // Try loading from the new structure - first check upvotes
+    try {
+      const upvotesResponse = await fetchWithTimeout(getDataUrl(`/data/upvotes/${postId}.json`), {}, 2000);
+      
+      if (upvotesResponse.ok) {
+        foundInNewStructure = true;
+        const upvotesData = await upvotesResponse.json();
+        upvotes = upvotesData.count || upvotesData.length || 0;
+      }
+    } catch (upvoteError) {
+      // Silently handle fetch errors for upvotes
+      console.log(`No upvotes file for post ${postId}, continuing with fallbacks`);
     }
     
-    if (downvotesResponse.ok) {
-      const downvotesData = await downvotesResponse.json();
-      downvotes = downvotesData.count || downvotesData.length || 0;
+    try {
+      const downvotesResponse = await fetchWithTimeout(getDataUrl(`/data/downvotes/${postId}.json`), {}, 2000);
+      
+      if (downvotesResponse.ok) {
+        foundInNewStructure = true;
+        const downvotesData = await downvotesResponse.json();
+        downvotes = downvotesData.count || downvotesData.length || 0;
+      }
+    } catch (downvoteError) {
+      // Silently handle fetch errors for downvotes
+      console.log(`No downvotes file for post ${postId}, continuing with fallbacks`);
     }
     
     // If we found vote data in the new structure
-    if (upvotesResponse.ok || downvotesResponse.ok) {
+    if (foundInNewStructure) {
       return { up: upvotes, down: downvotes };
     }
     
@@ -302,12 +316,61 @@ async function submitComment(comment) {
 }
 
 /**
+ * Initialize vote files for a new post
+ * @param {string} postId - The ID of the post
+ * @returns {Promise<boolean>} True if initialization was successful
+ */
+async function initializeVotesForPost(postId) {
+  try {
+    if (isGitHubPages()) {
+      // On GitHub Pages, create zero-count vote files via the Flask API
+      const response = await fetch(`${FLASK_API_URL}/initialize-votes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postId,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      return response.ok;
+    } else {
+      // For local development, we'll try to use the enhanced server if available
+      try {
+        const localResponse = await fetch(`http://localhost:5500/initialize-votes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postId,
+            timestamp: new Date().toISOString()
+          })
+        });
+        
+        return localResponse.ok;
+      } catch (localError) {
+        console.log('Local server not available for vote initialization, will use default values');
+        return false;
+      }
+    }
+  } catch (error) {
+    console.log('Could not initialize vote files, using default values:', error);
+    return false;
+  }
+}
+
+/**
  * Submit a new post
  * @param {object} post - The post data
  * @returns {Promise<boolean>} True if the post was submitted successfully
  */
 async function submitPost(post) {
   try {
+    let success = false;
+    
     if (isGitHubPages()) {
       const response = await fetch(`${FLASK_API_URL}/submit`, {
         method: 'POST',
@@ -317,16 +380,23 @@ async function submitPost(post) {
         body: JSON.stringify(post)
       });
       
-      return response.ok;
+      success = response.ok;
     } else {
       // For local development, use localStorage
       if (typeof savePostLocally === 'function') {
         savePostLocally(post);
-        return true;
+        success = true;
       } else {
         throw new Error('localStorage functionality not available');
       }
     }
+    
+    // If the post was submitted successfully, initialize votes
+    if (success && post.id) {
+      await initializeVotesForPost(post.id);
+    }
+    
+    return success;
   } catch (error) {
     console.error('Error submitting post:', error);
     return false;
@@ -453,7 +523,13 @@ async function fetchWithTimeout(url, options = {}, timeout = 5000) {
   const id = setTimeout(() => controller.abort(), timeout);
   
   try {
-    const response = await fetch(url, {
+    // For data files, we'll add a cache-busting parameter if we're not on GitHub Pages
+    // This helps with local development testing
+    const finalUrl = !isGitHubPages() && url.includes('/data/') 
+      ? `${url}${url.includes('?') ? '&' : '?'}_cache=${Date.now()}` 
+      : url;
+    
+    const response = await fetch(finalUrl, {
       ...options,
       signal: controller.signal
     });
@@ -461,6 +537,10 @@ async function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return response;
   } catch (error) {
     clearTimeout(id);
+    // For a cleaner console, we'll only log fetch errors at the debug level
+    if (error.name === 'AbortError') {
+      console.log(`Request timeout for ${url}`);
+    }
     throw error;
   }
 }

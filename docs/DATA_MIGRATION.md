@@ -100,6 +100,50 @@ This ensures a smooth transition and prevents breaking changes.
 - **Efficiency**: Only load the data needed for a specific post
 - **Versioning**: Easier to track changes to individual posts
 
+## Index Files and Content Discovery
+
+The new structure relies on index files (`index.json`) to provide an efficient way to discover content:
+
+- `/data/posts/index.json`: Lists all available post files
+- `/data/comments/{postId}/index.json`: Lists all comments for a specific post
+
+### Automatic Index Updates
+
+When new content is added through pull requests, the system automatically updates the appropriate index files:
+
+1. When a new post is added to `/data/posts/`, it's automatically added to `index.json`
+2. When new comments are added to `/data/comments/{postId}/`, they're added to that post's `index.json`
+
+This process is handled by the Auto-Merge Content PRs workflow, which:
+
+1. Detects new content files in PRs
+2. Updates the corresponding index files
+3. Commits the updated index files back to the repository
+4. Adds a comment to the PR detailing which indexes were updated
+
+The auto-index updating feature only processes newly added files (not modified or deleted files) and ensures the proper structure is maintained:
+
+```
+data/
+├── posts/
+│   ├── index.json         <-- Automatically updated when new posts are added
+│   ├── post-123.json
+│   └── post-456.json
+│
+└── comments/
+    ├── post-123/
+    │   ├── index.json     <-- Automatically updated when new comments are added
+    │   ├── comment-abc.json
+    │   └── comment-def.json
+    │
+    └── post-456/
+        ├── index.json     <-- Automatically updated when new comments are added
+        ├── comment-ghi.json
+        └── comment-jkl.json
+```
+
+This ensures that all content is properly indexed and discoverable without manual intervention.
+
 ## Best Practices Going Forward
 
 When developing new features:

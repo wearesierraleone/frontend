@@ -2,6 +2,18 @@
 
 ## May 2025 Updates
 
+### Bugfixes
+- **Post Submission Fix**: Fixed "submitPost is not defined" error by adding data_service.js script to submit.html
+- **Production Mode**: Ensured post submission works correctly in GitHub Pages environment
+- **Script Dependencies**: Improved script loading order for proper function availability
+
+### Error Handling Enhancements
+- **Improved Vote Loading**: Added automatic vote file initialization to prevent 404 errors for new posts
+- **Enhanced Error Handling**: Updated loadVotes function to gracefully handle missing vote files
+- **New API Endpoints**: Added /initialize-votes endpoint to both local server and Flask API
+- **Streamlined Post Creation**: Automatically initialize vote files when new posts are submitted
+- **Cache Busting**: Added cache-busting for local development to prevent stale vote data
+
 ### Data Structure Migration
 - **New Per-Post File Structure**: Migrated from single aggregated files to individual files per post
 - **Enhanced Scalability**: Improved performance for handling large numbers of posts and comments
@@ -32,6 +44,9 @@
 ### Auto-Merge Content PRs Workflow
 - **Added GitHub Actions Workflow**: Created auto-merge-content-prs.yml for automated content PR handling
 - **JSON Validation**: Added automatic validation of JSON files in PRs
+- **Auto Index Updates**: Added functionality to automatically update index.json files when new content is added
+- **Improved Content Discovery**: Ensures all newly added posts and comments are properly indexed
+- **Enhanced Documentation**: Updated AUTO_MERGE_WORKFLOW.md with details on the index updating process
 - **Smart Auto-Merge**: Implemented intelligent criteria for merging content-only PRs
 - **Branch Cleanup**: Automated branch deletion after successful merges
 - **Enhanced Collaboration**: Streamlined content contribution process for community members

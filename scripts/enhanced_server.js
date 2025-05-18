@@ -113,6 +113,9 @@ const server = http.createServer((req, res) => {
     } else if (pathname === '/create-petition') {
       handleCreatePetition(req, res);
       return;
+    } else if (pathname === '/initialize-votes') {
+      handleInitializeVotes(req, res);
+      return;
     }
   }
   
@@ -728,6 +731,50 @@ function handleCreatePetition(req, res) {
     } catch (error) {
       console.error('Error processing petition data:', error);
       sendJsonResponse(res, 400, { success: false, error: 'Invalid JSON' });
+    }
+  });
+}
+
+/**
+ * Initialize vote files for a new post
+ * Creates empty upvote and downvote files with count set to 0
+ */
+function handleInitializeVotes(req, res) {
+  let data = '';
+  
+  req.on('data', chunk => {
+    data += chunk;
+  });
+  
+  req.on('end', () => {
+    try {
+      const { postId } = JSON.parse(data);
+      
+      if (!postId) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Missing postId parameter' }));
+        return;
+      }
+      
+      // Initialize the vote files with count = 0
+      const voteData = { count: 0 };
+      
+      // Create upvotes file
+      const upvotesPath = path.join(DATA_DIRS.upvotes, `${postId}.json`);
+      fs.writeFileSync(upvotesPath, JSON.stringify(voteData, null, 2));
+      
+      // Create downvotes file
+      const downvotesPath = path.join(DATA_DIRS.downvotes, `${postId}.json`);
+      fs.writeFileSync(downvotesPath, JSON.stringify(voteData, null, 2));
+      
+      console.log(`Vote files initialized for post ${postId}`);
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+    } catch (error) {
+      console.error(`Error initializing votes for post: ${error}`);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to initialize vote files' }));
     }
   });
 }
