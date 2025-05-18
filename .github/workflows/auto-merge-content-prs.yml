@@ -1,0 +1,240 @@
+name: Auto Merge Content PRs
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+    paths:
+      - 'data/comments/**'
+      - 'data/posts/**'
+      - 'data/votes/**'
+      - 'data/upvotes/**'
+      - 'data/downvotes/**'
+      - 'data/petitions/**'
+      - 'data/signatures/**'
+      - 'data/reports/**'
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Validate JSON files
+        id: validate-json
+        run: |
+          FILES_TO_CHECK=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E 'data/.*\.json$' || true)
+          if [ -z "$FILES_TO_CHECK" ]; then
+            echo "No JSON files changed in the PR"
+            echo "validation_result=no_json_changes" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          INVALID_FILES=""
+          for file in $FILES_TO_CHECK; do
+            if [ -f "$file" ]; then
+              echo "Validating $file"
+              if ! jq empty "$file" 2>/dev/null; then
+                INVALID_FILES="$INVALID_FILES $file"
+              fi
+            fi
+          done
+
+          if [ -n "$INVALID_FILES" ]; then
+            echo "Invalid JSON files found: $INVALID_FILES"
+            echo "validation_result=invalid" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "All JSON files are valid"
+            echo "validation_result=valid" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR if validation fails
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ JSON validation failed. Please fix the formatting of the JSON files in your PR.'
+            });
+
+  add-auto-merge-label:
+    runs-on: ubuntu-latest
+    needs: validate-json
+    if: needs.validate-json.outputs.validation_result == 'valid'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR contains only data changes and add auto-merge label
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Check if PR only changes data files for content
+            const changedFiles = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            const onlyDataChanges = changedFiles.data.every(file => 
+              file.filename.startsWith('data/') &&
+              (file.filename.startsWith('data/comments/') || 
+               file.filename.startsWith('data/posts/') ||
+               file.filename.startsWith('data/votes/') ||
+               file.filename.startsWith('data/upvotes/') ||
+               file.filename.startsWith('data/downvotes/') ||
+               file.filename.startsWith('data/petitions/') ||
+               file.filename.startsWith('data/signatures/') ||
+               file.filename.startsWith('data/reports/'))
+            );
+            
+            // Check if PR already has auto-merge or dev label
+            const hasAutoMergeLabel = pr.labels.some(label => label.name === 'auto-merge');
+            const hasDevLabel = pr.labels.some(label => label.name === 'dev');
+            
+            // Add auto-merge label if it contains only data changes and doesn't already have the auto-merge label
+            // Don't add auto-merge label if it has the dev label (let dev PRs be handled separately)
+            if (onlyDataChanges && !hasAutoMergeLabel && !hasDevLabel) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['auto-merge']
+              });
+              console.log(`Added 'auto-merge' label to PR #${pr.number} as it only contains content changes`);
+              
+              // Add comment to explain the auto-merge label
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: '🏷️ Added the `auto-merge` label because this PR only contains content changes. It will be automatically merged after validation.'
+              });
+            }
+  
+  auto-merge:
+    needs: [validate-json, add-auto-merge-label]
+    if: needs.validate-json.outputs.validation_result == 'valid' || needs.validate-json.outputs.validation_result == 'no_json_changes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR is eligible for auto-merge
+        id: check-eligible
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Check if PR has relevant labels
+            const hasAutoMergeLabel = pr.labels.some(label => label.name === 'auto-merge');
+            const hasDevLabel = pr.labels.some(label => label.name === 'dev');
+            
+            // Check if PR only changes data files for comments, votes, or posts
+            const changedFiles = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            const onlyDataChanges = changedFiles.data.every(file => 
+              file.filename.startsWith('data/') &&
+              (file.filename.startsWith('data/comments/') || 
+               file.filename.startsWith('data/posts/') ||
+               file.filename.startsWith('data/votes/') ||
+               file.filename.startsWith('data/upvotes/') ||
+               file.filename.startsWith('data/downvotes/') ||
+               file.filename.startsWith('data/petitions/') ||
+               file.filename.startsWith('data/signatures/') ||
+               file.filename.startsWith('data/reports/'))
+            );
+            
+            // Only auto-merge if criteria are met and the PR doesn't have the "dev" label
+            // PRs with the "dev" label should be excluded from auto-merge, regardless of content changes
+            const isEligible = (hasAutoMergeLabel || (onlyDataChanges && !hasDevLabel));
+            
+            console.log(`PR #${pr.number} auto-merge eligibility:`)
+            console.log(`Has auto-merge label: ${hasAutoMergeLabel}`);
+            console.log(`Has dev label: ${hasDevLabel}`);
+            console.log(`Only changes data files: ${onlyDataChanges}`);
+            console.log(`Is eligible for auto-merge: ${isEligible}`);
+            
+            return isEligible;
+
+      - name: Merge PR if eligible
+        if: steps.check-eligible.outputs.result == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Check for auto-merge label to customize message
+            const hasAutoMergeLabel = pr.labels.some(label => label.name === 'auto-merge');
+            
+            // Add comment before merging with appropriate message
+            const commentBody = hasAutoMergeLabel
+              ? '🤖 Auto-merging this PR as it has the `auto-merge` label. The branch will be deleted after successful merge.'
+              : '🤖 Auto-merging this PR as it only contains content changes. The branch will be deleted after successful merge.';
+            
+            await github.rest.issues.createComment({
+              issue_number: pr.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+            
+            // Merge the PR
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              merge_method: 'squash',
+              commit_title: `Auto-merge: ${pr.title} (#${pr.number})`,
+              commit_message: `Auto-merged PR #${pr.number} as it contains only content changes.\n\n${pr.body || ''}`
+            });
+            
+            // Delete the branch after successful merge
+            // Only delete if it's in the same repository (not a fork)
+            if (pr.head.repo.full_name === pr.base.repo.full_name) {
+              const branchName = pr.head.ref;
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branchName}`
+              });
+              console.log(`Deleted branch ${branchName}`);
+            } else {
+              console.log("Not deleting branch as it belongs to a fork");
+            }

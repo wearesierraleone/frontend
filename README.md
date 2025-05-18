@@ -177,3 +177,18 @@ To work on the frontend locally:
 2. Make your changes to the HTML, CSS, or JavaScript files
 3. Test locally by opening the HTML files in a browser
 4. Deploy to GitHub Pages using the instructions in `GITHUB_PAGES_DEPLOYMENT.md`
+
+## Content Contribution Workflow
+
+This project includes an automated system for handling content contributions:
+
+### Auto-Merge Workflow
+
+The repository includes a GitHub Actions workflow that automatically processes pull requests containing content changes:
+
+1. **Validation**: Automatically validates JSON files in the PR
+2. **Smart Merging**: Auto-merges PRs that only modify content files (comments, votes, posts) 
+3. **Branch Cleanup**: Automatically deletes branches after successful merges
+4. **Simplified Collaboration**: Makes it easier for community members to contribute content
+
+For detailed information, see [AUTO_MERGE_WORKFLOW.md](docs/AUTO_MERGE_WORKFLOW.md)

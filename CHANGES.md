@@ -18,6 +18,16 @@
 - **Added Testing Tool**: Created sync_ui_test.html diagnostic tool for testing sync functionality
 - **Updated Documentation**: Created SYNC_UI_COMPONENT.md and updated GITHUB_PAGES_LOCALSTORAGE.md
 
+### Auto-Merge Content PRs Workflow
+- **Added GitHub Actions Workflow**: Created auto-merge-content-prs.yml for automated content PR handling
+- **JSON Validation**: Added automatic validation of JSON files in PRs
+- **Smart Auto-Merge**: Implemented intelligent criteria for merging content-only PRs
+- **Branch Cleanup**: Automated branch deletion after successful merges
+- **Enhanced Collaboration**: Streamlined content contribution process for community members
+- **Updated for New File Structure**: Modified workflow paths to use the new per-post file structure
+- **Auto-Label Application**: Added automatic application of the auto-merge label for eligible PRs
+- **Dev Label Support**: Added special handling for PRs with the "dev" label to exclude them from auto-merge
+
 ### Repository Structure Update
 - **Data File Location Change**: Data files moved from `wearesierraleone/wearesalone` repository to `wearesierraleone/frontend/data`
 - **Updated URL References**: Changed all repository URL references from the old backend repository to the new frontend repository

@@ -125,3 +125,16 @@ This project supports multiple local development server options with dynamic por
 - Enhanced API server with post submission support
 - VS Code Live Server compatible options
 - Troubleshooting connection issues
+
+## Content Contribution
+
+### Auto-Merge Workflow
+
+The repository includes a GitHub Actions workflow (`auto-merge-content-prs.yml`) to streamline content contributions:
+
+- Automatically validates JSON formats
+- Auto-merges pull requests that only modify content files (comments, votes, posts)
+- Deletes branches after successful merges
+- Makes it easier for community members to contribute content without requiring manual review
+
+For details on how this workflow functions and how to use it effectively, see `AUTO_MERGE_WORKFLOW.md`.
