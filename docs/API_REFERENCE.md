@@ -134,6 +134,28 @@ Create a new petition associated with a post.
 
 > Note: As of May 2025, petition creation has been updated to use direct server submission without modal notifications.
 
+### POST /initialize-votes
+
+Initialize vote files for a new post to prevent 404 errors when fetching vote data.
+
+**Request body:**
+```json
+{
+  "postId": "post_id",
+  "timestamp": "2025-05-17T12:34:56Z"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Vote files initialized successfully"
+}
+```
+
+> Note: This endpoint creates empty upvote and downvote files with a count of 0 to ensure that vote data can be loaded properly for new posts.
+
 ## Data URLs
 
 The following data files are available at the backend repository:

@@ -2,6 +2,13 @@
 
 ## May 2025 Updates
 
+### Error Handling Enhancements
+- **Improved Vote Loading**: Added automatic vote file initialization to prevent 404 errors for new posts
+- **Enhanced Error Handling**: Updated loadVotes function to gracefully handle missing vote files
+- **New API Endpoints**: Added /initialize-votes endpoint to both local server and Flask API
+- **Streamlined Post Creation**: Automatically initialize vote files when new posts are submitted
+- **Cache Busting**: Added cache-busting for local development to prevent stale vote data
+
 ### Data Structure Migration
 - **New Per-Post File Structure**: Migrated from single aggregated files to individual files per post
 - **Enhanced Scalability**: Improved performance for handling large numbers of posts and comments
