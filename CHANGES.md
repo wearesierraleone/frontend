@@ -32,6 +32,9 @@
 ### Auto-Merge Content PRs Workflow
 - **Added GitHub Actions Workflow**: Created auto-merge-content-prs.yml for automated content PR handling
 - **JSON Validation**: Added automatic validation of JSON files in PRs
+- **Auto Index Updates**: Added functionality to automatically update index.json files when new content is added
+- **Improved Content Discovery**: Ensures all newly added posts and comments are properly indexed
+- **Enhanced Documentation**: Updated AUTO_MERGE_WORKFLOW.md with details on the index updating process
 - **Smart Auto-Merge**: Implemented intelligent criteria for merging content-only PRs
 - **Branch Cleanup**: Automated branch deletion after successful merges
 - **Enhanced Collaboration**: Streamlined content contribution process for community members

@@ -138,8 +138,224 @@ jobs:
               });
             }
   
-  auto-merge:
+  update-indexes:
     needs: [validate-json, add-auto-merge-label]
+    if: needs.validate-json.outputs.validation_result == 'valid'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Update index files for new content
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            const pr = context.payload.pull_request;
+            
+            // Get list of changed files in the PR
+            const changedFiles = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number
+            });
+            
+            // Track which index files we need to update
+            const indexUpdates = {
+              posts: new Set(),
+              comments: new Map() // Stores postId -> Set of comment files
+            };
+            
+            // Analyze changed files to find new content to add to indexes
+            for (const file of changedFiles.data) {
+              console.log(`Checking file: ${file.filename}`);
+              
+              // Skip deleted files
+              if (file.status === 'removed') {
+                console.log(`Skipping deleted file: ${file.filename}`);
+                continue;
+              }
+              
+              // Check for new posts
+              if (file.filename.startsWith('data/posts/') && !file.filename.includes('index.json')) {
+                console.log(`Found post file: ${file.filename}`);
+                const fileName = path.basename(file.filename);
+                
+                // Only add to index if this is a new file
+                if (file.status === 'added') {
+                  indexUpdates.posts.add(fileName);
+                }
+              }
+              
+              // Check for new comments
+              if (file.filename.startsWith('data/comments/')) {
+                const pathParts = file.filename.split('/');
+                
+                // Skip if not the right format (should be data/comments/{postId}/{commentFile})
+                if (pathParts.length >= 4 && !pathParts[3].includes('index.json')) {
+                  const postId = pathParts[2];
+                  const commentFileName = pathParts[3];
+                  
+                  // Only add to index if this is a new file
+                  if (file.status === 'added') {
+                    if (!indexUpdates.comments.has(postId)) {
+                      indexUpdates.comments.set(postId, new Set());
+                    }
+                    indexUpdates.comments.get(postId).add(commentFileName);
+                  }
+                }
+              }
+            }
+            
+            // Update posts index if we found new posts
+            if (indexUpdates.posts.size > 0) {
+              const postsIndexPath = 'data/posts/index.json';
+              
+              try {
+                let postsIndex = { files: [] };
+                
+                // Read existing index if it exists
+                if (fs.existsSync(postsIndexPath)) {
+                  const indexContent = fs.readFileSync(postsIndexPath, 'utf-8');
+                  postsIndex = JSON.parse(indexContent);
+                  
+                  if (!Array.isArray(postsIndex.files)) {
+                    postsIndex.files = [];
+                  }
+                }
+                
+                // Add new entries
+                let updatedCount = 0;
+                for (const fileName of indexUpdates.posts) {
+                  if (!postsIndex.files.includes(fileName)) {
+                    postsIndex.files.push(fileName);
+                    updatedCount++;
+                  }
+                }
+                
+                // Write updated index if we actually added anything
+                if (updatedCount > 0) {
+                  fs.writeFileSync(postsIndexPath, JSON.stringify(postsIndex, null, 2));
+                  console.log(`Updated ${postsIndexPath} with ${updatedCount} new files`);
+                  
+                  // Commit the updated index file
+                  await github.rest.repos.createOrUpdateFileContents({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    path: postsIndexPath,
+                    message: `Update posts index.json with ${updatedCount} new entries [skip ci]`,
+                    content: Buffer.from(JSON.stringify(postsIndex, null, 2)).toString('base64'),
+                    committer: {
+                      name: 'GitHub Actions',
+                      email: 'actions@github.com'
+                    },
+                    author: {
+                      name: 'GitHub Actions',
+                      email: 'actions@github.com'
+                    },
+                    branch: 'main'
+                  });
+                }
+              } catch (error) {
+                console.error(`Error updating posts index: ${error.message}`);
+              }
+            }
+            
+            // Update comment indexes if we found new comments
+            if (indexUpdates.comments.size > 0) {
+              for (const [postId, commentFiles] of indexUpdates.comments.entries()) {
+                const postDir = `data/comments/${postId}`;
+                const commentsIndexPath = `${postDir}/index.json`;
+                
+                try {
+                  // Ensure the directory exists
+                  if (!fs.existsSync(postDir)) {
+                    fs.mkdirSync(postDir, { recursive: true });
+                  }
+                  
+                  let commentsIndex = { files: [] };
+                  
+                  // Read existing index if it exists
+                  if (fs.existsSync(commentsIndexPath)) {
+                    const indexContent = fs.readFileSync(commentsIndexPath, 'utf-8');
+                    commentsIndex = JSON.parse(indexContent);
+                    
+                    if (!Array.isArray(commentsIndex.files)) {
+                      commentsIndex.files = [];
+                    }
+                  }
+                  
+                  // Add new entries
+                  let updatedCount = 0;
+                  for (const fileName of commentFiles) {
+                    if (!commentsIndex.files.includes(fileName)) {
+                      commentsIndex.files.push(fileName);
+                      updatedCount++;
+                    }
+                  }
+                  
+                  // Write updated index if we actually added anything
+                  if (updatedCount > 0) {
+                    fs.writeFileSync(commentsIndexPath, JSON.stringify(commentsIndex, null, 2));
+                    console.log(`Updated ${commentsIndexPath} with ${updatedCount} new files`);
+                    
+                    // Commit the updated index file
+                    await github.rest.repos.createOrUpdateFileContents({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      path: commentsIndexPath,
+                      message: `Update comments index.json for post ${postId} with ${updatedCount} new entries [skip ci]`,
+                      content: Buffer.from(JSON.stringify(commentsIndex, null, 2)).toString('base64'),
+                      committer: {
+                        name: 'GitHub Actions',
+                        email: 'actions@github.com'
+                      },
+                      author: {
+                        name: 'GitHub Actions',
+                        email: 'actions@github.com'
+                      },
+                      branch: 'main'
+                    });
+                  }
+                } catch (error) {
+                  console.error(`Error updating comments index for ${postId}: ${error.message}`);
+                }
+              }
+            }
+            
+            // Add a comment to the PR if we updated any indexes
+            if (indexUpdates.posts.size > 0 || indexUpdates.comments.size > 0) {
+              let message = '📋 Index files have been updated:\n\n';
+              
+              if (indexUpdates.posts.size > 0) {
+                message += `- Added ${indexUpdates.posts.size} new post(s) to posts/index.json\n`;
+              }
+              
+              if (indexUpdates.comments.size > 0) {
+                message += `- Updated comment indexes for ${indexUpdates.comments.size} post(s)\n`;
+              }
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: message
+              });
+            }
+
+  auto-merge:
+    needs: [validate-json, add-auto-merge-label, update-indexes]
     if: needs.validate-json.outputs.validation_result == 'valid' || needs.validate-json.outputs.validation_result == 'no_json_changes'
     runs-on: ubuntu-latest
     permissions:
