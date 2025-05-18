@@ -2,6 +2,11 @@
 
 ## May 2025 Updates
 
+### Bugfixes
+- **Post Submission Fix**: Fixed "submitPost is not defined" error by adding data_service.js script to submit.html
+- **Production Mode**: Ensured post submission works correctly in GitHub Pages environment
+- **Script Dependencies**: Improved script loading order for proper function availability
+
 ### Error Handling Enhancements
 - **Improved Vote Loading**: Added automatic vote file initialization to prevent 404 errors for new posts
 - **Enhanced Error Handling**: Updated loadVotes function to gracefully handle missing vote files
