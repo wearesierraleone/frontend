@@ -17,6 +17,7 @@ function handleCommentSubmission(event) {
   localStorage.setItem('anonId', anonId);
 
   const comment = { 
+    id: 'comment-' + Date.now(), // Generate a unique ID
     postId, 
     text, 
     anonId, 
@@ -34,45 +35,38 @@ function handleCommentSubmission(event) {
     }
   }
   
-  // Submit directly to the server - without showing success modal
-  postContent(
-    '/comment',
-    comment,
-    null, // Remove success message
-    null,
-    'Failed to submit comment'
-  )
-  .then(() => {
-    // Check if we're running in static/GitHub Pages mode
-    const apiUrl = typeof baseUrl === 'function' ? baseUrl() : '';
-    const isStaticMode = (apiUrl === '' || apiUrl === '/api');
-    
-    if (isStaticMode) {
-      // In static mode, manually add the comment to UI
-      appendCommentToUI(comment);
-    } else {
-      // In server mode, reload the page to show updated comments
-      location.reload();
-    }
-  })
-  .finally(() => {
-    // Reset form
-    form.reset();
-    
-    // Re-enable submit button
-    setTimeout(() => {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit';
-        if (submitBtn.classList.contains('bg-blue-600')) {
-          submitBtn.classList.remove('opacity-50');
-        }
+  // Use the data service to submit the comment
+  submitComment(comment)
+    .then(success => {
+      if (success) {
+        // In static mode or for immediate feedback, manually add the comment to UI
+        appendCommentToUI(comment);
+      } else {
+        console.log('Comment submitted but may require refresh to see');
       }
-    }, 500);
-  });
+    })
+    .catch(error => {
+      console.error('Failed to submit comment:', error);
+      showSuccessModal('Failed to submit comment', null, 0, 'error');
+    })
+    .finally(() => {
+      // Reset form
+      form.reset();
+      
+      // Re-enable submit button
+      setTimeout(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit';
+          if (submitBtn.classList.contains('bg-blue-600')) {
+            submitBtn.classList.remove('opacity-50');
+          }
+        }
+      }, 500);
+    });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('commentForm');
   const list = document.getElementById('commentList');
   const postId = new URLSearchParams(window.location.search).get('id');
@@ -81,6 +75,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Use the global handleCommentSubmission function
   form.addEventListener('submit', handleCommentSubmission);
+  
+  // Load comments for this post if we have a list and postId
+  if (list && postId) {
+    // Show loading state
+    list.innerHTML = '<div class="text-center py-4"><span class="inline-block animate-spin mr-2">⏳</span> Loading comments...</div>';
+    
+    try {
+      // Use the data service to load comments
+      const comments = await loadComments(postId);
+      
+      // Clear the list
+      list.innerHTML = '';
+      
+      // If no comments, show a message
+      if (!comments || comments.length === 0) {
+        list.innerHTML = '<div class="text-gray-500 italic p-4">No comments yet. Be the first to comment!</div>';
+        return;
+      }
+      
+      // Sort comments by timestamp (newest first)
+      const sortedComments = [...comments].sort((a, b) => 
+        new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      
+      // Add each comment to the UI
+      sortedComments.forEach(comment => appendCommentToUI(comment));
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      list.innerHTML = '<div class="text-red-500 p-4">Failed to load comments. Please try refreshing the page.</div>';
+    }
+  }
 });
 
 /**

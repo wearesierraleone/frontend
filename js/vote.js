@@ -1,7 +1,7 @@
 /**
  * Vote handling functionality
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const voteBtn = document.getElementById('voteButton');
   if (!voteBtn) return;
 
@@ -9,6 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!postId) {
     console.error('No post ID found in URL');
     return;
+  }
+  
+  // Load initial vote count
+  try {
+    const voteData = await loadVotes(postId);
+    
+    // Update the UI with vote counts
+    const voteCountElement = document.getElementById('voteCount');
+    if (voteCountElement && voteData) {
+      voteCountElement.textContent = voteData.up.toString();
+    }
+  } catch (error) {
+    console.error('Error loading votes:', error);
   }
   
   // Check if user already voted on this post
@@ -25,56 +38,31 @@ document.addEventListener('DOMContentLoaded', () => {
     voteBtn.disabled = true;
     voteBtn.classList.add('opacity-50');
     
-    const vote = { 
-      postId,
-      type: 'upvote', // Changed from 'vote' to be more specific
-      timestamp: new Date().toISOString() 
-    };
-
-    // Check if we're on GitHub Pages
-    const isGitHubPages = window.location.hostname.includes('github.io');
-    
-    if (isGitHubPages) {
-      try {
-        // Use local storage for GitHub Pages
-        if (typeof saveVoteLocally === 'function') {
-          saveVoteLocally(vote);
-          voteBtn.innerText = 'Voted';
-          voteBtn.classList.add('cursor-not-allowed');
-          
-          // Update vote count in the UI if possible
-          const voteCountElement = document.getElementById('voteCount');
-          if (voteCountElement) {
-            const currentCount = parseInt(voteCountElement.textContent || '0', 10);
-            voteCountElement.textContent = (currentCount + 1).toString();
-          }
-        } else {
-          throw new Error('localStorage sync functionality not available');
+    try {
+      // Use the data service to submit the vote
+      const success = await submitVote(postId, 'up');
+      
+      if (success) {
+        // Mark as voted in localStorage to prevent double voting
+        localStorage.setItem(`voted-${postId}`, 'true');
+        
+        voteBtn.innerText = 'Voted';
+        voteBtn.classList.add('cursor-not-allowed');
+        
+        // Update vote count in the UI if possible
+        const voteCountElement = document.getElementById('voteCount');
+        if (voteCountElement) {
+          const currentCount = parseInt(voteCountElement.textContent || '0', 10);
+          voteCountElement.textContent = (currentCount + 1).toString();
         }
-      } catch (error) {
-        console.error('Vote error:', error);
-        voteBtn.disabled = false;
-        voteBtn.classList.remove('opacity-50');
-        alert('Failed to save your vote. Please try again later.');
+      } else {
+        throw new Error('Vote submission failed');
       }
-    } else {
-      // For non-GitHub Pages, use API
-      postContentWithCallback(
-        '/vote',
-        vote,
-        () => {
-          voteBtn.innerText = 'Voted';
-          voteBtn.classList.add('cursor-not-allowed');
-          // No success modal
-        },
-        'Failed to submit vote. Please try again.'
-      )
-      .catch((error) => {
-        console.error('Vote error:', error);
-        // Reset the button if there's an error
-        voteBtn.disabled = false;
-        voteBtn.classList.remove('opacity-50');
-      });
+    } catch (error) {
+      console.error('Vote error:', error);
+      voteBtn.disabled = false;
+      voteBtn.classList.remove('opacity-50');
+      alert('Failed to save your vote. Please try again later.');
     }
   });
 });

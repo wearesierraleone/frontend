@@ -85,97 +85,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Prepare post data
     const post = {
       ...formData,
+      id: `post-${Date.now()}`, // Generate a unique ID
       timestamp: new Date().toISOString(),
-      status: 'pending'
+      status: 'approved'
     };
     
-    // Check if we're on GitHub Pages
-    const isGitHubPages = window.location.hostname.includes('github.io');
+    console.log('Submitting post:', post);
     
-    console.log('Submitting post:', post, 'Is GitHub Pages:', isGitHubPages);
-    
-    // Simple direct post approach
-    // First load existing posts
-    fetch('data/approved.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to load posts: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(existingPosts => {
-        // Add a unique ID to the post
-        post.id = `post${Date.now()}`;
-        
-        // Add the post to the existing posts array
-        const updatedPosts = [...existingPosts, post];
-        
-        // In a real application, this would make an API call to save the post
-        // For local development, we need to save through another mechanism
-        console.log('New post created:', post);
-        
-        // Check if we're in development and using our enhanced server
-        // This ensures we only try to use the API when the correct server is running
-        // We now check for multiple possible ports that our dynamic port selection might use
-        const commonDevPorts = ['5500', '5501', '5502', '5503', '8080', '8081', '3000', '3001'];
-        const currentPort = window.location.port;
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const isEnhancedServer = isLocalhost && commonDevPorts.includes(currentPort);
-        
-        if (isEnhancedServer) {
-          // We're running on our enhanced API server
-          console.log('Using enhanced server with API support');
-          // Send the updated posts array to our local server endpoint
-          fetch('/save-post', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              post: post,
-              allPosts: updatedPosts
-            })
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Success:', data);
-            // Direct redirect without showing a modal
-            window.location.href = 'index.html';
-          })
-          .catch(saveError => {
-            console.error('Error saving post:', saveError);
-            // Use a simple alert instead of modal
-            alert(`Unable to save the post. Server connection error.\nMake sure you started the enhanced server with:\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`);
-          });
-        } else if (isGitHubPages) {
-          // We're on GitHub Pages - using direct save instead of Flask API
-          console.log('Running on GitHub Pages - using direct save');
-          
-          // Directly save to localStorage and redirect
-          if (typeof savePostLocally === 'function') {
-            savePostLocally(post);
-            console.log('Post saved to localStorage for GitHub Pages');
-            // Direct redirect without showing a modal
-            window.location.href = 'index.html';
-          } else {
-            // Only show an alert if localStorage save fails
-            alert('Failed to save post. localStorage functionality not available.');
-          }
-        } else {
-          // We're on another development server without API support
-          console.log('Not using enhanced server. Port: ' + window.location.port);
-          // Instead of a modal, alert and redirect
-          alert(`Demo mode: Post would be saved with pending status. To actually save posts, run one of the API servers:\n\n./scripts/start_local_server_with_api.sh\n\nCurrent port: ${window.location.port}`);
+    // Use data service to submit the post
+    submitPost(post)
+      .then(success => {
+        if (success) {
+          console.log('Post submitted successfully');
+          // Redirect to index page
           window.location.href = 'index.html';
+        } else {
+          throw new Error('Failed to submit post');
         }
       })
       .catch(error => {
-        console.error('Error processing post:', error);
+        console.error('Error submitting post:', error);
         // Use alert instead of modal
         alert('Failed to submit post, please try again.');
       })
