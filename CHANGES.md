@@ -2,6 +2,25 @@
 
 ## May 2025 Updates
 
+### Data Structure Migration
+- **New Per-Post File Structure**: Migrated from single aggregated files to individual files per post
+- **Enhanced Scalability**: Improved performance for handling large numbers of posts and comments
+- **Better Granularity**: Simplified updating individual posts, comments, votes, and signatures
+- **Backward Compatibility**: Added fallback to legacy structure for smooth transition
+- **Migration Tools**: Created scripts for data migration and updating code references
+- **Comprehensive Documentation**: Added DATA_MIGRATION.md explaining the new architecture
+- **Testing Framework**: Created test_data_structure.js and test_data_structure.sh to verify proper migration
+- **Enhanced Server**: Updated enhanced_server.js to fully support the new data structure
+- **Local Development Testing**: Added tools to test both structures side-by-side
+
+### Comment System Code Refactor
+- **Improved Code Organization**: Moved reply handling functionality from post.html to a separate reply-handler.js file
+- **Enhanced Maintainability**: Separated UI rendering, event handlers, and data operations for better code organization
+- **Proper Integration**: Updated post-loader.js to use the new reply-handler.js functionality
+- **Consistent Status Handling**: Ensured all comments and replies are set to "approved" status by default
+- **Better Error Handling**: Improved error handling for comment and reply submission
+- **Removed Modal Popups**: Eliminated showSuccessModal calls from submitComment, submitReply, and flagComment functions for a cleaner user experience
+
 ### GitHub Pages Sync UI Component Addition
 - **Added Sync UI Component**: Created new sync-ui.js that provides a UI to trigger GitHub Actions sync
 - **Enhanced Sync Functionality**: Improved triggerGitHubSync function with better error handling
@@ -9,6 +28,16 @@
 - **Improved Data Processing Script**: Enhanced process_local_storage_data.js to handle localStorage data
 - **Added Testing Tool**: Created sync_ui_test.html diagnostic tool for testing sync functionality
 - **Updated Documentation**: Created SYNC_UI_COMPONENT.md and updated GITHUB_PAGES_LOCALSTORAGE.md
+
+### Auto-Merge Content PRs Workflow
+- **Added GitHub Actions Workflow**: Created auto-merge-content-prs.yml for automated content PR handling
+- **JSON Validation**: Added automatic validation of JSON files in PRs
+- **Smart Auto-Merge**: Implemented intelligent criteria for merging content-only PRs
+- **Branch Cleanup**: Automated branch deletion after successful merges
+- **Enhanced Collaboration**: Streamlined content contribution process for community members
+- **Updated for New File Structure**: Modified workflow paths to use the new per-post file structure
+- **Auto-Label Application**: Added automatic application of the auto-merge label for eligible PRs
+- **Dev Label Support**: Added special handling for PRs with the "dev" label to exclude them from auto-merge
 
 ### Repository Structure Update
 - **Data File Location Change**: Data files moved from `wearesierraleone/wearesalone` repository to `wearesierraleone/frontend/data`

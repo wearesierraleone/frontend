@@ -2,6 +2,52 @@
 
 This document provides technical details about recent enhancements to the "We Are Sierra Leone" civic platform.
 
+## Modular Comment System Refactoring
+
+The comment and reply system has been refactored to improve code organization and maintainability.
+
+### Implementation Details
+
+#### Code Structure
+- Moved reply handling from post.html to a dedicated reply-handler.js file
+- Updated post-loader.js to use the new functionality
+- Proper integration between the two through function calls
+
+#### Key Components
+```javascript
+// reply-handler.js
+function showReplyForm(commentId) { /* Shows the reply form */ }
+function hideReplyForm(commentId) { /* Hides the reply form */ }
+async function submitReply(postId, parentCommentId) { /* Handles reply submission */ }
+function renderReplies(comment, postId) { /* Renders nested replies HTML */ }
+function flagComment(postId, commentId) { /* Flags inappropriate content */ }
+
+// Helper functions for finding and modifying nested comments
+function findAndAddReply(commentList, targetId, newReply) { /* ... */ }
+function findAndFlagComment(commentsList, targetId) { /* ... */ }
+```
+
+#### Integration in post-loader.js
+```javascript
+// In loadPostComments function
+${comment.replies && comment.replies.length > 0 ? 
+  `<div id="replies-${comment.id}" class="mt-3 pl-8">
+    ${renderReplies(comment, postId)}
+   </div>` 
+  : ''}
+```
+
+#### Exposing Functions Globally
+```javascript
+// Make functions available for use in HTML event handlers
+window.showReplyForm = showReplyForm;
+window.hideReplyForm = hideReplyForm;
+window.submitReply = submitReply;
+window.flagComment = flagComment;
+```
+
+For complete documentation on the comment system architecture, see `COMMENT_SYSTEM.md`.
+
 ## Expandable FAQ System
 
 The FAQ section has been enhanced with a modern, accessible implementation that provides a better user experience.

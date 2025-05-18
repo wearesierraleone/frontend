@@ -17,6 +17,14 @@ This project uses a simplified approach with data files stored directly in the r
 
 ## Key Features
 
+### Modular Comment System
+The comment and reply system has been refactored to improve code organization:
+- Dedicated reply-handler.js module for reply functionality
+- Integrated with the post display system via post-loader.js
+- Support for nested replies and comment flagging
+- Default "approved" status with post-moderation approach
+- See `COMMENT_SYSTEM.md` for detailed architecture documentation
+
 ### Expandable FAQ Section
 The FAQ page (`faq.html`) includes an enhanced user experience:
 - Collapsible content sections with smooth animations
@@ -117,3 +125,16 @@ This project supports multiple local development server options with dynamic por
 - Enhanced API server with post submission support
 - VS Code Live Server compatible options
 - Troubleshooting connection issues
+
+## Content Contribution
+
+### Auto-Merge Workflow
+
+The repository includes a GitHub Actions workflow (`auto-merge-content-prs.yml`) to streamline content contributions:
+
+- Automatically validates JSON formats
+- Auto-merges pull requests that only modify content files (comments, votes, posts)
+- Deletes branches after successful merges
+- Makes it easier for community members to contribute content without requiring manual review
+
+For details on how this workflow functions and how to use it effectively, see `AUTO_MERGE_WORKFLOW.md`.
